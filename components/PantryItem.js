@@ -25,7 +25,7 @@ import * as Utils from '../utils/utils';
 // { Picker } for implementing date selection
 
 
-export default function PantryAccordionItem({ item, exports }) {
+export default function PantryItem({ item, exports }) {
 	const { mode } = useSelector(S => S.global);
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
@@ -73,6 +73,7 @@ export default function PantryAccordionItem({ item, exports }) {
 			</TouchableOpacity>
 		);
 	}
+// Doing it without ListView
 
 	return (
 		<Collapse>
@@ -194,6 +195,215 @@ export default function PantryAccordionItem({ item, exports }) {
 			</CollapseBody>
 		</Collapse>
 	);
+// end doing it without listview
+
+// Doing it with listview
+/*
+
+	return (
+		<Collapse>
+			<CollapseHeader>
+				<View style={{ flexAlign: 'row' }}>
+					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
+					<ListItem>
+						<ListItem.Content>
+							<ListItem.Title
+								style={mode === 'list'
+									? item.needed
+										? _Styles.textItemName
+										: _Styles.textItemNameChecked
+									: _Styles.textItemName
+								}
+							>
+								{item.name}
+							</ListItem.Title>
+							<ListItem.Subtitle>
+								<View style={{ flex: 8, flexAlign: 'row' }}>
+									<Text style={_Styles.textItemQtyLabel}>
+										Qty:
+									</Text>
+									<Text style={_Styles.textItemQty}>
+										{item.qty}
+									</Text>
+								</View>
+								<View style={{ flex: 4 }}>
+									{ item.staple && <Icon
+										name='refresh'
+										type='font-awesome'
+										style={{ padding: 3, size: 12, color: 'lightgray' }}
+									/>
+									}
+								</View>
+							</ListItem.Subtitle>
+						</ListItem.Content>
+					</ListItem>
+				</View>
+			</CollapseHeader>
+			<CollapseBody>
+				<View>
+					<Image
+						source={{ uri: _DefaultImage }}
+						style={{
+							width: '70%',
+							height: 'auto'
+						}}
+					/>
+				</View>
+				<View style={{ flexDirection: 'row' }}>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Price:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.price || '-'}
+						</Text>
+					</View>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Location:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.loc || '-'}
+						</Text>
+					</View>
+				</View>
+
+				<View style={{ flexDirection: 'row' }}>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Last purchased:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.history[0] ? Utils.parseDate(item.history[0]) : '-'}
+						</Text>
+					</View>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Purchase by:
+						</Text>
+						<Button
+							onPress={_ => setShowCalendar(!showCalendar)}
+							title={item.purchaseBy
+								? Utils.parseDate(item.purchaseBy)
+								: '-'
+							}
+						/>
+						{ showCalendar && (
+							<DateTimePicker
+								value={pickDate}
+								mode='date'
+								display='calendar'
+								onChange={onCalendarChange}
+								minimumDate={Date.now()}
+							/>
+						)}
+					</View>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						URL:
+					</Text>
+					<Text style={_Styles.textItemDetailText}>
+						{item.url || '-'}
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						UPC:
+					</Text>
+					<Text style={_Styles.textItemDetailText}>
+						{item.upc || '-'}
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						Notes
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailText}>
+						{item.notes || '...'}
+					</Text>
+				</View>
+			</CollapseBody>
+		</Collapse>
+	);
+
+*/
+
+// Using SwipeRow instead of the list container
+/*
+		<SwipeRow rightOpenValue={-100}>
+			<View style={_Styles.itemSwipeView}>
+				<TouchableOpacity
+					style={{ backgroundColor: 'green', height: '100%' }}
+					onPress={_ => handleEdit(item)}
+				>
+					<Icon
+						name='pencil'
+						type='font-awesome'
+					/>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={{ backgroundColor: 'yellow', height: '100%' }}
+					onPress={_ => Alert.alert(
+						'Delete item?',
+						`Are you sure you wish to delete the item ${item.name} from
+						your pantry?  Your purchase history for this item will be lost!`,
+						[
+							{
+								text: 'Cancel',
+								style: 'cancel'
+							},
+							{
+								text: 'OK',
+								onPress: _ => handleDelete(item)
+							}
+						],
+						{ cancelable: false }
+					)}
+				>
+					<Icon
+						name='close'
+						type='font-awesome'
+					/>
+				</TouchableOpacity>
+			</View>
+			<View style={_Styles.viewList}>
+				<TouchableOpacity
+					style={{ flex: 1 }}
+					onPress={_ => handleAdd(item)}
+				>
+					<View>
+						<Icon
+							name={item.listed ? 'minus' : 'plus'}
+							type='font-awesome'
+						/>
+					</View>
+				</TouchableOpacity>
+				<View style={{ flex: 8 }}>
+					<Text
+						style={_Styles.textItemName}
+					>
+						{item.name}
+					</Text>
+				</View>
+				<View style={{ flex: 3 }}>
+					<Text
+						style={_Styles.textItemQtyLabel}
+					>
+						Qty:
+					</Text>
+					<Text
+						style={_Styles.textItemQty}
+					>
+						{item.qty}
+					</Text>
+				</View>
+			</View>
+		</SwipeRow>
+	);
+*/
 
 }
 
