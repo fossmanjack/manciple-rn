@@ -3,13 +3,12 @@
 // Calls ListViewHiddenButtons and PantryViewHiddenButtons
 // Expects the pantry item object and dispatch functions as props
 import {
-	Button,
 	Image,
 	Text,
 	TouchableOpacity,
 	View
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Icon, Button } from 'react-native-elements';
 import { useState } from 'react';
 import {
 	Collapse,

@@ -1,12 +1,15 @@
 import {
-	Button,
 	Modal,
 	Text,
 	TouchableOpacity,
 	View
 } from 'react-native';
 import { useState } from 'react';
-import { Icon, Input } from 'react-native-elements';
+import {
+	Button,
+	Icon,
+	Input
+} from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { _Styles } from '../res/_Styles';
@@ -152,26 +155,32 @@ export default function MainScreen() {
 						/>
 					)
 				}}
-				renderHiddenItem={(data, rowKey) => {
+				renderHiddenItem={(data, rowMap) => {
 					const { item: { item }} = data;
 					return (
 					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-						<TouchableOpacity
-							onPress={_ => editItem(item)}
-						>
-							<Icon
-								name='pencil'
-								type='font-awesome'
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
+						<Button
+							onPress={_ => {
+									editItem(item);
+									rowMap[item.id].close();
+								}
+							}
+							icon={
+								<Icon
+									name='pencil'
+									type='font-awesome'
+								/>
+							}
+						/>
+						<Button
 							onPress={_ => handleToggleStaple(item.id)}
-						>
-							<Icon
-								name={item.staple ? 'toggle-on' : 'toggle-off'}
-								type='font-awesome'
-							/>
-						</TouchableOpacity>
+							icon={
+								<Icon
+									name={item.staple ? 'toggle-on' : 'toggle-off'}
+									type='font-awesome'
+								/>
+							}
+						/>
 					</View>
 				)
 				}}
