@@ -88,6 +88,7 @@ const pantriesSlice = createSlice({
 			{
 				item.listed = true;
 				item.needed = true;
+				item.qty === qty || item.qty = qty;
 				pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
 			} else {
 				pantriesState._Pantries[pantriesState.currentPantry].inventory.push(createPantryItem({ name, id: idx, qty }));

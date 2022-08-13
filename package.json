@@ -3,12 +3,22 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "license": "GPL-3.0-only",
+  "homepage": "https://github.com/meyersjm/manciple-rn",
+  "bugs": {
+  	  "url": "https://github.com/meyersjm/manciple-rn/issues",
+  	  "email": "manciple@jackmeyers.co"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject"
+  },
+  "author": {
+  	  "name": "Jack Meyers",
+  	  "email": "jack@jackmeyers.co",
+  	  "url": "https://jackmeyers.co"
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "6.1.2",
