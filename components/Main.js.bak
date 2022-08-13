@@ -1,0 +1,34 @@
+import {
+	Button,
+	FlatList,
+	ScrollView,
+	Text,
+	TouchableOpacity,
+	View
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import { SwipeRow } from 'react-native-swipe-list-view';
+import { _Styles } from '../res/_Styles';
+import * as Global from '../slices/globalSlice';
+import * as Pantry from '../slices/pantriesSlice';
+import * as Options from '../slices/optionsSlice';
+import * as Utils from '../utils/utils';
+import renderListViewItem from './ListViewItem';
+import renderPantryViewItem from './PantryViewItem';
+
+export default function Main() {
+	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { mode } = useSelector(S => S.global);
+	const dispatch = useDispatch();
+
+	return (
+		<FlatList
+			data={_Pantries[currentPantry].inventory.filter(i => mode === 'list' ? i.listed : i)}
+			renderItem={mode === 'list'
+				? item => renderListViewItem({ ...item, index: item.item.id, dispatch })
+				: item => renderPantryViewItem({ ...item, index: item.item.id, dispatch })}
+			dispatch={dispatch}
+		/>
+	);
+}
