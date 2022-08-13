@@ -1,4 +1,4 @@
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import {
 	Text,
@@ -7,8 +7,12 @@ import {
 import { _Store } from './res/_Store';
 import { _Styles } from './res/_Styles';
 import MainScreen from './screens/MainScreen';
+import * as Global from './slices/globalSlice';
 
 export default function App() {
+	const dispatch = useDispatch();
+	dispatch(Global.setLastUse(Date.now()));
+
 	return (
 		<NavigationContainer>
 			<Provider store={_Store}>
