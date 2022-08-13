@@ -12,7 +12,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { _Styles } from '../res/_Styles';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import PantryItem from '../components/PantryAccordionItem';
+import PantryItem from '../components/PantryItem';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
 import * as Utils from '../utils/utils';
