@@ -37,6 +37,8 @@ export default function MainScreen() {
 	const [ updatedNotes, setUpdatedNotes ] = useState('');
 	//const [ updatedPurchaseBy, setUpdatedPurchaseBy ] = useState({});
 
+	//dispatch(Global.setLastUse(Date.now()));
+
 	const handleCheckBox = itemID => {
 		console.log("handleCheckBox called with item", itemID);
 

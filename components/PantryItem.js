@@ -76,8 +76,8 @@ export default function PantryItem({ item, exports }) {
 
 	return (
 		<Collapse>
-			<CollapseHeader>
-				<View style={_Styles.viewList}>
+			<CollapseHeader style={{ backgroundColor: 'white'}}>
+				<View style={_Styles.viewList }>
 					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
 					<View style={{ flex: 8, flexDirection: 'row' }}>
 						<Text
