@@ -76,7 +76,7 @@ export default function PantryItem({ item, exports }) {
 
 	return (
 		<Collapse>
-			<CollapseHeader style={{ backgroundColor: 'white'}}>
+			<CollapseHeader style={{ backgroundColor: 'white' }}>
 				<View style={_Styles.viewList }>
 					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
 					<View style={{ flex: 8, flexDirection: 'row' }}>
@@ -110,8 +110,7 @@ export default function PantryItem({ item, exports }) {
 					<Image
 						source={{ uri: _DefaultImage }}
 						style={{
-							width: '70%',
-							height: 'auto'
+							width: 200
 						}}
 					/>
 				</View>

@@ -14,6 +14,10 @@
 - [ ] Pantry mode (should be easy)
 - [x] When adding an item, if the item already exists, still parse quantity
 - [ ] Change out all the TouchableOpacities and Buttons for Pressables (RN)
+- [ ] Convert accordion header to listItem
+- [ ] Change staple? button to RNE Switch
+- [ ] Figure out that "unregistered element" bug when swiping an item off the list
+
 
 As of the evening of 2022-08-10, the date picker is basically working (except for the
 cancel and ok buttons), so next I should probably implement pantry mode.
