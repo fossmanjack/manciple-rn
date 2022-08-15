@@ -61,36 +61,222 @@ export default function PantryItem({ item, exports }) {
 			/>
 		);
 	}
-/*
-	const ListViewCheckBox = _ => {
-		return (
-			<CheckBox
-				center
-				checkedIcon='check-square-o'
-				uncheckedIcon='square-o'
-				type='font-awesome'
-				checked={!item.needed}
-				onPress={_ => handleCheckBox(item.id)}
-			/>
-		)
-	}
-*/
 
 	const PantryViewCheckBox = _ => {
 		return (
-			<TouchableOpacity
-				style={{ flex: 1 }}
-				onPress={_ => handleCheckBox(item.id)}
-			>
-				<View>
+			<Button
+				type='clear'
+				icon={_ => (
 					<Icon
-						name={item.needed ? 'minus' : 'plus'}
+						name={item.listed ? 'minus' : 'plus'}
 						type='font-awesome'
+						size={32}
+						color={item.listed ? 'red' : 'green'}
 					/>
-				</View>
-			</TouchableOpacity>
+				)}
+				onPress={_ => handleCheckBox(item.id)}
+			/>
 		);
 	}
+
+// Doing it with listview
+
+	return (
+		<Collapse style={{
+			backgroundColor: 'white',
+			borderBottomColor: 'lightgray',
+			borderBottomWidth: 1,
+		}}>
+			<CollapseHeader>
+				<ListItem>
+					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
+					<ListItem.Content>
+						<ListItem.Title
+							style={mode === 'list'
+								? item.needed
+									? _Styles.textItemName
+									: _Styles.textItemNameChecked
+								: _Styles.textItemName
+							}
+						>
+							{item.name}
+						</ListItem.Title>
+						<ListItem.Subtitle style={{
+							flexDirection: 'row',
+							width: '100%',
+						}}>
+							<View style={{
+								flex: 8,
+								flexDirection: 'row',
+								alignSelf: 'stretch'
+							}}>
+								<Text style={_Styles.textItemQtyLabel}>
+									Qty:
+								</Text>
+								<Text style={_Styles.textItemQty}>
+									{item.qty}
+								</Text>
+							</View>
+							<View style={{
+								flex: 4,
+								flexDirection: 'row-reverse',
+								alignItems: 'flex-end',
+								alignSelf: 'flex-end',
+								justifyContent: 'center',
+							}}>
+								{
+									item.staple && <Icon
+										name='refresh'
+										type='font-awesome'
+										size={20}
+										color='gray'
+										style={{
+											marginLeft: 5
+										}}
+									/>
+								}
+								{
+									(item.notes !== '') && <Icon
+										name='note-alert-outline'
+										type='material-community'
+										size={20}
+										color='gray'
+										style={{
+											marginLeft: 5
+										}}
+									/>
+								}
+								{
+									(item.purchaseBy !== 0 && item.purchaseBy < Date.now()) && <Icon
+										name='calendar-alert'
+										type='material-community'
+										size={20}
+										color='red'
+										style={{
+											marginLeft: 5
+										}}
+									/>
+								}
+							</View>
+						</ListItem.Subtitle>
+					</ListItem.Content>
+				</ListItem>
+			</CollapseHeader>
+			<CollapseBody style={{
+				padding: 20
+			}}>
+				<View style={{
+					justifyContent: 'center',
+					alignItems: 'center',
+					flex: 1,
+				}}>
+					<Image
+						source={{ uri: _DefaultImage }}
+						style={{
+							width: 100,
+							height: 100
+						}}
+					/>
+				</View>
+				<View style={{ flexDirection: 'row' }}>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Price:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.price || '-'}
+						</Text>
+					</View>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Location:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.loc || '-'}
+						</Text>
+					</View>
+				</View>
+
+				<View style={{ flexDirection: 'row' }}>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Last purchased:
+						</Text>
+						<Text style={_Styles.textItemDetailText}>
+							{item.history[0] ? Utils.parseDate(item.history[0]) : '-'}
+						</Text>
+					</View>
+					<View style={{ flex: 3 }}>
+						<Text style={_Styles.textItemDetailLabel}>
+							Purchase by:
+						</Text>
+						<Button
+							onPress={_ => setShowCalendar(!showCalendar)}
+							title={item.purchaseBy
+								? Utils.parseDate(item.purchaseBy)
+								: '-'
+							}
+						/>
+						{ showCalendar && (
+							<DateTimePicker
+								value={pickDate}
+								mode='date'
+								display='calendar'
+								onChange={onCalendarChange}
+								minimumDate={Date.now()}
+							/>
+						)}
+					</View>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						URL:
+					</Text>
+					<Text style={_Styles.textItemDetailText}>
+						{item.url || '-'}
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						UPC:
+					</Text>
+					<Text style={_Styles.textItemDetailText}>
+						{item.upc || '-'}
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						Notes
+					</Text>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailText}>
+						{item.notes || '...'}
+					</Text>
+				</View>
+			</CollapseBody>
+		</Collapse>
+	);
+
+
+}
+
+/* Everything that follows is archival -- earlier versions and attempts
+
+ListViewCheckBox:
+					<TouchableOpacity
+						style={{ flex: 1 }}
+						onPress={_ => handleCheck(item.id)}
+					>
+						<View>
+							<Icon
+								name={item.needed ? 'square-o' : 'check-square-o'}
+								type='font-awesome'
+							/>
+						</View>
+					</TouchableOpacity>
+*/
+
 // Doing it without ListView
 /*
 	return (
@@ -214,176 +400,7 @@ export default function PantryItem({ item, exports }) {
 	);
 */
 // end doing it without listview
-
-// Doing it with listview
-
-	return (
-		<Collapse style={{
-			backgroundColor: 'white',
-			borderBottomColor: 'lightgray',
-			borderBottomWidth: 1,
-		}}>
-			<CollapseHeader>
-				<ListItem>
-					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
-					<ListItem.Content>
-						<ListItem.Title
-							style={mode === 'list'
-								? item.needed
-									? _Styles.textItemName
-									: _Styles.textItemNameChecked
-								: _Styles.textItemName
-							}
-						>
-							{item.name}
-						</ListItem.Title>
-						<ListItem.Subtitle style={{ flexDirection: 'row' }}>
-							<View style={{ flex: 8, flexDirection: 'row' }}>
-								<Text style={_Styles.textItemQtyLabel}>
-									Qty:
-								</Text>
-								<Text style={_Styles.textItemQty}>
-									{item.qty}
-								</Text>
-							</View>
-							<View style={{
-								flex: 4,
-								flexDirection: 'row-reverse',
-								alignItems: 'flex-end',
-								justifyContent: 'center',
-								textAlign: 'right'
-							}}>
-								{
-									item.staple && <Icon
-										name='refresh'
-										type='font-awesome'
-										size={20}
-										color='gray'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-								{
-									(item.notes !== '') && <Icon
-										name='note-alert-outline'
-										type='material-community'
-										size={20}
-										color='gray'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-								{
-									(item.purchaseBy !== 0 && item.purchaseBy < Date.now()) && <Icon
-										name='calendar-alert'
-										type='material-community'
-										size={20}
-										color='red'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-							</View>
-						</ListItem.Subtitle>
-					</ListItem.Content>
-				</ListItem>
-			</CollapseHeader>
-			<CollapseBody style={{
-				padding: 20
-			}}>
-				<View style={{
-					justifyContent: 'center',
-				}}>
-					<Image
-						source={{ uri: _DefaultImage }}
-						style={{
-							width: 100,
-							height: 100
-						}}
-					/>
-				</View>
-				<View style={{ flexDirection: 'row' }}>
-					<View style={{ flex: 3 }}>
-						<Text style={_Styles.textItemDetailLabel}>
-							Price:
-						</Text>
-						<Text style={_Styles.textItemDetailText}>
-							{item.price || '-'}
-						</Text>
-					</View>
-					<View style={{ flex: 3 }}>
-						<Text style={_Styles.textItemDetailLabel}>
-							Location:
-						</Text>
-						<Text style={_Styles.textItemDetailText}>
-							{item.loc || '-'}
-						</Text>
-					</View>
-				</View>
-
-				<View style={{ flexDirection: 'row' }}>
-					<View style={{ flex: 3 }}>
-						<Text style={_Styles.textItemDetailLabel}>
-							Last purchased:
-						</Text>
-						<Text style={_Styles.textItemDetailText}>
-							{item.history[0] ? Utils.parseDate(item.history[0]) : '-'}
-						</Text>
-					</View>
-					<View style={{ flex: 3 }}>
-						<Text style={_Styles.textItemDetailLabel}>
-							Purchase by:
-						</Text>
-						<Button
-							onPress={_ => setShowCalendar(!showCalendar)}
-							title={item.purchaseBy
-								? Utils.parseDate(item.purchaseBy)
-								: '-'
-							}
-						/>
-						{ showCalendar && (
-							<DateTimePicker
-								value={pickDate}
-								mode='date'
-								display='calendar'
-								onChange={onCalendarChange}
-								minimumDate={Date.now()}
-							/>
-						)}
-					</View>
-				</View>
-				<View>
-					<Text style={_Styles.textItemDetailLabel}>
-						URL:
-					</Text>
-					<Text style={_Styles.textItemDetailText}>
-						{item.url || '-'}
-					</Text>
-				</View>
-				<View>
-					<Text style={_Styles.textItemDetailLabel}>
-						UPC:
-					</Text>
-					<Text style={_Styles.textItemDetailText}>
-						{item.upc || '-'}
-					</Text>
-				</View>
-				<View>
-					<Text style={_Styles.textItemDetailLabel}>
-						Notes
-					</Text>
-				</View>
-				<View>
-					<Text style={_Styles.textItemDetailText}>
-						{item.notes || '...'}
-					</Text>
-				</View>
-			</CollapseBody>
-		</Collapse>
-	);
+//
 
 
 // Using SwipeRow instead of the list container
@@ -458,22 +475,33 @@ export default function PantryItem({ item, exports }) {
 			</View>
 		</SwipeRow>
 	);
-*/
 
-}
+	const ListViewCheckBox = _ => {
+		return (
+			<CheckBox
+				center
+				checkedIcon='check-square-o'
+				uncheckedIcon='square-o'
+				type='font-awesome'
+				checked={!item.needed}
+				onPress={_ => handleCheckBox(item.id)}
+			/>
+		)
+	}
 
-/*
-
-ListViewCheckBox:
-					<TouchableOpacity
-						style={{ flex: 1 }}
-						onPress={_ => handleCheck(item.id)}
-					>
-						<View>
-							<Icon
-								name={item.needed ? 'square-o' : 'check-square-o'}
-								type='font-awesome'
-							/>
-						</View>
-					</TouchableOpacity>
+	const PantryViewCheckBox = _ => {
+		return (
+			<TouchableOpacity
+				style={{ flex: 1 }}
+				onPress={_ => handleCheckBox(item.id)}
+			>
+				<View>
+					<Icon
+						name={item.needed ? 'minus' : 'plus'}
+						type='font-awesome'
+					/>
+				</View>
+			</TouchableOpacity>
+		);
+	}
 */

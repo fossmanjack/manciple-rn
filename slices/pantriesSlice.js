@@ -118,6 +118,10 @@ const pantriesSlice = createSlice({
 			index !== -1
 				&& pantriesState._Pantries[pantriesState.currentPantry].inventory.splice(index, 1, updatedItem)
 				|| pantriesState._Pantries[pantriesState.currentPantry].inventory.push(updatedItem);
+		},
+		sortList: (pantriesState, action) => {
+			// Expects [ field(string), asc(bool) ] as action payload
+			const [ field, asc ] = action.payload;
 		}
 	}
 });
@@ -131,6 +135,7 @@ export const { toggleStaple } = pantriesSlice.actions;
 export const { addItem } = pantriesSlice.actions;
 export const { deleteItem } = pantriesSlice.actions;
 export const { updateItem } = pantriesSlice.actions;
+export const { sortList } = pantriesSlice.actions;
 
 /*
 

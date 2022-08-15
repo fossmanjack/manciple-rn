@@ -140,11 +140,11 @@ export default function MainScreen() {
 						dispatch
 					}))
 				}
-				renderItem={(data, rowKey) => {
+				renderItem={(data, rowMap) => {
 					console.log('************');
 					console.log('renderItem: ');
 					console.log('\tdata:', Utils.truncateString(''+data, 60));
-					console.log('\trowKey:', Utils.truncateString(''+rowKey, 60));
+					console.log('\trowMap:', Utils.truncateString(''+rowMap, 60));
 					console.log('************');
 					const { item: { item } } = data;
 					return (
@@ -160,7 +160,12 @@ export default function MainScreen() {
 				renderHiddenItem={(data, rowMap) => {
 					const { item: { item }} = data;
 					return (
-					<View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+					<View style={{
+						alignItems: 'flex-end',
+						justifyContent: 'center',
+						borderWidth: 1,
+						borderColor: 'purple',
+					}}>
 						<Button
 							onPress={_ => {
 									editItem(item);
@@ -176,6 +181,7 @@ export default function MainScreen() {
 								/>
 							}
 							title='Edit'
+							style={{ width: 100 }}
 						/>
 						<Button
 							onPress={_ => handleToggleStaple(item.id)}
@@ -183,11 +189,12 @@ export default function MainScreen() {
 								<Icon
 									name={item.staple ? 'toggle-on' : 'toggle-off'}
 									type='font-awesome'
-									color='white'
+									color='black'
 									style={{ marginRight: 5 }}
 								/>
 							}
 							title='Staple'
+							type='outline'
 						/>
 					</View>
 				)
@@ -197,6 +204,10 @@ export default function MainScreen() {
 				leftActionValue={500}
 				onLeftAction={handleSweep}
 				bottomDivider
+				closeOnRowPress
+				closeOnRowBeginSwipe
+				closeOnRowOpen
+				closeOnScroll
 			/>
 			<Modal
 				transparent={false}
