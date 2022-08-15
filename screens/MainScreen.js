@@ -160,7 +160,7 @@ export default function MainScreen() {
 				renderHiddenItem={(data, rowMap) => {
 					const { item: { item }} = data;
 					return (
-					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+					<View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
 						<Button
 							onPress={_ => {
 									editItem(item);
@@ -171,8 +171,11 @@ export default function MainScreen() {
 								<Icon
 									name='pencil'
 									type='font-awesome'
+									color='white'
+									style={{ marginRight: 5 }}
 								/>
 							}
+							title='Edit'
 						/>
 						<Button
 							onPress={_ => handleToggleStaple(item.id)}
@@ -180,8 +183,11 @@ export default function MainScreen() {
 								<Icon
 									name={item.staple ? 'toggle-on' : 'toggle-off'}
 									type='font-awesome'
+									color='white'
+									style={{ marginRight: 5 }}
 								/>
 							}
+							title='Staple'
 						/>
 					</View>
 				)
