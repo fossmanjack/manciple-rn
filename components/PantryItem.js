@@ -8,7 +8,12 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import { Icon, Button } from 'react-native-elements';
+import {
+	CheckBox,
+	Icon,
+	ListItem,
+	Button
+} from 'react-native-elements';
 import { useState } from 'react';
 import {
 	Collapse,
@@ -43,19 +48,33 @@ export default function PantryItem({ item, exports }) {
 
 	const ListViewCheckBox = _ => {
 		return (
-			<TouchableOpacity
-				style={{ flex: 1 }}
-				onPress={_ => handleCheckBox(item.id)}
-			>
-				<View>
+			<Button
+				type='clear'
+				icon={_ => (
 					<Icon
 						name={item.needed ? 'square-o' : 'check-square-o'}
 						type='font-awesome'
+						size={32}
 					/>
-				</View>
-			</TouchableOpacity>
+				)}
+				onPress={_ => handleCheckBox(item.id)}
+			/>
 		);
 	}
+/*
+	const ListViewCheckBox = _ => {
+		return (
+			<CheckBox
+				center
+				checkedIcon='check-square-o'
+				uncheckedIcon='square-o'
+				type='font-awesome'
+				checked={!item.needed}
+				onPress={_ => handleCheckBox(item.id)}
+			/>
+		)
+	}
+*/
 
 	const PantryViewCheckBox = _ => {
 		return (
@@ -73,7 +92,7 @@ export default function PantryItem({ item, exports }) {
 		);
 	}
 // Doing it without ListView
-
+/*
 	return (
 		<Collapse>
 			<CollapseHeader style={{ backgroundColor: 'white' }}>
@@ -193,57 +212,96 @@ export default function PantryItem({ item, exports }) {
 			</CollapseBody>
 		</Collapse>
 	);
+*/
 // end doing it without listview
 
 // Doing it with listview
-/*
 
 	return (
-		<Collapse>
+		<Collapse style={{
+			backgroundColor: 'white',
+			borderBottomColor: 'lightgray',
+			borderBottomWidth: 1,
+		}}>
 			<CollapseHeader>
-				<View style={{ flexAlign: 'row' }}>
+				<ListItem>
 					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
-					<ListItem>
-						<ListItem.Content>
-							<ListItem.Title
-								style={mode === 'list'
-									? item.needed
-										? _Styles.textItemName
-										: _Styles.textItemNameChecked
-									: _Styles.textItemName
-								}
-							>
-								{item.name}
-							</ListItem.Title>
-							<ListItem.Subtitle>
-								<View style={{ flex: 8, flexAlign: 'row' }}>
-									<Text style={_Styles.textItemQtyLabel}>
-										Qty:
-									</Text>
-									<Text style={_Styles.textItemQty}>
-										{item.qty}
-									</Text>
-								</View>
-								<View style={{ flex: 4 }}>
-									{ item.staple && <Icon
+					<ListItem.Content>
+						<ListItem.Title
+							style={mode === 'list'
+								? item.needed
+									? _Styles.textItemName
+									: _Styles.textItemNameChecked
+								: _Styles.textItemName
+							}
+						>
+							{item.name}
+						</ListItem.Title>
+						<ListItem.Subtitle style={{ flexDirection: 'row' }}>
+							<View style={{ flex: 8, flexDirection: 'row' }}>
+								<Text style={_Styles.textItemQtyLabel}>
+									Qty:
+								</Text>
+								<Text style={_Styles.textItemQty}>
+									{item.qty}
+								</Text>
+							</View>
+							<View style={{
+								flex: 4,
+								flexDirection: 'row-reverse',
+								alignItems: 'flex-end',
+								justifyContent: 'center',
+								textAlign: 'right'
+							}}>
+								{
+									item.staple && <Icon
 										name='refresh'
 										type='font-awesome'
-										style={{ padding: 3, size: 12, color: 'lightgray' }}
+										size={20}
+										color='gray'
+										style={{
+											marginLeft: 5
+										}}
 									/>
-									}
-								</View>
-							</ListItem.Subtitle>
-						</ListItem.Content>
-					</ListItem>
-				</View>
+								}
+								{
+									(item.notes !== '') && <Icon
+										name='note-alert-outline'
+										type='material-community'
+										size={20}
+										color='gray'
+										style={{
+											marginLeft: 5
+										}}
+									/>
+								}
+								{
+									(item.purchaseBy !== 0 && item.purchaseBy < Date.now()) && <Icon
+										name='calendar-alert'
+										type='material-community'
+										size={20}
+										color='red'
+										style={{
+											marginLeft: 5
+										}}
+									/>
+								}
+							</View>
+						</ListItem.Subtitle>
+					</ListItem.Content>
+				</ListItem>
 			</CollapseHeader>
-			<CollapseBody>
-				<View>
+			<CollapseBody style={{
+				padding: 20
+			}}>
+				<View style={{
+					justifyContent: 'center',
+				}}>
 					<Image
 						source={{ uri: _DefaultImage }}
 						style={{
-							width: '70%',
-							height: 'auto'
+							width: 100,
+							height: 100
 						}}
 					/>
 				</View>
@@ -327,7 +385,6 @@ export default function PantryItem({ item, exports }) {
 		</Collapse>
 	);
 
-*/
 
 // Using SwipeRow instead of the list container
 /*

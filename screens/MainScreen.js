@@ -164,7 +164,7 @@ export default function MainScreen() {
 						<Button
 							onPress={_ => {
 									editItem(item);
-									rowMap[item.id].close();
+									//rowMap[item.id].close();
 								}
 							}
 							icon={

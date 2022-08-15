@@ -19,10 +19,10 @@ export const PANTRIES = [
 				loc: 'HEB aisle 20',
 				url: '',
 				upc: '',
-				purchaseBy: 0,
+				purchaseBy: 1660532115847,
 				interval: 0,
 				history: [],
-				notes: '',
+				notes: 'This is a test note',
 				creationDate: Date.now(),
 				modifyDate: Date.now()
 			},
