@@ -1,10 +1,10 @@
 import { Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Button, Icon } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Global from '../slices/globalSlice';
 import * as Pantry from '../slices/pantriesSlice';
 
-export default function Header() {
+export default function Header({ drawerCtl }) {
 	const ptr = useSelector(S => S.pantries);
 	const { mode } = useSelector(S => S.global);
 	const dispatch = useDispatch();
@@ -18,8 +18,19 @@ export default function Header() {
 
 	return (
 		<View style={{ flexDirection: 'row', backgroundColor: 'royalblue', alignItems: 'center' }}>
+			<Button
+				type='outline'
+				icon={
+					<Icon
+						name='menu'
+						type='material-community'
+						color='white'
+					/>
+				}
+				onPress={drawerCtl}
+			/>
 			<View style={{ flex: 10 }}>
-				<Text style={{ color: 'white', fontSize: 24 }}>
+				<Text style={{ color: 'white', fontSize: 22 }}>
 					{ptr._Pantries[ptr.currentPantry].name}: {mode === 'list' ? 'List' : 'Pantry'} view
 				</Text>
 			</View>

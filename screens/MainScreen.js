@@ -1,10 +1,12 @@
 import {
+	DrawerLayoutAndroid,
+	FlatList,
 	Modal,
 	Text,
 	TouchableOpacity,
 	View
 } from 'react-native';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
 	Button,
 	Icon,
@@ -37,7 +39,52 @@ export default function MainScreen() {
 	const [ updatedNotes, setUpdatedNotes ] = useState('');
 	//const [ updatedPurchaseBy, setUpdatedPurchaseBy ] = useState({});
 
+	const drawer = useRef(null);
 	//dispatch(Global.setLastUse(Date.now()));
+
+	const LoginHandler = _ => {
+		return (
+			<Text>
+				Login Handler
+			</Text>
+		);
+	}
+
+	const setDrawerOpen = _ => {
+		console.log('Drawer:', drawer);
+
+		drawer.current.openDrawer();
+	}
+
+	const setDrawerClosed = _ => {
+		drawer.current.closeDrawer();
+	}
+
+	const renderDrawer = _ => {
+		return (
+			<>
+				<LoginHandler />
+				<FlatList
+					data={_Pantries}
+					keyExtractor={item => item.id}
+					renderItem={({ item: list }) => (
+						<View>
+							<Text>{list.name}</Text>
+						</View>
+					)}
+				/>
+				<Text>
+					New List...
+				</Text>
+				<Text>
+					Settings
+				</Text>
+				<Text>
+					Options
+				</Text>
+			</>
+		);
+	}
 
 	const handleCheckBox = itemID => {
 		console.log("handleCheckBox called with item", itemID);
@@ -124,8 +171,15 @@ export default function MainScreen() {
 	}
 
 	return (
-		<>
-			<Header />
+		<DrawerLayoutAndroid
+			ref={drawer}
+			drawerWidth={300}
+			drawerPosition='left'
+			renderNavigationView={renderDrawer}
+		>
+			<Header
+				drawerCtl={setDrawerOpen}
+			/>
 			<SwipeListView
 				data={
 					mode === 'list'
@@ -289,7 +343,7 @@ export default function MainScreen() {
 				/>
 			</Modal>
 			<Footer />
-		</>
+		</DrawerLayoutAndroid>
 	);
 }
 
