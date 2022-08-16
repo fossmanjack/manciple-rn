@@ -22,6 +22,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { PANTRIES } from '../res/PANTRIES';
 import createPantryItem from './pantryItemSlice';
+import uuid from 'react-native-uuid';
 import * as Utils from '../utils/utils';
 
 const initialState = {
@@ -34,9 +35,35 @@ const pantriesSlice = createSlice({
 	initialState,
 	reducers: {
 		setPantry: (pantriesState, action) => {
-			// updates currentPantry to the action payload
-			Utils.debug('setPantry', [ action ]);
+			// action.payload = index of selected pantry
+			console.log('setPantry', action.payload);
 			return { ...pantriesState, currentPantry: action.payload }
+		},
+		addPantry: (pantriesState, action) => {
+			// action.payload = pantry name
+			const newPantry = {
+				name: action.payload,
+				id: uuid.v4(),
+				creationDate: Date.now(),
+				modifyDate: Date.now(),
+				inventory: []
+			};
+			console.log('addPantry', newPantry);
+
+			return { ...pantriesState, _Pantries: [ ...pantriesState._Pantries, newPantry ]}
+		},
+		deletePantry: (pantriesState, action) => {
+			// action.payload = pantry index
+			return pantriesState._Pantries.splice(action.payload, 0);
+		},
+		updatePantry: (pantriesState, action) => {
+			// action.payload is updated pantry object; ID won't have changed
+			const updateID = action.payload.id;
+			const updateIdx = pantriesState._Pantries.indexOf(pantriesState._Pantries.find(pt => pt.id === updateID));
+			console.log('updatePantry called:', action.payload);
+			index !== -1
+				&& pantriesState._Pantries.splice(updateIdx, 1, action.payload)
+				|| pantriesState._Pantries.push(action.payload);
 		},
 		toggleNeeded: (pantriesState, action) => {
 			// updates the passed item's "needed" to the inverse of its current value
@@ -128,7 +155,22 @@ const pantriesSlice = createSlice({
 
 export const pantriesReducer = pantriesSlice.reducer;
 
+export const {
+	setPantry,
+	addPantry,
+	deletePantry,
+	updatePantry,
+	toggleNeeded,
+	toggleListed,
+	toggleStaple,
+	addItem,
+	deleteItem,
+	updateItem,
+	sortList
+} = pantriesSlice.actions;
+/*
 export const { setPantry } = pantriesSlice.actions;
+export const { addPantry } = pantriesSlice.actions;
 export const { toggleNeeded } = pantriesSlice.actions;
 export const { toggleListed } = pantriesSlice.actions;
 export const { toggleStaple } = pantriesSlice.actions;
@@ -136,7 +178,7 @@ export const { addItem } = pantriesSlice.actions;
 export const { deleteItem } = pantriesSlice.actions;
 export const { updateItem } = pantriesSlice.actions;
 export const { sortList } = pantriesSlice.actions;
-
+*/
 /*
 
 				// another option might be to have the payload be the modified item instead of the ID

@@ -5,8 +5,8 @@
   "license": "GPL-3.0-only",
   "homepage": "https://github.com/meyersjm/manciple-rn",
   "bugs": {
-  	  "url": "https://github.com/meyersjm/manciple-rn/issues",
-  	  "email": "manciple@jackmeyers.co"
+    "url": "https://github.com/meyersjm/manciple-rn/issues",
+    "email": "manciple@jackmeyers.co"
   },
   "scripts": {
     "start": "expo start",
@@ -16,9 +16,9 @@
     "eject": "expo eject"
   },
   "author": {
-  	  "name": "Jack Meyers",
-  	  "email": "jack@jackmeyers.co",
-  	  "url": "https://jackmeyers.co"
+    "name": "Jack Meyers",
+    "email": "jack@jackmeyers.co",
+    "url": "https://jackmeyers.co"
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "6.1.2",
@@ -36,6 +36,7 @@
     "react-dom": "17.0.2",
     "react-native": "0.68.2",
     "react-native-animatable": "^1.3.3",
+    "react-native-dialog": "^9.2.2",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "~2.2.1",
     "react-native-reanimated": "~2.8.0",

@@ -1,7 +1,9 @@
 import {
+	Alert,
 	DrawerLayoutAndroid,
 	FlatList,
 	Modal,
+	Pressable,
 	Text,
 	TouchableOpacity,
 	View
@@ -9,11 +11,13 @@ import {
 import { useState, useRef } from 'react';
 import {
 	Button,
+	Card,
 	Icon,
 	Input
 } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import Dialog from 'react-native-dialog';
 import { _Styles } from '../res/_Styles';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -27,8 +31,8 @@ export default function MainScreen() {
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { debug } = useSelector(S => S.options);
 	const { mode } = useSelector(S => S.global);
+	const [ view, setView ] = useState('list');
 	const [ currentItem, setCurrentItem ] = useState({});
-	const [ showModal, setShowModal ] = useState(false);
 	const [ updatedName, setUpdatedName ] = useState('');
 	const [ updatedQty, setUpdatedQty ] = useState('');
 	const [ updatedPrice, setUpdatedPrice ] = useState('');
@@ -37,7 +41,17 @@ export default function MainScreen() {
 	const [ updatedUPC, setUpdatedUPC ] = useState('');
 	const [ updatedInterval, setUpdatedInterval ] = useState('');
 	const [ updatedNotes, setUpdatedNotes ] = useState('');
+	const [ pantryToEdit, setPantryToEdit ] = useState(_Pantries[currentPantry]);
+
+	// Modal and Dialog toggles
+	const [ showModal, setShowModal ] = useState(false);
+	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
+	const [ showEditPantryDialog, setShowEditPantryDialog ] = useState(false);
 	//const [ updatedPurchaseBy, setUpdatedPurchaseBy ] = useState({});
+
+	// Input field variables
+	const [ inputNewPantry, setInputNewPantry ] = useState('');
+	const [ inputEditPantry, setInputEditPantry ] = useState('');
 
 	const drawer = useRef(null);
 	//dispatch(Global.setLastUse(Date.now()));
@@ -48,17 +62,112 @@ export default function MainScreen() {
 				Login Handler
 			</Text>
 		);
-	}
+	};
 
 	const setDrawerOpen = _ => {
 		console.log('Drawer:', drawer);
 
 		drawer.current.openDrawer();
-	}
+	};
 
 	const setDrawerClosed = _ => {
 		drawer.current.closeDrawer();
+	};
+
+	const handlePantryChange = ptID => {
+		console.log('handleListChange', ptID);
+
+		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
+		setDrawerClosed();
+	};
+
+	const editPantry = ptID => {
+		console.log('editPantry', ptID);
+		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
+		//setInputEditPantry(_Pantries.find(pt => pt.id === ptID).name);
+		setInputEditPantry(pantryToEdit.str);
+		drawer.current.closeDrawer();
+		setShowEditPantryDialog(!showEditPantryDialog);
+	};
+/*
+	const handleNewPantry = inputText => {
+		console.log('handleNewList', inputText);
+
+		if(inputText) {
+			dispatch(Pantry.addPantry(inputText));
+		}
 	}
+*/
+
+	const handleNPDCancel = _ => {
+		setShowNewPantryDialog(!showNewPantryDialog);
+		setInputNewPantry('');
+	}
+
+	const handleNPDCreate = _ => {
+		console.log('handleNPDCreate', inputNewPantry);
+
+		dispatch(Pantry.addPantry(inputNewPantry));
+		_Pantries.map((pt, idx) => console.log(`_Pantries[${idx}] = ${pt.name}`));
+		//dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.name === inputNewPantry))));
+		setShowNewPantryDialog(!showNewPantryDialog);
+		setInputNewPantry('');
+	}
+
+	const handleEPDCancel = _ => {
+		setShowEditPantryDialog(!showEditPantryDialog);
+		setInputEditPantry('');
+	};
+
+	const handleEPDCommit = _ => {
+		const updatedPantry = {
+			..._Pantries.find(pt => pt.id === pantryToEdit.id),
+			name: inputEditPantry
+		};
+
+		setShowEditPantryDialog(!showEditPantryDialog);
+		dispatch(Pantry.updatePantry(updatedPantry));
+		setPantryToEdit(_Pantries[currentPantry]);
+	};
+
+	const handleEPDDelete = _ => {
+		console.log('handleEPDDelete:', pantryToEdit.id);
+		setShowEditPantryDialog(!showEditPantryDialog);
+
+		Alert.alert(
+			'Delete pantry?'
+			`Are you sure you wish to delete the pantry ${pantryToDelete.name}?
+			  All of your item and purchase history will be lost!`,
+			[
+				{
+					text: 'Cancel',
+					onPress: _ => handlePantryDeleteCancel(),
+					style: 'cancel'
+				},
+				{
+					text: 'OK',
+					onPress: _ => handlePantryDeleteConfirm(),
+				}
+			],
+			{
+				cancelable: true,
+				onDismiss: _ => handlePantryDeleteCancel()
+			}
+		);
+	}
+
+	const handlePantryDeleteConfirm = _ => {
+		const idx = _Pantries.indexOf(pantryToEdit);
+
+		if(idx === currentPantry) {
+			if(idx === 0) dispatch(Pantry.setPantry(1));
+			else dispatch(Pantry.setPantry(idx - 1));
+		}
+
+		pantryToEdit=(_Pantries[currentPantry]);
+		dispatch(Pantry.deletePantry(idx));
+	}
+
 
 	const renderDrawer = _ => {
 		return (
@@ -67,21 +176,140 @@ export default function MainScreen() {
 				<FlatList
 					data={_Pantries}
 					keyExtractor={item => item.id}
-					renderItem={({ item: list }) => (
-						<View>
-							<Text>{list.name}</Text>
-						</View>
+					renderItem={({ item: pantry }) => (
+						<Pressable
+							onPress={_ => handlePantryChange(pantry.id)}
+							onLongPress={_ => editPantry(pantry.id)}
+							style={{
+								borderBottomWidth: 1,
+								borderBottomColor: 'lightgray',
+								paddingVertical: 10,
+							}}
+						>
+							<View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center'
+								}}
+							>
+								<Icon
+									name='list'
+									type='entypo'
+									size={22}
+									style={{
+										marginRight: 3,
+										marginLeft: 10
+									}}
+								/>
+								<Text
+									style={{
+										fontSize: 18
+									}}
+								>
+									{pantry.name}
+								</Text>
+							</View>
+						</Pressable>
 					)}
 				/>
-				<Text>
-					New List...
-				</Text>
-				<Text>
-					Settings
-				</Text>
-				<Text>
-					Options
-				</Text>
+				<Pressable
+					onPress={_ => {
+						console.log('New pantry pressed');
+						drawer.current.closeDrawer();
+						setShowNewPantryDialog(!showNewPantryDialog);
+					}}
+					style={{
+						borderBottomWidth: 1,
+						borderBottomColor: 'lightgray',
+						paddingVertical: 10,
+					}}
+				>
+					<View
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center'
+						}}
+					>
+						<Icon
+							name='add-to-list'
+							type='entypo'
+							size={22}
+							style={{
+								marginRight: 3,
+								marginLeft: 10
+							}}
+						/>
+						<Text
+							style={{
+								fontSize: 18
+							}}
+						>
+							New Pantry...
+						</Text>
+					</View>
+				</Pressable>
+				<Pressable
+					style={{
+						borderBottomWidth: 1,
+						borderBottomColor: 'lightgray',
+						paddingVertical: 10,
+					}}
+				>
+					<View
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center'
+						}}
+					>
+						<Icon
+							name='settings'
+							type='material'
+							size={22}
+							style={{
+								marginRight: 3,
+								marginLeft: 10
+							}}
+						/>
+						<Text
+							style={{
+								fontSize: 18
+							}}
+						>
+							Settings
+						</Text>
+					</View>
+				</Pressable>
+				<Pressable
+					style={{
+						borderBottomWidth: 1,
+						borderBottomColor: 'lightgray',
+						paddingVertical: 10,
+					}}
+				>
+					<View
+						style={{
+							flexDirection: 'row',
+							alignItems: 'center'
+						}}
+					>
+						<Icon
+							name='help-circle-outline'
+							type='material-community'
+							size={22}
+							style={{
+								marginRight: 3,
+								marginLeft: 10
+							}}
+						/>
+						<Text
+							style={{
+								fontSize: 18
+							}}
+						>
+							Help
+						</Text>
+					</View>
+				</Pressable>
 			</>
 		);
 	}
@@ -342,6 +570,31 @@ export default function MainScreen() {
 					onPress={_ => resetState()}
 				/>
 			</Modal>
+			<Dialog.Container visible={showNewPantryDialog}>
+				<Dialog.Title>
+					Create New Pantry
+				</Dialog.Title>
+				<Dialog.Input
+					placeholder='New pantry name...'
+					value={inputNewPantry}
+					onChangeText={text => setInputNewPantry(text)}
+				/>
+				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
+				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
+			</Dialog.Container>
+			<Dialog.Container visible={showEditPantryDialog}>
+				<Dialog.Title>
+					Edit Pantry
+				</Dialog.Title>
+				<Dialog.Input
+					placeholder='Edit pantry name...'
+					value={inputEditPantry}
+					onChangeText={text => setInputEditPantry(text)}
+				/>
+				<Dialog.Button label='Delete List' onPress={handleEPDDelete} />
+				<Dialog.Button label='Cancel' onPress={handleEPDCancel} />
+				<Dialog.Button label='OK' onPress={handleEPDCommit} />
+			</Dialog.Container>
 			<Footer />
 		</DrawerLayoutAndroid>
 	);
