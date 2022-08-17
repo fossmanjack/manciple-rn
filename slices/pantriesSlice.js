@@ -50,18 +50,18 @@ const pantriesSlice = createSlice({
 			};
 			console.log('addPantry', newPantry);
 
-			return { ...pantriesState, _Pantries: [ ...pantriesState._Pantries, newPantry ]}
+			return { ...pantriesState, _Pantries: [ ...pantriesState._Pantries, newPantry ]};
 		},
 		deletePantry: (pantriesState, action) => {
 			// action.payload = pantry index
-			return pantriesState._Pantries.splice(action.payload, 0);
+			pantriesState._Pantries.splice(action.payload, 1);
 		},
 		updatePantry: (pantriesState, action) => {
 			// action.payload is updated pantry object; ID won't have changed
 			const updateID = action.payload.id;
 			const updateIdx = pantriesState._Pantries.indexOf(pantriesState._Pantries.find(pt => pt.id === updateID));
 			console.log('updatePantry called:', action.payload);
-			index !== -1
+			updateIdx !== -1
 				&& pantriesState._Pantries.splice(updateIdx, 1, action.payload)
 				|| pantriesState._Pantries.push(action.payload);
 		},

@@ -19,6 +19,9 @@
 - [ ] Figure out that "unregistered element" bug when swiping an item off the list
 - [ ] Set hidden button width equal to hidden drawer width
 - [ ] Move item to another list
+- [ ] Sort drop-down
+- [ ] Sort function -- Utils.sort(pantry, field, asc)
+- [ ] Add little up/down arrow next to field in detail view to show current sort by
 
 
 As of the evening of 2022-08-10, the date picker is basically working (except for the

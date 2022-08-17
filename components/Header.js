@@ -31,7 +31,7 @@ export default function Header({ drawerCtl }) {
 			/>
 			<View style={{ flex: 10 }}>
 				<Text style={{ color: 'white', fontSize: 22 }}>
-					{ptr._Pantries[ptr.currentPantry].name}: {mode === 'list' ? 'List' : 'Pantry'} view
+					{ptr.currentPantry !== -1 && ptr._Pantries[ptr.currentPantry].name}: {mode === 'list' ? 'List' : 'Pantry'} view
 				</Text>
 			</View>
 			<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end' }}>

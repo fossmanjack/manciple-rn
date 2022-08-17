@@ -41,7 +41,7 @@ export default function MainScreen() {
 	const [ updatedUPC, setUpdatedUPC ] = useState('');
 	const [ updatedInterval, setUpdatedInterval ] = useState('');
 	const [ updatedNotes, setUpdatedNotes ] = useState('');
-	const [ pantryToEdit, setPantryToEdit ] = useState(_Pantries[currentPantry]);
+	const [ pantryToEdit, setPantryToEdit ] = useState({});
 
 	// Modal and Dialog toggles
 	const [ showModal, setShowModal ] = useState(false);
@@ -65,7 +65,7 @@ export default function MainScreen() {
 	};
 
 	const setDrawerOpen = _ => {
-		console.log('Drawer:', drawer);
+		//console.log('Drawer:', drawer);
 
 		drawer.current.openDrawer();
 	};
@@ -83,9 +83,12 @@ export default function MainScreen() {
 
 	const editPantry = ptID => {
 		console.log('editPantry', ptID);
-		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
+		const findPantry = _Pantries.find(pt => pt.id === ptID);
+		console.log('findPantry', findPantry);
+		setPantryToEdit(findPantry);
 		//setInputEditPantry(_Pantries.find(pt => pt.id === ptID).name);
-		setInputEditPantry(pantryToEdit.str);
+		console.log('pantryToEdit', pantryToEdit);
+		setInputEditPantry(pantryToEdit.name);
 		drawer.current.closeDrawer();
 		setShowEditPantryDialog(!showEditPantryDialog);
 	};
@@ -135,9 +138,8 @@ export default function MainScreen() {
 		setShowEditPantryDialog(!showEditPantryDialog);
 
 		Alert.alert(
-			'Delete pantry?'
-			`Are you sure you wish to delete the pantry ${pantryToDelete.name}?
-			  All of your item and purchase history will be lost!`,
+			'Delete pantry?',
+			`Are you sure you wish to delete the pantry ${pantryToEdit.name}?  All of your item and purchase history will be lost!`,
 			[
 				{
 					text: 'Cancel',
@@ -159,59 +161,84 @@ export default function MainScreen() {
 	const handlePantryDeleteConfirm = _ => {
 		const idx = _Pantries.indexOf(pantryToEdit);
 
+		setShowEditPantryDialog(!showEditPantryDialog);
+		console.log('handlePantryDeleteConfirm', idx, currentPantry);
 		if(idx === currentPantry) {
-			if(idx === 0) dispatch(Pantry.setPantry(1));
-			else dispatch(Pantry.setPantry(idx - 1));
+			// We need to make sure currentPantry points to a valid pantry after
+			// the delete operation.  As long as _Pantries.length is at least two more than
+			// the index we're deleting we don't need to do anything, because:
+			// idx = x
+			// _Pantries.length = x+1
+			// _Pantries.length after op = x (but _Pantries[x] is gone)
+			// So that's one literal edge case
+			// So if _Pantries.length > x + 1, no action
+			// else setPantry(currentPantry - 1);
+			// Which is fine unless currentPantry is 0
+			// but even then actually, because no action will be taken unless _Pantries.length is 1
+			// In which case _Pantries[0] is the only element
+			// So:
+			// if(_Pantries.length <= idx + 1) setPantry(currentPantry - 1);
+			console.log('trying to delete current pantry!');
+			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(currentPantry - 1));
 		}
 
-		pantryToEdit=(_Pantries[currentPantry]);
+		setPantryToEdit({});
+		console.log('currentPantry:', currentPantry);
 		dispatch(Pantry.deletePantry(idx));
+		console.log(_Pantries);
 	}
 
+	const handlePantryDeleteCancel = _ => {
+		setPantryToEdit({});
+		setInputEditPantry('');
+		setShowEditPantryDialog(!showEditPantryDialog);
+	}
 
 	const renderDrawer = _ => {
 		return (
 			<>
 				<LoginHandler />
-				<FlatList
-					data={_Pantries}
-					keyExtractor={item => item.id}
-					renderItem={({ item: pantry }) => (
-						<Pressable
-							onPress={_ => handlePantryChange(pantry.id)}
-							onLongPress={_ => editPantry(pantry.id)}
-							style={{
-								borderBottomWidth: 1,
-								borderBottomColor: 'lightgray',
-								paddingVertical: 10,
-							}}
-						>
-							<View
+				{ _Pantries.length > 0 &&
+					<FlatList
+						data={_Pantries}
+						keyExtractor={item => item.id}
+						renderItem={({ item: pantry }) => (
+							<Pressable
+								onPress={_ => handlePantryChange(pantry.id)}
+								onLongPress={_ => editPantry(pantry.id)}
 								style={{
-									flexDirection: 'row',
-									alignItems: 'center'
+									borderBottomWidth: 1,
+									borderBottomColor: 'lightgray',
+									paddingVertical: 10,
 								}}
 							>
-								<Icon
-									name='list'
-									type='entypo'
-									size={22}
+								<View
 									style={{
-										marginRight: 3,
-										marginLeft: 10
-									}}
-								/>
-								<Text
-									style={{
-										fontSize: 18
+										flexDirection: 'row',
+										alignItems: 'center'
 									}}
 								>
-									{pantry.name}
-								</Text>
-							</View>
-						</Pressable>
-					)}
-				/>
+									<Icon
+										name='list'
+										type='entypo'
+										size={22}
+										style={{
+											marginRight: 3,
+											marginLeft: 10
+										}}
+									/>
+									<Text
+										style={{
+											fontSize: 18
+										}}
+									>
+										{pantry.name}
+									</Text>
+								</View>
+							</Pressable>
+						)}
+					/>
+				}
 				<Pressable
 					onPress={_ => {
 						console.log('New pantry pressed');
@@ -408,89 +435,93 @@ export default function MainScreen() {
 			<Header
 				drawerCtl={setDrawerOpen}
 			/>
-			<SwipeListView
-				data={
-					mode === 'list'
-					? _Pantries[currentPantry].inventory.filter(i => i.listed).map(item => ({
-						item,
-						key: item.id,
-						dispatch
-					}))
-					: _Pantries[currentPantry].inventory.map(item => ({
-						item,
-						key: item.id,
-						dispatch
-					}))
-				}
-				renderItem={(data, rowMap) => {
-					console.log('************');
-					console.log('renderItem: ');
-					console.log('\tdata:', Utils.truncateString(''+data, 60));
-					console.log('\trowMap:', Utils.truncateString(''+rowMap, 60));
-					console.log('************');
-					const { item: { item } } = data;
-					return (
-						<PantryItem
-							item={item}
-							exports={{
-								handleCheckBox,
-								handleDateChange
-							}}
-						/>
-					)
-				}}
-				renderHiddenItem={(data, rowMap) => {
-					const { item: { item }} = data;
-					return (
-					<View style={{
-						alignItems: 'flex-end',
-						justifyContent: 'center',
-						borderWidth: 1,
-						borderColor: 'purple',
-					}}>
-						<Button
-							onPress={_ => {
-									editItem(item);
-									//rowMap[item.id].close();
+			{ currentPantry !== -1 &&
+				<SwipeListView
+					data={
+						mode === 'list'
+						? _Pantries[currentPantry].inventory.filter(i => i.listed).map(item => ({
+							item,
+							key: item.id,
+							dispatch
+						}))
+						: _Pantries[currentPantry].inventory.map(item => ({
+							item,
+							key: item.id,
+							dispatch
+						}))
+					}
+					renderItem={(data, rowMap) => {
+						/*
+						console.log('************');
+						console.log('renderItem: ');
+						console.log('\tdata:', Utils.truncateString(''+data, 60));
+						console.log('\trowMap:', Utils.truncateString(''+rowMap, 60));
+						console.log('************');
+						*/
+						const { item: { item } } = data;
+						return (
+							<PantryItem
+								item={item}
+								exports={{
+									handleCheckBox,
+									handleDateChange
+								}}
+							/>
+						)
+					}}
+					renderHiddenItem={(data, rowMap) => {
+						const { item: { item }} = data;
+						return (
+						<View style={{
+							alignItems: 'flex-end',
+							justifyContent: 'center',
+							borderWidth: 1,
+							borderColor: 'purple',
+						}}>
+							<Button
+								onPress={_ => {
+										editItem(item);
+										//rowMap[item.id].close();
+									}
 								}
-							}
-							icon={
-								<Icon
-									name='pencil'
-									type='font-awesome'
-									color='white'
-									style={{ marginRight: 5 }}
-								/>
-							}
-							title='Edit'
-							style={{ width: 100 }}
-						/>
-						<Button
-							onPress={_ => handleToggleStaple(item.id)}
-							icon={
-								<Icon
-									name={item.staple ? 'toggle-on' : 'toggle-off'}
-									type='font-awesome'
-									color='black'
-									style={{ marginRight: 5 }}
-								/>
-							}
-							title='Staple'
-							type='outline'
-						/>
-					</View>
-				)
-				}}
-				rightOpenValue={-100}
-				leftActivationValue={75}
-				leftActionValue={500}
-				onLeftAction={handleSweep}
-				bottomDivider
-				closeOnRowPress
-				closeOnRowBeginSwipe
-				closeOnRowOpen
-				closeOnScroll
-			/>
+								icon={
+									<Icon
+										name='pencil'
+										type='font-awesome'
+										color='white'
+										style={{ marginRight: 5 }}
+									/>
+								}
+								title='Edit'
+								style={{ width: 100 }}
+							/>
+							<Button
+								onPress={_ => handleToggleStaple(item.id)}
+								icon={
+									<Icon
+										name={item.staple ? 'toggle-on' : 'toggle-off'}
+										type='font-awesome'
+										color='black'
+										style={{ marginRight: 5 }}
+									/>
+								}
+								title='Staple'
+								type='outline'
+							/>
+						</View>
+					)
+					}}
+					rightOpenValue={-100}
+					leftActivationValue={75}
+					leftActionValue={500}
+					onLeftAction={handleSweep}
+					bottomDivider
+					closeOnRowPress
+					closeOnRowBeginSwipe
+					closeOnRowOpen
+					closeOnScroll
+				/>
+			}
 			<Modal
 				transparent={false}
 				visible={showModal}

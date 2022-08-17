@@ -50,6 +50,7 @@ export default function Footer() {
 				color='royalblue'
 				reverse
 				onPress={_ => handleSubmit()}
+				disabled={ptr.currentPantry === -1}
 			/>
 			<Icon
 				style={_Styles.footerIcon}
