@@ -26,3 +26,12 @@
 
 As of the evening of 2022-08-10, the date picker is basically working (except for the
 cancel and ok buttons), so next I should probably implement pantry mode.
+
+### Next steps
+
+- [x] Implement sidebar
+- [ ] Options -- sort, auto-interval
+- [ ] Image carousel
+- [ ] Persistence
+- [ ] Import/export
+- [ ] webDAV

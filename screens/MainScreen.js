@@ -21,6 +21,7 @@ import Dialog from 'react-native-dialog';
 import { _Styles } from '../res/_Styles';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import SortOrderDialog from '../components/SortOrderDialog';
 import PantryItem from '../components/PantryItem';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
@@ -29,7 +30,7 @@ import * as Utils from '../utils/utils';
 export default function MainScreen() {
 	const dispatch = useDispatch();
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { debug } = useSelector(S => S.options);
+	const { debug, sortOpts } = useSelector(S => S.options);
 	const { mode } = useSelector(S => S.global);
 	const [ view, setView ] = useState('list');
 	const [ currentItem, setCurrentItem ] = useState({});
@@ -423,17 +424,14 @@ export default function MainScreen() {
 			{ currentPantry !== -1 &&
 				<SwipeListView
 					data={
-						mode === 'list'
-						? _Pantries[currentPantry].inventory.filter(i => i.listed).map(item => ({
-							item,
-							key: item.id,
-							dispatch
-						}))
-						: _Pantries[currentPantry].inventory.map(item => ({
-							item,
-							key: item.id,
-							dispatch
-						}))
+						Utils.sortPantry(mode === 'list'
+							? _Pantries[currentPantry].inventory.filter(i => i.listed)
+							: _Pantries[currentPantry].inventory, sortOpts)
+							.map(item => ({
+								item,
+								key: item.id,
+								dispatch
+							}))
 					}
 					renderItem={(data, rowMap) => {
 						const { item: { item } } = data;
@@ -608,3 +606,24 @@ export default function MainScreen() {
 	);
 }
 
+/*
+ *
+					data={
+						mode === 'list'
+						? _Pantries[currentPantry]
+							.inventory
+							.filter(i => i.listed)
+							.map(item => ({
+								item,
+								key: item.id,
+								dispatch
+							}))
+						: _Pantries[currentPantry]
+							.inventory
+							.map(item => ({
+								item,
+								key: item.id,
+								dispatch
+							}))
+					}
+*/

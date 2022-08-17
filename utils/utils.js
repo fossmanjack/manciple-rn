@@ -19,6 +19,36 @@ export const debugMsg = (fun, params, dlvl=9) => {
 	}
 }
 
+export const calculateInterval = item => {
+	if(item.history.length < 2) return 0;
+
+	let acc, i = 0;
+	// history(length 3) = [
+	//   [0]: ... 1-0
+	//   [1]: ... 2-1
+	//   [2]: ... 3*-2
+	// So the last iteration has to be when i = length-2
+	for(i; i <= item.history.length - 2; i++) {
+		acc += daysBetween(item.history[i], item.history[i+1]);
+	}
+
+	return acc / (item.history.length - 1);
+}
+
+export const sortPantry = (inv, [ field, asc ]) => {
+	// Valid fields: name, price, loc, purchaseBy, none
+	// asc is a bool for "ascending"
+	if(!field || field === 'none') return inv;
+	console.log('sortPantry:', inv);
+
+	return [...inv].sort((a, b) => {
+		let x = a[field].toString().toLowerCase();
+		let y = b[field].toString().toLowerCase();
+
+		return asc ? x > y ? 1 : x < y ? -1 : 0 : x > y ? -1 : x < y ? 1 : 0;
+	});
+}
+
 
 /* debugging
 

@@ -14,3 +14,14 @@ Not sure why.  Need to fix this somehow.
 ### Icon tray not correctly positioned
 
 This is a frustrating thing that I've been working on for hours now.
+
+### Adding item "unknown variable item" or some such
+
+Happened when I created a new list and tried to add a new item to it.  Wasn't connected
+to expo at the time so I'm not sure if this is a real bug but I think I remember it
+happening once before?
+
+### useState and useSelector aren't updating in a timely fashion, why?
+
+addPantry won't switch to the new pantry, editPantry won't auto-populate the input
+field, uhh there's at least one other place
