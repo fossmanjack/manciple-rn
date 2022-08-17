@@ -103,14 +103,6 @@ const pantriesSlice = createSlice({
 			const idx = Utils.camelize(name);
 
 			item = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === idx);
-/*
-			const item = typeof(action.payload) === 'string'
-				? pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload)
-				: typeof(action.payload) === 'object'
-					? pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload.id)
-					: null;
-*/
-
 			if(typeof(item) === 'object')
 			{
 				item.listed = true;
@@ -125,14 +117,6 @@ const pantriesSlice = createSlice({
 		deleteItem: (pantriesState, action) => {
 			// Expects an item ID as the action payload
 			console.log('deleteItem', action);
-			/*
-			const item = typeof(action.payload) === 'string'
-				? pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload)
-				: typeof(action.payload) === 'object'
-					? pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload.id)
-					: null;
-			*/
-
 			pantriesState._Pantries[pantriesState.currentPantry].inventory =
 				pantriesState._Pantries[pantriesState.currentPantry].inventory.filter(i => i.id !== action.payload);
 		},
@@ -168,64 +152,3 @@ export const {
 	updateItem,
 	sortList
 } = pantriesSlice.actions;
-/*
-export const { setPantry } = pantriesSlice.actions;
-export const { addPantry } = pantriesSlice.actions;
-export const { toggleNeeded } = pantriesSlice.actions;
-export const { toggleListed } = pantriesSlice.actions;
-export const { toggleStaple } = pantriesSlice.actions;
-export const { addItem } = pantriesSlice.actions;
-export const { deleteItem } = pantriesSlice.actions;
-export const { updateItem } = pantriesSlice.actions;
-export const { sortList } = pantriesSlice.actions;
-*/
-/*
-
-				// another option might be to have the payload be the modified item instead of the ID
-		// so like: payload: { ...item, listed: !item.listed }
-				inv = _Pantries[currentPantry].inventory;
-				item = inv.find(i => i.id === action.payload);
-				return ({
-					...pantriesState,
-					_Pantries[currentPantry]: {
-						..._Pantries[currentPantry],
-						inventory: [
-							...inv.filter(i => i.id !== action.payload),
-							{
-								...inv.find(i => i.id === action.payload),
-								listed: !inv.find(i => i.id === action.payload).listed
-							}
-						]
-					}
-				})
-
-				or
-
-				return ({
-					...pantriesState,
-					_Pantries[currentPantry]: {
-						..._Pantries[currentPantry],
-						inventory: [
-							...inv.filter(i => i.id !== action.payload.id),
-							action.payload
-						]
-					}
-				})
-				// this has the side effect of messing with the inventory order,
-				// but that's a problem with the original method as well
-				// if we don't like that we can use splice - item - splice
-
-
-			if(list.includes(([ item ]) => item === action.payload)) return {
-				...pantriesState, // { _Pantries: { pantry1: {...}, pantry2: {...}, ... }, currentPantry: 'pantryID' }
-				_Pantries[currentPantry]: {
-					..._Pantries[currentPantry],
-					shoppingList: [
-						...list.filter(([ item ]) => item !== action.payload),
-						[ item, !list.find(([ item ]) => item === action.payload)[1] ]
-					]
-				}
-			}
-		}
-	}
-*/

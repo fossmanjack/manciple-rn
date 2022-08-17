@@ -47,14 +47,12 @@ export default function MainScreen() {
 	const [ showModal, setShowModal ] = useState(false);
 	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
 	const [ showEditPantryDialog, setShowEditPantryDialog ] = useState(false);
-	//const [ updatedPurchaseBy, setUpdatedPurchaseBy ] = useState({});
 
 	// Input field variables
 	const [ inputNewPantry, setInputNewPantry ] = useState('');
 	const [ inputEditPantry, setInputEditPantry ] = useState('');
 
 	const drawer = useRef(null);
-	//dispatch(Global.setLastUse(Date.now()));
 
 	const LoginHandler = _ => {
 		return (
@@ -65,8 +63,6 @@ export default function MainScreen() {
 	};
 
 	const setDrawerOpen = _ => {
-		//console.log('Drawer:', drawer);
-
 		drawer.current.openDrawer();
 	};
 
@@ -92,15 +88,6 @@ export default function MainScreen() {
 		drawer.current.closeDrawer();
 		setShowEditPantryDialog(!showEditPantryDialog);
 	};
-/*
-	const handleNewPantry = inputText => {
-		console.log('handleNewList', inputText);
-
-		if(inputText) {
-			dispatch(Pantry.addPantry(inputText));
-		}
-	}
-*/
 
 	const handleNPDCancel = _ => {
 		setShowNewPantryDialog(!showNewPantryDialog);
@@ -112,7 +99,6 @@ export default function MainScreen() {
 
 		dispatch(Pantry.addPantry(inputNewPantry));
 		_Pantries.map((pt, idx) => console.log(`_Pantries[${idx}] = ${pt.name}`));
-		//dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.name === inputNewPantry))));
 		setShowNewPantryDialog(!showNewPantryDialog);
 		setInputNewPantry('');
 	}
@@ -420,7 +406,6 @@ export default function MainScreen() {
 		setUpdatedUPC('');
 		setUpdatedInterval('');
 		setUpdatedNotes('');
-		//setUpdatedPurchaseBy({});
 
 		console.log('State reset');
 	}
@@ -451,13 +436,6 @@ export default function MainScreen() {
 						}))
 					}
 					renderItem={(data, rowMap) => {
-						/*
-						console.log('************');
-						console.log('renderItem: ');
-						console.log('\tdata:', Utils.truncateString(''+data, 60));
-						console.log('\trowMap:', Utils.truncateString(''+rowMap, 60));
-						console.log('************');
-						*/
 						const { item: { item } } = data;
 						return (
 							<PantryItem
@@ -481,7 +459,6 @@ export default function MainScreen() {
 							<Button
 								onPress={_ => {
 										editItem(item);
-										//rowMap[item.id].close();
 									}
 								}
 								icon={

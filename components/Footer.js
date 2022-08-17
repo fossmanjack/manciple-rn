@@ -19,7 +19,6 @@ export default function Footer() {
 	const handleSubmit = _ => {
 		console.log('handleSubmit:', ptr.currentPantry, inputText);
 
-		//if(mode === 'list') {
 		// if the input field is empty, set all staples to needed
 		// otherwise attempt to add the input field text as an item
 		if(inputText) {
