@@ -34,17 +34,26 @@ export default function Header({ drawerCtl }) {
 					{ptr.currentPantry !== -1 && ptr._Pantries[ptr.currentPantry].name}: {mode === 'list' ? 'List' : 'Pantry'} view
 				</Text>
 			</View>
-			<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end' }}>
-				<Icon
-					name='list'
-					type='font-awesome'
-					onPress={_ => handleToggleMode()}
-					reverse
+			<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+				<Button
+					onPress={handleToggleMode}
+					icon={mode === 'list'
+						? <Icon
+							name='list-status'
+							type='material-community'
+							color='white'
+						/>
+						: <Icon
+							name='local-grocery-store'
+							type='material'
+							color='white'
+						/>
+					}
 					color='royalblue'
 				/>
 				<Icon
-					name='gear'
-					type='font-awesome'
+					name='sort'
+					type='material'
 					onPress={_ => console.log('Options pressed')}
 					reverse
 					color='royalblue'
