@@ -22,6 +22,8 @@ import { _Styles } from '../res/_Styles';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SortOrderDialog from '../components/SortOrderDialog';
+import PantryDetailDialog from '../components/PantryDetailDialog';
+import PantryEditDialog from '../components/PantryEditDialog';
 import PantryItem from '../components/PantryItem';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
@@ -42,16 +44,16 @@ export default function MainScreen() {
 	const [ updatedUPC, setUpdatedUPC ] = useState('');
 	const [ updatedInterval, setUpdatedInterval ] = useState('');
 	const [ updatedNotes, setUpdatedNotes ] = useState('');
-	const [ pantryToEdit, setPantryToEdit ] = useState({});
+	const [ pantryToEdit, setPantryToEdit ] = useState(_Pantries[currentPantry]);
 
 	// Modal and Dialog toggles
 	const [ showModal, setShowModal ] = useState(false);
 	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
-	const [ showEditPantryDialog, setShowEditPantryDialog ] = useState(false);
+	const [ showPantryDetailDialog, setShowPantryDetailDialog ] = useState(false);
+	const [ showPantryEditDialog, setShowPantryEditDialog ] = useState(false);
 
 	// Input field variables
 	const [ inputNewPantry, setInputNewPantry ] = useState('');
-	const [ inputEditPantry, setInputEditPantry ] = useState('');
 
 	const drawer = useRef(null);
 
@@ -77,7 +79,7 @@ export default function MainScreen() {
 		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
 		setDrawerClosed();
 	};
-
+/*
 	const editPantry = ptID => {
 		console.log('editPantry', ptID);
 		const findPantry = _Pantries.find(pt => pt.id === ptID);
@@ -89,7 +91,7 @@ export default function MainScreen() {
 		drawer.current.closeDrawer();
 		setShowEditPantryDialog(!showEditPantryDialog);
 	};
-
+*/
 	const handleNPDCancel = _ => {
 		setShowNewPantryDialog(!showNewPantryDialog);
 		setInputNewPantry('');
@@ -104,25 +106,19 @@ export default function MainScreen() {
 		setInputNewPantry('');
 	}
 
-	const handleEPDCancel = _ => {
-		setShowEditPantryDialog(!showEditPantryDialog);
-		setInputEditPantry('');
-	};
-
-	const handleEPDCommit = _ => {
+	const handleEditPantry = updatedName => {
 		const updatedPantry = {
-			..._Pantries.find(pt => pt.id === pantryToEdit.id),
-			name: inputEditPantry
+			...pantryToEdit,
+			name: updatedName
 		};
 
-		setShowEditPantryDialog(!showEditPantryDialog);
+		setShowPantryEditDialog(!showPantryEditDialog);
 		dispatch(Pantry.updatePantry(updatedPantry));
-		setPantryToEdit(_Pantries[currentPantry]);
-	};
+	}
 
-	const handleEPDDelete = _ => {
-		console.log('handleEPDDelete:', pantryToEdit.id);
-		setShowEditPantryDialog(!showEditPantryDialog);
+	const handleDeletePantry = _ => {
+		console.log('handleDeletePantry:', pantryToEdit.id);
+		setShowPantryEditDialog(!showPantryEditDialog);
 
 		Alert.alert(
 			'Delete pantry?',
@@ -148,7 +144,7 @@ export default function MainScreen() {
 	const handlePantryDeleteConfirm = _ => {
 		const idx = _Pantries.indexOf(pantryToEdit);
 
-		setShowEditPantryDialog(!showEditPantryDialog);
+		setShowPantryEditDialog(!showPantryEditDialog);
 		console.log('handlePantryDeleteConfirm', idx, currentPantry);
 		if(idx === currentPantry) {
 			// We need to make sure currentPantry points to a valid pantry after
@@ -181,6 +177,11 @@ export default function MainScreen() {
 		setShowEditPantryDialog(!showEditPantryDialog);
 	}
 
+	const showPantryDetail = ptID => {
+		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
+		setShowPantryDetailDialog(!showPantryDetailDialog);
+	}
+
 	const renderDrawer = _ => {
 		return (
 			<>
@@ -192,7 +193,7 @@ export default function MainScreen() {
 						renderItem={({ item: pantry }) => (
 							<Pressable
 								onPress={_ => handlePantryChange(pantry.id)}
-								onLongPress={_ => editPantry(pantry.id)}
+								onLongPress={_ => showPantryDetail(pantry.id)}
 								style={{
 									borderBottomWidth: 1,
 									borderBottomColor: 'lightgray',
@@ -588,19 +589,22 @@ export default function MainScreen() {
 				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
 				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
 			</Dialog.Container>
-			<Dialog.Container visible={showEditPantryDialog}>
-				<Dialog.Title>
-					Edit Pantry
-				</Dialog.Title>
-				<Dialog.Input
-					placeholder='Edit pantry name...'
-					value={inputEditPantry}
-					onChangeText={text => setInputEditPantry(text)}
-				/>
-				<Dialog.Button label='Delete List' onPress={handleEPDDelete} />
-				<Dialog.Button label='Cancel' onPress={handleEPDCancel} />
-				<Dialog.Button label='OK' onPress={handleEPDCommit} />
-			</Dialog.Container>
+			<PantryDetailDialog
+				visible={showPantryDetailDialog}
+				setVisible={setShowPantryDetailDialog}
+				pantry={pantryToEdit}
+				handleEditPantry={_ => {
+					setShowPantryDetailDialog(!showPantryDetailDialog);
+					setShowPantryEditDialog(!showPantryEditDialog);
+				}}
+			/>
+			<PantryEditDialog
+				visible={showPantryEditDialog}
+				setVisible={setShowPantryEditDialog}
+				pantry={pantryToEdit}
+				handleEditPantry={handleEditPantry}
+				handleDeletePantry={handleDeletePantry}
+			/>
 			<Footer />
 		</DrawerLayoutAndroid>
 	);

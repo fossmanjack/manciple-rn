@@ -1,18 +1,17 @@
 import { useSelector } from 'react-redux';
-import { Button } from 'react-native-elements';
-import { Text } from 'react-native';
+import { Button, Icon } from 'react-native-elements';
+import { Text, View } from 'react-native';
 import Dialog from 'react-native-dialog';
 
 export default function PantryDetailDialog(props) {
 	const { pantry, visible, setVisible, handleEditPantry } = props;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 
 	const handleExport = _ => {
 		console.log('handleExport', pantry);
 	}
 
 	return (
-		<Dialog.Container visible={display}>
+		<Dialog.Container visible={visible}>
 			<Dialog.Title>
 				Pantry Info: {pantry.name}
 			</Dialog.Title>
@@ -49,7 +48,7 @@ export default function PantryDetailDialog(props) {
 			/>
 			<Dialog.Button
 				label='OK'
-				onPress={handleClosePantryItemDialog}
+				onPress={_ => setVisible(!visible)}
 				icon={
 					<Icon
 						name='check'

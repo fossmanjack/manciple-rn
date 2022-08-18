@@ -25,3 +25,5 @@ happening once before?
 
 addPantry won't switch to the new pantry, editPantry won't auto-populate the input
 field, uhh there's at least one other place
+
+It's still happening even after changing the code around
