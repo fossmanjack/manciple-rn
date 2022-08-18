@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
 	Pressable,
-	ScrollView,
 	Switch,
 	Text,
 	View
@@ -15,16 +14,48 @@ export default function SortOrderDialog(props) {
 	const { dispatch, visible, setVisible } = props;
 	const [ sortField, sortAsc ] = useSelector(S => S.options.sortOpts);
 	const [ ascending, setAscending ] = useState(sortAsc);
+	const [ field, setField ] = useState(sortField);
+	const _Opts = [
+		[ 'name', 'Name' ],
+		[ 'loc', 'Location' ],
+		[ 'price', 'Price' ],
+		[ 'purchaseBy', 'Purchase By' ],
+		[ 'none', 'Custom' ]
+	];
 
-	const handleSelection = field => {
+	const handleClose = _ => {
 		dispatch(Options.setSortOpts([ field, ascending ]));
 		setVisible(!visible);
 	}
 
-	const handleClose = _ => {
-		if(ascending !== sortAsc)
-			dispatch(Options.setSortOpts([ sortField, ascending]));
-		setVisible(!visible);
+	const RadioButton = props => {
+		const { id, label } = props;
+
+		return (
+			<Pressable
+				onPress={_ => setField(id)}
+				style={{
+					flexDirection: 'row',
+					alignItems: 'center',
+					paddingVertical: 8
+				}}
+			>
+				<Icon
+					name={field === id ? 'radio-button-on' : 'radio-button-off'}
+					type='material'
+					style={{
+						paddingRight: 5
+					}}
+				/>
+				<Text
+					style={{
+						fontSize: 18
+					}}
+				>
+					{label}
+				</Text>
+			</Pressable>
+		);
 	}
 
 	return (
@@ -33,97 +64,28 @@ export default function SortOrderDialog(props) {
 			onBackdropPress={handleClose}
 			onRequestClose={handleClose}
 		>
-			<ScrollView>
-				<Dialog.Title>
-					Sort Order
-				</Dialog.Title>
-				<Dialog.Description style={{
-					flexDirection: 'row',
-					alignItems: 'center',
-					justifyContent: 'center'
-				}}>
-						<Text>
-							Ascending?
-						</Text>
-						<Switch
-							value={ascending}
-							onValueChange={_ => setAscending(!ascending)}
-						/>
-						<Button
-							onPress={handleClose}
-							title='Close'
-						/>
-				</Dialog.Description>
-				<Dialog.Description>
+			<Dialog.Title>
+				Sort Order
+			</Dialog.Title>
+			<Dialog.Switch
+				value={ascending}
+				label='Ascending?'
+				onValueChange={_ => setAscending(!ascending)}
+			/>
+				{_Opts.map(opt =>
 					<View>
-						<Pressable
-							onPress={_ => handleSelection('name')}
-						>
-							{ sortField === 'name' &&
-								<Icon
-									name='check'
-									type='font-awesome'
-									color='gray'
-									size={14}
-								/>
-							}
-							<Text>Name</Text>
-						</Pressable>
-						<Pressable
-							onPress={_ => handleSelection('loc')}
-						>
-							{ sortField === 'loc' &&
-								<Icon
-									name='check'
-									type='font-awesome'
-									color='gray'
-									size={14}
-								/>
-							}
-							<Text>Location</Text>
-						</Pressable>
-						<Pressable
-							onPress={_ => handleSelection('purchaseBy')}
-						>
-							{ sortField === 'purchaseBy' &&
-								<Icon
-									name='check'
-									type='font-awesome'
-									color='gray'
-									size={14}
-								/>
-							}
-							<Text>Purchase By</Text>
-						</Pressable>
-						<Pressable
-							onPress={_ => handleSelection('price')}
-						>
-							{ sortField === 'price' &&
-								<Icon
-									name='check'
-									type='font-awesome'
-									color='gray'
-									size={14}
-								/>
-							}
-							<Text>Price</Text>
-						</Pressable>
-						<Pressable
-							onPress={_ => handleSelection('none')}
-						>
-							{ sortField === 'none' &&
-								<Icon
-									name='check'
-									type='font-awesome'
-									color='gray'
-									size={14}
-								/>
-							}
-							<Text>Custom</Text>
-						</Pressable>
+						<RadioButton
+							id={opt[0]}
+							label={opt[1]}
+						/>
 					</View>
-				</Dialog.Description>
-			</ScrollView>
+				)}
+			<Dialog.Button
+				onPress={handleClose}
+				label='OK'
+			/>
 		</Dialog.Container>
 	);
+
 }
+
