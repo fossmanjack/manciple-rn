@@ -39,7 +39,7 @@ export const sortPantry = (inv, [ field, asc ]) => {
 	// Valid fields: name, price, loc, purchaseBy, none
 	// asc is a bool for "ascending"
 	if(!field || field === 'none') return inv;
-	console.log('sortPantry:', inv);
+	console.log('sortPantry called');
 
 	return [...inv].sort((a, b) => {
 		let x = a[field].toString().toLowerCase();

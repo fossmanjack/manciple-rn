@@ -8,7 +8,10 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import { useState, useRef } from 'react';
+import {
+	useEffect,
+	useState,
+	useRef } from 'react';
 import {
 	Button,
 	Card,
@@ -24,30 +27,30 @@ import Footer from '../components/Footer';
 import SortOrderDialog from '../components/SortOrderDialog';
 import PantryDetailDialog from '../components/PantryDetailDialog';
 import PantryEditDialog from '../components/PantryEditDialog';
+import EditItemModal from '../components/EditItemModal';
+import EditItemComponent from '../components/EditItemComponent';
 import PantryItem from '../components/PantryItem';
+import createPantryItem from '../slices/pantryItemSlice';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
 import * as Utils from '../utils/utils';
 
 export default function MainScreen() {
+	const blankItem = (createPantryItem({ name: 'Blank item', id: 'blankItem' }));
+	const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 	const dispatch = useDispatch();
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { debug, sortOpts } = useSelector(S => S.options);
 	const { mode } = useSelector(S => S.global);
 	const [ view, setView ] = useState('list');
 	const [ currentItem, setCurrentItem ] = useState({});
-	const [ updatedName, setUpdatedName ] = useState('');
-	const [ updatedQty, setUpdatedQty ] = useState('');
-	const [ updatedPrice, setUpdatedPrice ] = useState('');
-	const [ updatedLoc, setUpdatedLoc ] = useState('');
-	const [ updatedURL, setUpdatedURL ] = useState('');
-	const [ updatedUPC, setUpdatedUPC ] = useState('');
-	const [ updatedInterval, setUpdatedInterval ] = useState('');
-	const [ updatedNotes, setUpdatedNotes ] = useState('');
-	const [ pantryToEdit, setPantryToEdit ] = useState(_Pantries[currentPantry]);
+	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
+	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
+
+
 
 	// Modal and Dialog toggles
-	const [ showModal, setShowModal ] = useState(false);
+	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
 	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
 	const [ showPantryDetailDialog, setShowPantryDetailDialog ] = useState(false);
 	const [ showPantryEditDialog, setShowPantryEditDialog ] = useState(false);
@@ -73,25 +76,18 @@ export default function MainScreen() {
 		drawer.current.closeDrawer();
 	};
 
+	const toggleEditItemVisible = _ => {
+		console.log('toggleEditItemVisible called');
+		setShowEditItemModal(!showEditItemModal);
+	}
+
 	const handlePantryChange = ptID => {
 		console.log('handleListChange', ptID);
 
 		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
 		setDrawerClosed();
 	};
-/*
-	const editPantry = ptID => {
-		console.log('editPantry', ptID);
-		const findPantry = _Pantries.find(pt => pt.id === ptID);
-		console.log('findPantry', findPantry);
-		setPantryToEdit(findPantry);
-		//setInputEditPantry(_Pantries.find(pt => pt.id === ptID).name);
-		console.log('pantryToEdit', pantryToEdit);
-		setInputEditPantry(pantryToEdit.name);
-		drawer.current.closeDrawer();
-		setShowEditPantryDialog(!showEditPantryDialog);
-	};
-*/
+
 	const handleNPDCancel = _ => {
 		setShowNewPantryDialog(!showNewPantryDialog);
 		setInputNewPantry('');
@@ -165,7 +161,7 @@ export default function MainScreen() {
 			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(currentPantry - 1));
 		}
 
-		setPantryToEdit({});
+		setPantryToEdit(blankPantry);
 		console.log('currentPantry:', currentPantry);
 		dispatch(Pantry.deletePantry(idx));
 		console.log(_Pantries);
@@ -361,17 +357,12 @@ export default function MainScreen() {
 	}
 
 	const editItem = item => {
-		setCurrentItem(item);
-		setUpdatedName(item.name);
-		setUpdatedQty(item.qty);
-		setUpdatedPrice(item.price);
-		setUpdatedLoc(item.loc);
-		setUpdatedURL(item.url);
-		setUpdatedUPC(item.upc);
-		setUpdatedInterval(item.interval.toString());
-		setUpdatedNotes(item.notes);
+		console.log('setItemToEdit passed item:', item.id);
+		console.log('setItemToEdit pre:', itemToEdit.id);
+		setItemToEdit({ ...item });
+		console.log('Items equal after set?', item === itemToEdit.current ? 'yes' : 'no', item.id, ':', itemToEdit.id);
 
-		setShowModal(!showModal);
+		setShowEditItemModal(!showEditItemModal);
 	}
 
 	const handleEditItemCommit = _ => {
@@ -498,85 +489,6 @@ export default function MainScreen() {
 					closeOnScroll
 				/>
 			}
-			<Modal
-				transparent={false}
-				visible={showModal}
-				onRequestClose={_ => setShowModal(!showModal)}
-			>
-				<Text>
-					Name
-				</Text>
-				<Input
-					placeholder='Item name'
-					value={updatedName}
-					onChangeText={t => setUpdatedName(t)}
-				/>
-				<Text>
-					Quantity
-				</Text>
-				<Input
-					placeholder='Quantity'
-					value={updatedQty}
-					onChangeText={t => setUpdatedQty(t)}
-				/>
-				<Text>
-					Price
-				</Text>
-				<Input
-					placeholder='Price'
-					value={updatedPrice}
-					onChangeText={t => setUpdatedPrice(t)}
-				/>
-				<Text>
-					Location
-				</Text>
-				<Input
-					placeholder='Location'
-					value={updatedLoc}
-					onChangeText={t => setUpdatedLoc(t)}
-				/>
-				<Text>
-					URL
-				</Text>
-				<Input
-					placeholder='URL'
-					value={updatedURL}
-					onChangeText={t => setUpdatedURL(t)}
-				/>
-				<Text>
-					UPC
-				</Text>
-				<Input
-					placeholder='UPC'
-					value={updatedUPC}
-					onChangeText={t => setUpdatedUPC(t)}
-				/>
-				<Text>
-					Interval
-				</Text>
-				<Input
-					placeholder='Purchase interval'
-					value={updatedInterval}
-					keyboardType='number-pad'
-					onChangeText={t => setUpdatedInterval(t)}
-				/>
-				<Text>
-					Notes
-				</Text>
-				<Input
-					placeholder='Notes'
-					value={updatedNotes}
-					onChangeText={t => setUpdatedNotes(t)}
-				/>
-				<Button
-					title='Commit'
-					onPress={_ => handleEditItemCommit()}
-				/>
-				<Button
-					title='Cancel'
-					onPress={_ => resetState()}
-				/>
-			</Modal>
 			<Dialog.Container visible={showNewPantryDialog}>
 				<Dialog.Title>
 					Create New Pantry
@@ -589,6 +501,13 @@ export default function MainScreen() {
 				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
 				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
 			</Dialog.Container>
+			<EditItemModal
+				dispatch={dispatch}
+				visible={showEditItemModal}
+				setVisible={setShowEditItemModal}
+				item={itemToEdit}
+				key={itemToEdit.id}
+			/>
 			<PantryDetailDialog
 				visible={showPantryDetailDialog}
 				setVisible={setShowPantryDetailDialog}
@@ -597,6 +516,7 @@ export default function MainScreen() {
 					setShowPantryDetailDialog(!showPantryDetailDialog);
 					setShowPantryEditDialog(!showPantryEditDialog);
 				}}
+				key={pantryToEdit.id}
 			/>
 			<PantryEditDialog
 				visible={showPantryEditDialog}
@@ -604,30 +524,9 @@ export default function MainScreen() {
 				pantry={pantryToEdit}
 				handleEditPantry={handleEditPantry}
 				handleDeletePantry={handleDeletePantry}
+				key={`${pantryToEdit.id}-ped`}
 			/>
 			<Footer />
 		</DrawerLayoutAndroid>
 	);
 }
-
-/*
- *
-					data={
-						mode === 'list'
-						? _Pantries[currentPantry]
-							.inventory
-							.filter(i => i.listed)
-							.map(item => ({
-								item,
-								key: item.id,
-								dispatch
-							}))
-						: _Pantries[currentPantry]
-							.inventory
-							.map(item => ({
-								item,
-								key: item.id,
-								dispatch
-							}))
-					}
-*/

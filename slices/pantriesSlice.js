@@ -121,10 +121,12 @@ const pantriesSlice = createSlice({
 				pantriesState._Pantries[pantriesState.currentPantry].inventory.filter(i => i.id !== action.payload);
 		},
 		updateItem: (pantriesState, action) => {
-			// Expects { itemID, newItemOb } as action.payload
+			// Expects { origItemID, newItemOb } as action.payload
 			const { itemID, updatedItem } = action.payload;
-			const initItem = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === itemID);
-			const index = initItem ? pantriesState._Pantries[pantriesState.currentPantry].inventory.indexOf(initItem) : null;
+			//const initItem = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === itemID);
+			//const index = initItem ? pantriesState._Pantries[pantriesState.currentPantry].inventory.indexOf(initItem) : null;
+			const index = pantriesState._Pantries[pantriesState.currentPantry].inventory.indexOf(
+				pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === itemID));;
 			console.log('updateItem called:', updatedItem, index);
 			index !== -1
 				&& pantriesState._Pantries[pantriesState.currentPantry].inventory.splice(index, 1, updatedItem)
