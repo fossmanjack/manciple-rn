@@ -27,6 +27,7 @@ import Footer from '../components/Footer';
 import SortOrderDialog from '../components/SortOrderDialog';
 import PantryDetailDialog from '../components/PantryDetailDialog';
 import PantryEditDialog from '../components/PantryEditDialog';
+import NewPantryDialog from '../components/NewPantryDialog';
 import EditItemModal from '../components/EditItemModal';
 import EditItemComponent from '../components/EditItemComponent';
 import PantryItem from '../components/PantryItem';
@@ -111,7 +112,6 @@ export default function MainScreen() {
 		setShowPantryEditDialog(!showPantryEditDialog);
 		dispatch(Pantry.updatePantry(updatedPantry));
 	}
-*/
 
 	const handleDeletePantry = _ => {
 		console.log('handleDeletePantry:', pantryToEdit.id);
@@ -173,6 +173,7 @@ export default function MainScreen() {
 		setInputEditPantry('');
 		setShowEditPantryDialog(!showEditPantryDialog);
 	}
+*/
 
 	const showPantryDetail = ptID => {
 		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
@@ -380,7 +381,7 @@ export default function MainScreen() {
 
 		setShowEditItemModal(!showEditItemModal);
 	}
-
+/*
 	const handleEditItemCommit = _ => {
 		setShowModal(!showModal);
 		setCurrentItem({});
@@ -418,6 +419,7 @@ export default function MainScreen() {
 
 		console.log('State reset');
 	}
+*/
 
 	return (
 		<DrawerLayoutAndroid
@@ -505,24 +507,16 @@ export default function MainScreen() {
 					closeOnScroll
 				/>
 			}
-			<Dialog.Container visible={showNewPantryDialog}>
-				<Dialog.Title>
-					Create New Pantry
-				</Dialog.Title>
-				<Dialog.Input
-					placeholder='New pantry name...'
-					value={inputNewPantry}
-					onChangeText={text => setInputNewPantry(text)}
-				/>
-				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
-				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
-			</Dialog.Container>
 			<EditItemModal
 				dispatch={dispatch}
 				visible={showEditItemModal}
 				setVisible={setShowEditItemModal}
 				item={itemToEdit}
-				key={itemToEdit.id}
+				key={`${itemToEdit}-modal`}
+			/>
+			<NewPantryDialog
+				visible={showNewPantryDialog}
+				setVisible={setShowNewPantryDialog}
 			/>
 			<PantryDetailDialog
 				visible={showPantryDetailDialog}
@@ -545,3 +539,20 @@ export default function MainScreen() {
 		</DrawerLayoutAndroid>
 	);
 }
+
+/*
+ *
+
+			<Dialog.Container visible={showNewPantryDialog}>
+				<Dialog.Title>
+					Create New Pantry
+				</Dialog.Title>
+				<Dialog.Input
+					placeholder='New pantry name...'
+					value={inputNewPantry}
+					onChangeText={text => setInputNewPantry(text)}
+				/>
+				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
+				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
+			</Dialog.Container>
+*/
