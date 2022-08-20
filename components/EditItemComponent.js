@@ -4,7 +4,7 @@
 // Then handleEdit sets the ref to a new one that grabs the current object to edit
 // That might work?  Otherwise we'll probably have to turn this into a React component
 // or something
-import { useState } from 'react';
+import React from 'react';
 import {
 	Modal,
 	Text,
@@ -18,47 +18,61 @@ import {
 import * as Pantry from '../slices/pantriesSlice';
 import * as Utils from '../utils/utils';
 
-export default function EditItemModal(props) {
-	const { item, visible, setVisible, dispatch } = props;
-	const [ updatedItem, setUpdatedItem ] = useState(item);
-
-	const handleCommit = _ => {
-		dispatch(Pantry.updateItem({
-			updatedItem: { ...updatedItem, id: Utils.camelize(updatedItem.name) },
-			itemID: item.id
-		}));
-		setVisible(!visible);
+export default class EditItemComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		this.visible = props.visible;
+		this.toggleVisible = props.toggleVisible;
+		this.dispatch = props.dispatch;
+		this.referenceItemId = props.item.id;
+		this.updatedItem = { ...props.item };
+		this.handleCommit = this.handleCommit.bind(this);
+		this.state = { updatedItem: { ...props.item } };
 	}
 
-	return (
-		<Modal
-			transparent={false}
-			visible={visible}
-			onRequestClose={_ => setVisible(!visible)}
-		>
-			<Text>
-				Name
-			</Text>
-			<Input
-				placeholder='Item name'
-				value={updatedItem.name}
-				onChangeText={t => setUpdatedItem({ ...updatedItem, name: t })}
-			/>
-			<View style={{
-				flexDirection: 'row'
-			}}>
-				<Button
-					title='Commit'
-					onPress={_ => handleCommit(updatedItem)}
+	handleCommit() {
+		this.dispatch(Pantry.updateItem({
+			updatedItem: { ...this.updatedItem, id: Utils.camelize(this.updatedItem.name) },
+			itemID: this.referenceItemId
+		}));
+		this.toggleVisible();
+	}
+
+	render() {
+		return (
+			<Modal
+				transparent={false}
+				visible={this.visible}
+				onRequestClose={_ => this.toggleVisible()}
+			>
+				<Text>
+					Name
+				</Text>
+				<Input
+					placeholder='Item name'
+					value={this.state.updatedItem.name}
+					onChangeText={t => this.setState({ updatedItem: {
+						...this.state.updatedItem,
+						name: t
+					}})}
 				/>
-				<Button
-					title='Cancel'
-					onPress={_ => setVisible(!visible)}
-				/>
-			</View>
-		</Modal>
-	);
+				<View style={{
+					flexDirection: 'row'
+				}}>
+					<Button
+						title='Commit'
+						onPress={_ => this.handleCommit(this.state.updatedItem)}
+					/>
+					<Button
+						title='Cancel'
+						onPress={_ => this.toggleVisible()}
+					/>
+				</View>
+			</Modal>
+		);
+	}
 }
+
 
 /*
 

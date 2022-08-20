@@ -29,10 +29,11 @@ export default function SortOrderDialog(props) {
 	}
 
 	const RadioButton = props => {
-		const { id, label } = props;
+		const { id, label, key } = props;
 
 		return (
 			<Pressable
+				key={key}
 				onPress={_ => setField(id)}
 				style={{
 					flexDirection: 'row',
@@ -73,12 +74,11 @@ export default function SortOrderDialog(props) {
 				onValueChange={_ => setAscending(!ascending)}
 			/>
 				{_Opts.map(opt =>
-					<View>
 						<RadioButton
 							id={opt[0]}
 							label={opt[1]}
+							key={opt[0]}
 						/>
-					</View>
 				)}
 			<Dialog.Button
 				onPress={handleClose}
