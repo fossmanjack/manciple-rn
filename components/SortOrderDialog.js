@@ -29,11 +29,10 @@ export default function SortOrderDialog(props) {
 	}
 
 	const RadioButton = props => {
-		const { id, label, key } = props;
+		const { id, label } = props;
 
 		return (
 			<Pressable
-				key={key}
 				onPress={_ => setField(id)}
 				style={{
 					flexDirection: 'row',

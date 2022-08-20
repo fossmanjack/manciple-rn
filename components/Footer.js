@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	SafeAreaView,
 	Text,
@@ -5,40 +7,57 @@ import {
 	View
 } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { useDispatch, useSelector } from 'react-redux';
-import React from 'react';
 import * as Pantry from '../slices/pantriesSlice';
 import { _Styles } from '../res/_Styles';
 
 export default function Footer() {
-	const [ inputText, onChangeInputText ] = React.useState('');
+	const [ inputText, setInputText ] = useState('');
 	const { mode } = useSelector(S => S.options);
-	const ptr = useSelector(S => S.pantries);
+	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const dispatch = useDispatch();
 
 	const handleSubmit = _ => {
-		console.log('handleSubmit:', ptr.currentPantry, inputText);
+		console.log('handleSubmit:', currentPantry, inputText);
 
 		// if the input field is empty, set all staples to needed
 		// otherwise attempt to add the input field text as an item
 		if(inputText) {
 			dispatch(Pantry.addItem(inputText));
 		} else {
-			ptr._Pantries[ptr.currentPantry].inventory.forEach(item =>
-				item.staple && !item.listed && dispatch(Pantry.toggleListed(item.id)) && !item.needed && dispatch(Pantry.toggleNeeded(item.id)));
+			_Pantries[currentPantry].inventory.forEach(item =>
+				//item.staple && !item.listed && dispatch(Pantry.toggleListed(item.id)) && !item.needed && dispatch(Pantry.toggleNeeded(item.id)));
+				item.staple && !item.listed && dispatch(Pantry.updateItem({
+					itemID: item.id,
+					updatedItem: {
+						...item,
+						listed: true,
+						needed: true
+					}
+				}))
+			);
 		}
-		resetForm();
+		setInputText('');
 	}
 
-	const resetForm = _ => {
-		onChangeInputText('');
+	const sweepAll = _ => {
+		_Pantries[currentPantry].inventory.forEach(item =>
+			!item.needed && dispatch(Pantry.updateItem({
+				itemID: item.id,
+				updatedItem: {
+					...item,
+					listed: false,
+					needed: true
+				}
+			}))
+		);
 	}
+
 
 	return (
 		<SafeAreaView style={{ flexDirection: 'row', alignItems: 'center' }}>
 			<TextInput
 				style={_Styles.footerTextBox}
-				onChangeText={onChangeInputText}
+				onChangeText={setInputText}
 				value={inputText}
 				placeholder='Add an item ...'
 			/>
@@ -48,8 +67,8 @@ export default function Footer() {
 				type='font-awesome'
 				color='royalblue'
 				reverse
-				onPress={_ => handleSubmit()}
-				disabled={ptr.currentPantry === -1}
+				onPress={handleSubmit}
+				disabled={currentPantry === -1}
 			/>
 			<Icon
 				style={_Styles.footerIcon}
@@ -57,7 +76,7 @@ export default function Footer() {
 				type='font-awesome-5'
 				color='royalblue'
 				reverse
-				onPress={_ => ptr._Pantries[ptr.currentPantry].inventory.forEach(i => !i.needed && dispatch(Pantry.toggleListed(i.id)))}
+				onPress={sweepAll}
 			/>
 		</SafeAreaView>
 	);

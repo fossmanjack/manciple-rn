@@ -11,7 +11,8 @@ import {
 import {
 	useEffect,
 	useState,
-	useRef } from 'react';
+	useRef
+} from 'react';
 import {
 	Button,
 	Card,
@@ -29,7 +30,6 @@ import PantryDetailDialog from '../components/PantryDetailDialog';
 import PantryEditDialog from '../components/PantryEditDialog';
 import NewPantryDialog from '../components/NewPantryDialog';
 import EditItemModal from '../components/EditItemModal';
-import EditItemComponent from '../components/EditItemComponent';
 import PantryItem from '../components/PantryItem';
 import createPantryItem from '../slices/pantryItemSlice';
 import * as Pantry from '../slices/pantriesSlice';
@@ -44,11 +44,8 @@ export default function MainScreen() {
 	const { debug, sortOpts } = useSelector(S => S.options);
 	const { mode } = useSelector(S => S.global);
 	const [ view, setView ] = useState('list');
-	const [ currentItem, setCurrentItem ] = useState({});
 	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
 	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
-
-
 
 	// Modal and Dialog toggles
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
@@ -89,95 +86,9 @@ export default function MainScreen() {
 		setDrawerClosed();
 	};
 
-	const handleNPDCancel = _ => {
-		setShowNewPantryDialog(!showNewPantryDialog);
-		setInputNewPantry('');
-	}
-
-	const handleNPDCreate = _ => {
-		console.log('handleNPDCreate', inputNewPantry);
-
-		dispatch(Pantry.addPantry(inputNewPantry));
-		_Pantries.map((pt, idx) => console.log(`_Pantries[${idx}] = ${pt.name}`));
-		setShowNewPantryDialog(!showNewPantryDialog);
-		setInputNewPantry('');
-	}
-/*
-	const handleEditPantry = updatedName => {
-		const updatedPantry = {
-			...pantryToEdit,
-			name: updatedName
-		};
-
-		setShowPantryEditDialog(!showPantryEditDialog);
-		dispatch(Pantry.updatePantry(updatedPantry));
-	}
-
-	const handleDeletePantry = _ => {
-		console.log('handleDeletePantry:', pantryToEdit.id);
-		setShowPantryEditDialog(!showPantryEditDialog);
-
-		Alert.alert(
-			'Delete pantry?',
-			`Are you sure you wish to delete the pantry ${pantryToEdit.name}?  All of your item and purchase history will be lost!`,
-			[
-				{
-					text: 'Cancel',
-					onPress: _ => handlePantryDeleteCancel(),
-					style: 'cancel'
-				},
-				{
-					text: 'OK',
-					onPress: _ => handlePantryDeleteConfirm(),
-				}
-			],
-			{
-				cancelable: true,
-				onDismiss: _ => handlePantryDeleteCancel()
-			}
-		);
-	}
-
-	const handlePantryDeleteConfirm = _ => {
-		const idx = _Pantries.indexOf(pantryToEdit);
-
-		setShowPantryEditDialog(!showPantryEditDialog);
-		console.log('handlePantryDeleteConfirm', idx, currentPantry);
-		if(idx === currentPantry) {
-			// We need to make sure currentPantry points to a valid pantry after
-			// the delete operation.  As long as _Pantries.length is at least two more than
-			// the index we're deleting we don't need to do anything, because:
-			// idx = x
-			// _Pantries.length = x+1
-			// _Pantries.length after op = x (but _Pantries[x] is gone)
-			// So that's one literal edge case
-			// So if _Pantries.length > x + 1, no action
-			// else setPantry(currentPantry - 1);
-			// Which is fine unless currentPantry is 0
-			// but even then actually, because no action will be taken unless _Pantries.length is 1
-			// In which case _Pantries[0] is the only element
-			// So:
-			// if(_Pantries.length <= idx + 1) setPantry(currentPantry - 1);
-			console.log('trying to delete current pantry!');
-			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(currentPantry - 1));
-		}
-
-		setPantryToEdit(blankPantry);
-		console.log('currentPantry:', currentPantry);
-		dispatch(Pantry.deletePantry(idx));
-		console.log(_Pantries);
-	}
-
-	const handlePantryDeleteCancel = _ => {
-		setPantryToEdit({});
-		setInputEditPantry('');
-		setShowEditPantryDialog(!showEditPantryDialog);
-	}
-*/
-
 	const showPantryDetail = ptID => {
 		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
-		setShowPantryDetailDialog(!showPantryDetailDialog);
+		setShowPantryDetailDialog(true);
 	}
 
 	const renderDrawer = _ => {
@@ -330,36 +241,37 @@ export default function MainScreen() {
 	const handleCheckBox = itemID => {
 		console.log("handleCheckBox called with item", itemID);
 
-		mode === 'list' && dispatch(Pantry.toggleNeeded(itemID)) || dispatch(Pantry.toggleListed(itemID));
+		const updatedItem = { ..._Pantries[currentPantry].inventory.find(i => i.id === itemID) };
+		mode === 'list'
+			? updatedItem.needed = !updatedItem.needed
+			: updatedItem.listed = !updatedItem.listed;
+
+		dispatch(Pantry.updateItem({ itemID, updatedItem }));
 	};
 
 	const handleSweep = (rowKey, listData) => {
-//		console.log('handleSweep called with data', rowKey, rowVal);
 		console.log('handleSweep:', rowKey, listData[rowKey].props.item.item);
-		newItem = {
-			...listData[rowKey].props.item.item,
-			listed: false
-		};
 
-		console.log('newItem:', newItem);
 		dispatch(Pantry.updateItem({
 			itemID: rowKey,
-			updatedItem: newItem
+			updatedItem: {
+				...listData[rowKey].props.item.item,
+				listed: false,
+				needed: true
+			}
 		}));
-
-		//dispatch(Pantry.toggleListed(rowKey));
-/*
-		dispatch(Pantry.updateItem(rowKey, {
-			...listData[rowKey].props.item.item,
-			listed: false
-		}));
-*/
 	};
 
-	const handleToggleStaple = itemID => {
-		console.log('handleToggleStaple called with item', itemID);
+	const handleToggleStaple = item => {
+		console.log('handleToggleStaple called with item', item);
 
-		dispatch(Pantry.toggleStaple(itemID));
+		dispatch(Pantry.updateItem({
+			itemID: item.id,
+			updatedItem: {
+				...item,
+				staple: !item.staple
+			}
+		}));
 	};
 
 	const handleDateChange = (item, date) => {
@@ -381,45 +293,6 @@ export default function MainScreen() {
 
 		setShowEditItemModal(!showEditItemModal);
 	}
-/*
-	const handleEditItemCommit = _ => {
-		setShowModal(!showModal);
-		setCurrentItem({});
-
-		const updatedItem = {
-			...currentItem,
-			name: updatedName,
-			id: Utils.camelize(updatedName),
-			qty: updatedQty,
-			price: updatedPrice,
-			loc: updatedLoc,
-			url: updatedURL,
-			upc: updatedUPC,
-			interval: parseInt(updatedInterval),
-			notes: updatedNotes
-		};
-
-		dispatch(Pantry.updateItem({
-			itemID: currentItem.id,
-			updatedItem
-		}));
-	}
-
-	const resetState = _ => {
-		setShowModal(false);
-		setCurrentItem({});
-		setUpdatedName('');
-		setUpdatedQty('');
-		setUpdatedPrice('');
-		setUpdatedLoc('');
-		setUpdatedURL('');
-		setUpdatedUPC('');
-		setUpdatedInterval('');
-		setUpdatedNotes('');
-
-		console.log('State reset');
-	}
-*/
 
 	return (
 		<DrawerLayoutAndroid
@@ -481,7 +354,7 @@ export default function MainScreen() {
 								style={{ width: 100 }}
 							/>
 							<Button
-								onPress={_ => handleToggleStaple(item.id)}
+								onPress={_ => handleToggleStaple(item)}
 								icon={
 									<Icon
 										name={item.staple ? 'toggle-on' : 'toggle-off'}
@@ -512,7 +385,7 @@ export default function MainScreen() {
 				visible={showEditItemModal}
 				setVisible={setShowEditItemModal}
 				item={itemToEdit}
-				key={`${itemToEdit}-modal`}
+				key={itemToEdit.id}
 			/>
 			<NewPantryDialog
 				visible={showNewPantryDialog}
@@ -539,20 +412,3 @@ export default function MainScreen() {
 		</DrawerLayoutAndroid>
 	);
 }
-
-/*
- *
-
-			<Dialog.Container visible={showNewPantryDialog}>
-				<Dialog.Title>
-					Create New Pantry
-				</Dialog.Title>
-				<Dialog.Input
-					placeholder='New pantry name...'
-					value={inputNewPantry}
-					onChangeText={text => setInputNewPantry(text)}
-				/>
-				<Dialog.Button label='Cancel' onPress={handleNPDCancel} />
-				<Dialog.Button label='Create' onPress={handleNPDCreate} disabled={!inputNewPantry} />
-			</Dialog.Container>
-*/

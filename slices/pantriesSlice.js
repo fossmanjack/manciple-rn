@@ -65,6 +65,7 @@ const pantriesSlice = createSlice({
 				&& pantriesState._Pantries.splice(updateIdx, 1, action.payload)
 				|| pantriesState._Pantries.push(action.payload);
 		},
+/*
 		toggleNeeded: (pantriesState, action) => {
 			// updates the passed item's "needed" to the inverse of its current value
 			// action -> { type: 'pantries/toggleNeeded', payload: itemID }
@@ -94,6 +95,7 @@ const pantriesSlice = createSlice({
 			item.staple = !item.staple;
 			pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
 		},
+*/
 		addItem: (pantriesState, action) => {
 			// Expects a string as an action payload, which it then splits at the parentheses
 			// searches the inventory for the action payload, then toggles its needed/listed states if found
@@ -146,9 +148,11 @@ export const {
 	addPantry,
 	deletePantry,
 	updatePantry,
+/*
 	toggleNeeded,
 	toggleListed,
 	toggleStaple,
+*/
 	addItem,
 	deleteItem,
 	updateItem,
