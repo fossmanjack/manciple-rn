@@ -101,7 +101,7 @@ export default function MainScreen() {
 		setShowNewPantryDialog(!showNewPantryDialog);
 		setInputNewPantry('');
 	}
-
+/*
 	const handleEditPantry = updatedName => {
 		const updatedPantry = {
 			...pantryToEdit,
@@ -111,6 +111,7 @@ export default function MainScreen() {
 		setShowPantryEditDialog(!showPantryEditDialog);
 		dispatch(Pantry.updatePantry(updatedPantry));
 	}
+*/
 
 	const handleDeletePantry = _ => {
 		console.log('handleDeletePantry:', pantryToEdit.id);
@@ -331,12 +332,27 @@ export default function MainScreen() {
 		mode === 'list' && dispatch(Pantry.toggleNeeded(itemID)) || dispatch(Pantry.toggleListed(itemID));
 	};
 
-	const handleSweep = rowKey => {
-		console.log('**************');
-		console.log('handleSweep called with rowKey', rowKey);
-		console.log('**************');
+	const handleSweep = (rowKey, listData) => {
+//		console.log('handleSweep called with data', rowKey, rowVal);
+		console.log('handleSweep:', rowKey, listData[rowKey].props.item.item);
+		newItem = {
+			...listData[rowKey].props.item.item,
+			listed: false
+		};
 
-		dispatch(Pantry.toggleListed(rowKey));
+		console.log('newItem:', newItem);
+		dispatch(Pantry.updateItem({
+			itemID: rowKey,
+			updatedItem: newItem
+		}));
+
+		//dispatch(Pantry.toggleListed(rowKey));
+/*
+		dispatch(Pantry.updateItem(rowKey, {
+			...listData[rowKey].props.item.item,
+			listed: false
+		}));
+*/
 	};
 
 	const handleToggleStaple = itemID => {
@@ -513,18 +529,17 @@ export default function MainScreen() {
 				setVisible={setShowPantryDetailDialog}
 				pantry={pantryToEdit}
 				handleEditPantry={_ => {
-					setShowPantryDetailDialog(!showPantryDetailDialog);
-					setShowPantryEditDialog(!showPantryEditDialog);
+					setShowPantryDetailDialog(false);
+					setShowPantryEditDialog(true);
 				}}
-				key={pantryToEdit.id}
+				key={`${pantryToEdit.id}-detail`}
 			/>
 			<PantryEditDialog
 				visible={showPantryEditDialog}
 				setVisible={setShowPantryEditDialog}
 				pantry={pantryToEdit}
-				handleEditPantry={handleEditPantry}
-				handleDeletePantry={handleDeletePantry}
-				key={`${pantryToEdit.id}-ped`}
+				setPantry={setPantryToEdit}
+				key={`${pantryToEdit.id}-edit`}
 			/>
 			<Footer />
 		</DrawerLayoutAndroid>
