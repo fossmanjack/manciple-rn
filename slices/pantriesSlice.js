@@ -65,37 +65,6 @@ const pantriesSlice = createSlice({
 				&& pantriesState._Pantries.splice(updateIdx, 1, action.payload)
 				|| pantriesState._Pantries.push(action.payload);
 		},
-/*
-		toggleNeeded: (pantriesState, action) => {
-			// updates the passed item's "needed" to the inverse of its current value
-			// action -> { type: 'pantries/toggleNeeded', payload: itemID }
-			//Utils.debugMsg('toggleNeeded', [ action ]);
-			console.log('toggleNeeded:', action);
-			const { currentPantry } = pantriesState;
-			const { inventory: inv } = pantriesState._Pantries[currentPantry];
-			const item = inv.find(i => i.id === action.payload);
-			console.log('pre-toggle item', item);
-			// spreading nested objects is a pain so I hope this just works
-			item.needed = !item.needed;
-			pantriesState._Pantries[currentPantry].modifyDate = Date.now();
-			console.log('post-toggle item', item);
-		},
-		toggleListed: (pantriesState, action) => {
-			// updates the passed item's "listed" to the inverse of its current value
-			// action -> { type: 'pantries/toggleListed', payload: itemID
-			const item = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload);
-			item.listed && !item.needed && item.history.unshift(Date.now()); // listed && !needed means it's been bought
-			item.listed = !item.listed;
-			pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
-		},
-		toggleStaple: (pantriesState, action) => {
-			// updates the passed item's "staple" to its inverse
-			// action -> { type: 'pantries/toggleStaple', payload: itemID }
-			const item = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === action.payload);
-			item.staple = !item.staple;
-			pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
-		},
-*/
 		addItem: (pantriesState, action) => {
 			// Expects a string as an action payload, which it then splits at the parentheses
 			// searches the inventory for the action payload, then toggles its needed/listed states if found
@@ -125,8 +94,6 @@ const pantriesSlice = createSlice({
 		updateItem: (pantriesState, action) => {
 			// Expects { origItemID, newItemOb } as action.payload
 			const { itemID, updatedItem } = action.payload;
-			//const initItem = pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === itemID);
-			//const index = initItem ? pantriesState._Pantries[pantriesState.currentPantry].inventory.indexOf(initItem) : null;
 			const index = pantriesState._Pantries[pantriesState.currentPantry].inventory.indexOf(
 				pantriesState._Pantries[pantriesState.currentPantry].inventory.find(i => i.id === itemID));;
 			console.log('updateItem called:', updatedItem, index);

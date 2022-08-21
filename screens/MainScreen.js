@@ -1,4 +1,9 @@
 import {
+	useEffect,
+	useState,
+	useRef
+} from 'react';
+import {
 	Alert,
 	DrawerLayoutAndroid,
 	FlatList,
@@ -8,11 +13,6 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import {
-	useEffect,
-	useState,
-	useRef
-} from 'react';
 import {
 	Button,
 	Card,

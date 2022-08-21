@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
 	SafeAreaView,
 	Text,
 	TextInput,
 	View
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
 import * as Pantry from '../slices/pantriesSlice';
 import { _Styles } from '../res/_Styles';

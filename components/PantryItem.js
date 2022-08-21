@@ -22,6 +22,7 @@ import {
 } from 'accordion-collapse-react-native';
 import { useSelector } from 'react-redux';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Carousel from './Carousel';
 import { _Styles } from '../res/_Styles';
 import { _DefaultImage } from '../res/_DefaultImage';
 import * as Utils from '../utils/utils';
@@ -32,6 +33,7 @@ import * as Utils from '../utils/utils';
 export default function PantryItem({ item, exports }) {
 	const { mode } = useSelector(S => S.global);
 	const [ showCalendar, setShowCalendar ] = useState(false);
+	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
 	const {
 		handleCheckBox,
@@ -165,19 +167,11 @@ export default function PantryItem({ item, exports }) {
 			<CollapseBody style={{
 				padding: 20
 			}}>
-				<View style={{
-					justifyContent: 'center',
-					alignItems: 'center',
-					flex: 1,
-				}}>
-					<Image
-						source={{ uri: _DefaultImage }}
-						style={{
-							width: 100,
-							height: 100
-						}}
-					/>
-				</View>
+				<Carousel
+					pics={item.images}
+					width={200}
+					height={200}
+				/>
 				<View style={{ flexDirection: 'row' }}>
 					<View style={{ flex: 3 }}>
 						<Text style={_Styles.textItemDetailLabel}>
