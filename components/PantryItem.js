@@ -168,9 +168,10 @@ export default function PantryItem({ item, exports }) {
 				padding: 20
 			}}>
 				<Carousel
-					pics={item.images}
+					item={item}
 					width={200}
 					height={200}
+					key={item}
 				/>
 				<View style={{ flexDirection: 'row' }}>
 					<View style={{ flex: 3 }}>
