@@ -1,6 +1,6 @@
 {
   "name": "manciple-rn",
-  "version": "1.0.0",
+  "version": "alpha-1",
   "main": "node_modules/expo/AppEntry.js",
   "license": "GPL-3.0-only",
   "homepage": "https://github.com/meyersjm/manciple-rn",
