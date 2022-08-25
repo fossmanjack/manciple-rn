@@ -10,9 +10,8 @@ import { Icon } from 'react-native-elements';
 import * as Pantry from '../slices/pantriesSlice';
 import { _Styles } from '../res/_Styles';
 
-export default function Footer() {
+export default function Footer(props) {
 	const [ inputText, setInputText ] = useState('');
-	const { mode } = useSelector(S => S.options);
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const dispatch = useDispatch();
 
@@ -24,9 +23,8 @@ export default function Footer() {
 		if(inputText) {
 			dispatch(Pantry.addItem(inputText));
 		} else {
-			_Pantries[currentPantry].inventory.forEach(item =>
-				//item.staple && !item.listed && dispatch(Pantry.toggleListed(item.id)) && !item.needed && dispatch(Pantry.toggleNeeded(item.id)));
-				item.staple && !item.listed && dispatch(Pantry.updateItem({
+			_Pantries[currentPantry].inventory.filter(item => item.staple && !item.listed)
+				.forEach(item => dispatch(Pantry.updateItem({
 					itemID: item.id,
 					updatedItem: {
 						...item,
@@ -40,13 +38,14 @@ export default function Footer() {
 	}
 
 	const sweepAll = _ => {
-		_Pantries[currentPantry].inventory.forEach(item =>
-			!item.needed && dispatch(Pantry.updateItem({
+		_Pantries[currentPantry].inventory.filter(i => !i.needed)
+			.forEach(item => dispatch(Pantry.updateItem({
 				itemID: item.id,
 				updatedItem: {
 					...item,
 					listed: false,
-					needed: true
+					needed: true,
+					history: [ Date.now(), ...item.history ]
 				}
 			}))
 		);

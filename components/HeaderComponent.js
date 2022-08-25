@@ -1,22 +1,56 @@
+// HeaderComponent.js
+// Provides the header for the application
+
+// import React, RN, community deps
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Global from '../slices/globalSlice';
-import * as Pantry from '../slices/pantriesSlice';
+
+// import custom components
 import SortOrderDialog from '../components/SortOrderDialog';
 
-export default function Header({ drawerCtl }) {
-	const ptr = useSelector(S => S.pantries);
-	const { mode } = useSelector(S => S.global);
+// import slices
+import * as Global from '../slices/globalSlice';
+import * as Pantry from '../slices/pantriesSlice';
+
+// function def
+export default function Header({ drawerCtl, setMode, mode, nav }) {
+	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const dispatch = useDispatch();
 	const [ showSortDialog, setShowSortDialog ] = useState(false);
 
 	const handleToggleMode = _ => {
-		console.log(ptr._Pantries[ptr.currentPantry]);
+		console.log(_Pantries[currentPantry]);
 
 		const targetMode = mode === 'list' ? 'pantry' : 'list';
-		dispatch(Global.setMode(targetMode));
+		setMode(mode);
+	}
+
+	const HeaderTitle = _ => {
+		let title;
+
+		switch(nav) {
+			case 'help':
+				title = 'Help';
+				break;
+			case 'options':
+				title = 'Options';
+				break;
+			case 'pantry':
+				title = currentPantry === -1
+					&& title = 'No pantry loaded!'
+					|| title = `${_Pantries[currentPantry].name}: ${mode === 'list' ? 'List' : 'Pantry'} view`;
+				break;
+			default:
+				title = 'Error!';
+		}
+
+		return (
+			<Text style={{ color: 'white', fontSize: 20 }}>
+				{title}
+			</Text>
+		);
 	}
 
 	return (
@@ -34,35 +68,37 @@ export default function Header({ drawerCtl }) {
 					onPress={drawerCtl}
 				/>
 				<View style={{ flex: 10 }}>
-					<Text style={{ color: 'white', fontSize: 22 }}>
-						{ptr.currentPantry !== -1 && ptr._Pantries[ptr.currentPantry].name}: {mode === 'list' ? 'List' : 'Pantry'} view
-					</Text>
+					<HeaderTitle />
 				</View>
-				<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-					<Button
-						onPress={handleToggleMode}
-						icon={mode === 'list'
-							? <Icon
-								name='list-status'
-								type='material-community'
-								color='white'
+				{ nav === 'pantry' &&
+					(
+						<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+							<Button
+								onPress={handleToggleMode}
+								icon={mode === 'list'
+									? <Icon
+										name='list-status'
+										type='material-community'
+										color='white'
+									/>
+									: <Icon
+										name='local-grocery-store'
+										type='material'
+										color='white'
+									/>
+								}
+								color='royalblue'
 							/>
-							: <Icon
-								name='local-grocery-store'
+							<Icon
+								name='sort'
 								type='material'
-								color='white'
+								onPress={_ => setShowSortDialog(!showSortDialog)}
+								reverse
+								color='royalblue'
 							/>
-						}
-						color='royalblue'
-					/>
-					<Icon
-						name='sort'
-						type='material'
-						onPress={_ => setShowSortDialog(!showSortDialog)}
-						reverse
-						color='royalblue'
-					/>
-				</View>
+						</View>
+					)
+				}
 			</View>
 			<SortOrderDialog
 				dispatch={dispatch}

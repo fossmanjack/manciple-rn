@@ -115,11 +115,6 @@ export const {
 	addPantry,
 	deletePantry,
 	updatePantry,
-/*
-	toggleNeeded,
-	toggleListed,
-	toggleStaple,
-*/
 	addItem,
 	deleteItem,
 	updateItem,
