@@ -32,6 +32,7 @@ import NewPantryDialog from '../components/NewPantryDialog';
 import EditItemModal from '../components/EditItemModal';
 import PantryItem from '../components/PantryItem';
 import createPantryItem from '../slices/pantryItemSlice';
+import OptionsScreen from './OptionsScreen';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
 import * as Utils from '../utils/utils';
@@ -46,6 +47,7 @@ export default function MainScreen() {
 	const [ view, setView ] = useState('list');
 	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
 	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
+	const [ nav, setNav ] = useState('options');
 
 	// Modal and Dialog toggles
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
@@ -300,11 +302,13 @@ export default function MainScreen() {
 			drawerWidth={300}
 			drawerPosition='left'
 			renderNavigationView={renderDrawer}
+			key={nav}
 		>
 			<Header
 				drawerCtl={setDrawerOpen}
 			/>
-			{ currentPantry !== -1 &&
+			{ nav === 'options' && <OptionsScreen setNav={setNav} /> ||
+			currentPantry !== -1 &&
 				<SwipeListView
 					data={
 						Utils.sortPantry(mode === 'list'
