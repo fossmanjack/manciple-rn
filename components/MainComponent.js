@@ -41,7 +41,7 @@ import PantryEditDialog from './PantryEditDialog';
 import SortOrderDialog from './SortOrderDialog';
 
 // slice imports
-import createPantryItem from '../slices/pantryItemSlice';
+//import createPantryItem from '../slices/pantryItemSlice';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
 
@@ -114,6 +114,7 @@ export default function Main() {
 			renderNavigationView={_ =>
 				<NavDrawer
 					exports={{
+						drawer: drawer.current,
 						handlePantryChange,
 						setShowNewPantryDialog,
 						setNav,

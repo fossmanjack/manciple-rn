@@ -193,7 +193,7 @@ export default function PantryScreen(props) {
 				controls
 				mode={mode}
 				setMode={handleModeChange}
-				titleTxt={currentPantry === -1 ? 'No pantry loaded!' :
+				title={currentPantry === -1 ? 'No pantry loaded!' :
 					`${_Pantries[currentPantry].name}: ${mode === 'list' ? 'List' : 'Pantry'} view`
 				}
 			/>

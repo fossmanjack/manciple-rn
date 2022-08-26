@@ -5,12 +5,16 @@ import {
 	Text,
 	View
 } from 'react-native';
+import {
+	Button
+} from 'react-native-elements';
 import { useSelector, useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Header from '../components/HeaderComponent';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
+import * as Dav from '../utils/davModule';
 
 export default function OptionsScreen(props) {
 	const { setNav, drawerCtl } = props;
@@ -41,7 +45,7 @@ export default function OptionsScreen(props) {
 		<View style={styles.container}>
 			<Header
 				drawerCtl={drawerCtl}
-				titleText='Options'
+				title='Options'
 			/>
 			<Text>
 				TBI:
@@ -62,14 +66,22 @@ export default function OptionsScreen(props) {
 				/>
 			</View>
 			<View>
-				<Pressable onPress={restoreDefaults}>
-					<Text>Restore Factory Defaults</Text>
-				</Pressable>
+				<Button
+					onPress={restoreDefaults}
+					title='Restore Factory Defaults'
+				/>
 			</View>
 			<View>
-				<Pressable onPress={_ => setNav('pantry')}>
-					<Text>Back to Pantry</Text>
-				</Pressable>
+				<Button
+					onPress={_ => setNav('pantry')}
+					title='Back to Pantry'
+				/>
+			</View>
+			<View>
+				<Button
+					onPress={_ => Dav.saveStateToDAV()}
+					title='State Save Test'
+				/>
 			</View>
 		</View>
 	);

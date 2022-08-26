@@ -11,7 +11,7 @@ export default function HelpScreen(props) {
 		<View>
 			<Header
 				drawerCtl={drawerCtl}
-				titleTxt='Manciple Help'
+				title='Manciple Help'
 			/>
 			<Pressable onPress={_ => setNav('pantry')}>
 				<Text>Back to Pantry</Text>

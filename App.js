@@ -7,7 +7,7 @@ import {
 import { PersistGate } from 'redux-persist/integration/react';
 import { _Store, _Persist } from './res/_Store';
 import { _Styles } from './res/_Styles';
-import MainScreen from './screens/MainScreen';
+//import MainScreen from './screens/MainScreen';
 import Main from './components/MainComponent';
 import Loading from './components/LoadingComponent';
 import * as Global from './slices/globalSlice';

@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pantriesReducer } from '../slices/pantriesSlice';
 import { optionsReducer } from '../slices/optionsSlice';
 import { globalReducer } from '../slices/globalSlice';
+import { getRemoteState} from '../utils/saver.js';
 
 const config = {
 	key: 'root',
@@ -41,4 +42,4 @@ export const _Store = configureStore({
 		})
 });
 
-export const _Persist = persistStore(_Store);
+export const _Persist = persistStore(_Store, null, getRemoteState);

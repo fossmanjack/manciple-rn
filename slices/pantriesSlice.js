@@ -110,6 +110,10 @@ const pantriesSlice = createSlice({
 			// no payload
 			//purgeStoredState();
 			return initialState;
+		},
+		overwriteState: (pantriesState, action) => {
+			// action.payload is { _Pantries: [], currentPantry: int } loaded from remote store
+			return action.payload;
 		}
 	}
 });
@@ -125,5 +129,6 @@ export const {
 	deleteItem,
 	updateItem,
 	sortList,
-	resetState
+	resetState,
+	overwriteState
 } = pantriesSlice.actions;

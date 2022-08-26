@@ -18,7 +18,7 @@ import * as Pantry from '../slices/pantriesSlice';
 export default function Header(props) {
 	const {
 		drawerCtl,
-		titleTxt,
+		title,
 		controls=false,
 		mode='list',
 		setMode
@@ -35,33 +35,6 @@ export default function Header(props) {
 		const targetMode = mode === 'list' ? 'pantry' : 'list';
 		setMode(targetMode);
 	}
-/*
-	const HeaderTitle = _ => {
-		let title;
-
-		switch(nav) {
-			case 'help':
-				title = 'Help';
-				break;
-			case 'options':
-				title = 'Options';
-				break;
-			case 'pantry':
-				title = currentPantry === -1
-					&& title = 'No pantry loaded!'
-					|| title = `${_Pantries[currentPantry].name}: ${mode === 'list' ? 'List' : 'Pantry'} view`;
-				break;
-			default:
-				title = 'Error!';
-		}
-
-		return (
-			<Text style={{ color: 'white', fontSize: 20 }}>
-				{title}
-			</Text>
-		);
-	}
-*/
 
 	return (
 		<>
@@ -79,7 +52,7 @@ export default function Header(props) {
 				/>
 				<View style={{ flex: 10 }}>
 					<Text style={{ color: 'white', fontSize: 20 }}>
-						{titleTxt}
+						{title}
 					</Text>
 				</View>
 				{ controls &&
