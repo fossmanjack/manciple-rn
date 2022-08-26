@@ -24,9 +24,15 @@ export default function Screen(props) {
 	}
 */
 	return nav === 'help'
-		? <HelpScreen />
+		? <HelpScreen
+			drawerCtl={drawerCtl}
+			setNav={setNav}
+		/>
 		: nav === 'options'
-			? <OptionsScreen />
+			? <OptionsScreen
+				drawerCtl={drawerCtl}
+				setNav={setNav}
+			/>
 			: nav === 'pantry'
 				? <PantryScreen exports={{ drawerCtl, handleCheckBox, handleDateChange }}/>
 				: (<View><Text>Oops!</Text></View>);

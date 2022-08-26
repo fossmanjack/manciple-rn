@@ -20,6 +20,7 @@ import UserComponent from './UserComponent';
 
 export default function NavDrawer(props) {
 	const {
+		drawer,
 		handlePantryChange,
 		setShowNewPantryDialog,
 		setNav,
@@ -76,7 +77,8 @@ export default function NavDrawer(props) {
 			<Pressable
 				onPress={_ => {
 					console.log('New pantry pressed');
-					drawer.current.closeDrawer();
+					drawer.closeDrawer();
+					setNav('pantry');
 					setShowNewPantryDialog(!showNewPantryDialog);
 				}}
 				style={{
@@ -147,6 +149,7 @@ export default function NavDrawer(props) {
 					borderBottomColor: 'lightgray',
 					paddingVertical: 10,
 				}}
+				onPress={_ => setNav('help')}
 			>
 				<View
 					style={{

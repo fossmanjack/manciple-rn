@@ -59,6 +59,7 @@ export default function Main() {
 	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
 	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
 	const [ nav, setNav ] = useState('pantry');
+	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
 
 	// Modal and Dialog toggles
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
@@ -80,9 +81,12 @@ export default function Main() {
 		drawer.current.closeDrawer();
 	};
 
+	const toggleDrawer = _ => drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+
 	const handlePantryChange = ptID => { console.log('handleListChange', ptID);
 
 		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
+		setNav('pantry');
 		setDrawerClosed();
 	};
 
@@ -137,8 +141,10 @@ export default function Main() {
 				/>
 			}
 			key={nav}
+			onDrawerOpen={_ => setDrawerIsOpen(true)}
+			onDrawerClose={_ => setDrawerIsOpen(false)}
 		>
-			<Screen exports={{ nav, setNav, drawerCtl: setDrawerOpen }} />
+			<Screen exports={{ nav, setNav, drawerCtl: toggleDrawer }} />
 			<EditItemModal
 				dispatch={dispatch}
 				visible={showEditItemModal}

@@ -7,11 +7,13 @@ import {
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
+import Header from '../components/HeaderComponent';
+import * as Pantry from '../slices/pantriesSlice';
 import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
 
 export default function OptionsScreen(props) {
-	const { setNav } = props;
+	const { setNav, drawerCtl } = props;
 	const _Opts = useSelector(S => S.options);
 	const [ syncOpen, setSyncOpen ] = useState(false);
 	const [ syncValue, setSyncValue ] = useState(_Opts.sync);
@@ -31,10 +33,16 @@ export default function OptionsScreen(props) {
 
 	const restoreDefaults = _ => {
 		// purge store
+		console.log('Attempting to restore defaults!');
+		dispatch(Pantry.resetState());
 	}
 
 	return (
 		<View style={styles.container}>
+			<Header
+				drawerCtl={drawerCtl}
+				titleText='Options'
+			/>
 			<Text>
 				TBI:
 					- Back-end storage option

@@ -20,6 +20,7 @@
 // }
 
 import { createSlice } from '@reduxjs/toolkit';
+import { purgeStoredState } from 'redux-persist';
 import { PANTRIES } from '../res/PANTRIES';
 import createPantryItem from './pantryItemSlice';
 import uuid from 'react-native-uuid';
@@ -104,6 +105,11 @@ const pantriesSlice = createSlice({
 		sortList: (pantriesState, action) => {
 			// Expects [ field(string), asc(bool) ] as action payload
 			const [ field, asc ] = action.payload;
+		},
+		resetState: (pantriesState, action) => {
+			// no payload
+			//purgeStoredState();
+			return initialState;
 		}
 	}
 });
@@ -118,5 +124,6 @@ export const {
 	addItem,
 	deleteItem,
 	updateItem,
-	sortList
+	sortList,
+	resetState
 } = pantriesSlice.actions;
