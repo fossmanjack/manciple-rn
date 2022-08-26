@@ -6,7 +6,7 @@ import OptionsScreen from '../screens/OptionsScreen';
 import PantryScreen from '../screens/PantryScreen';
 
 export default function Screen(props) {
-	const { exports: { nav, setNav, drawerCtl, handleCheckBox, handleDateChange }} = props;
+	const { exports: { nav, setNav, drawerCtl }} = props;
 
 /*
 	switch(nav) {
@@ -34,6 +34,9 @@ export default function Screen(props) {
 				setNav={setNav}
 			/>
 			: nav === 'pantry'
-				? <PantryScreen exports={{ drawerCtl, handleCheckBox, handleDateChange }}/>
+				? <PantryScreen
+					drawerCtl={drawerCtl}
+					setNav={setNav}
+				/>
 				: (<View><Text>Oops!</Text></View>);
 }

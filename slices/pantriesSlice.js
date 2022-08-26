@@ -22,7 +22,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { purgeStoredState } from 'redux-persist';
 import { PANTRIES } from '../res/PANTRIES';
-import createPantryItem from './pantryItemSlice';
+//import createPantryItem from './pantryItemSlice';
 import uuid from 'react-native-uuid';
 import * as Utils from '../utils/utils';
 
@@ -82,7 +82,7 @@ const pantriesSlice = createSlice({
 				if(item.qty !== qty) item.qty = qty;
 				pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
 			} else {
-				pantriesState._Pantries[pantriesState.currentPantry].inventory.push(createPantryItem({ name, id: idx, qty }));
+				pantriesState._Pantries[pantriesState.currentPantry].inventory.push(Utils.createPantryItem({ name, id: idx, qty }));
 				pantriesState._Pantries[pantriesState.currentPantry].modifyDate = Date.now();
 			}
 		},

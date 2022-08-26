@@ -1,8 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
+import uuid from 'react-native-uuid';
 
 const initialState = {
 	mode: 'list',
-	lastUse: Date.now()
+	lastUse: Date.now(),
+	clientID: uuid.v4()
 }
 
 const globalSlice = createSlice({

@@ -117,7 +117,10 @@ export default function NavDrawer(props) {
 					borderBottomColor: 'lightgray',
 					paddingVertical: 10,
 				}}
-				onPress={_ => setNav('options')}
+				onPress={_ => {
+					setNav('options');
+					drawer.closeDrawer();
+				}}
 			>
 				<View
 					style={{
@@ -149,7 +152,10 @@ export default function NavDrawer(props) {
 					borderBottomColor: 'lightgray',
 					paddingVertical: 10,
 				}}
-				onPress={_ => setNav('help')}
+				onPress={_ => {
+					setNav('help');
+					drawer.closeDrawer();
+				}}
 			>
 				<View
 					style={{

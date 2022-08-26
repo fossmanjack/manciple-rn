@@ -13,6 +13,7 @@ import { Button, Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // custom component imports
+import EditItemModal from '../components/EditItemModal';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/FooterComponent';
 import PantryItem from '../components/PantryItem';
@@ -25,49 +26,30 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function PantryScreen(props) {
-	const { exports: {
-		drawerCtl,
-		handleDateChange,
-	}} = props;
+	const { drawerCtl, setNav } = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { sortOpts } = useSelector(S => S.options);
 	const [ mode, setMode ] = useState('list');
 	const dispatch = useDispatch();
-/* pretty sure this contains some legacy nonsense
- * I don't think I need to hand dispatch down anymore so let's see if the
- * key extractor can handle all the important details
-	const [ listData, setListData ] = useState(
-		Utils.sortPantry(mode === 'list'
-			? _Pantries[currentPantry].inventory.filter(i => i.listed)
-			: _Pantries[currentPantry].inventory, sortOpts)
-			.map(item => ({
-				item,
-				key: item.id,
-				dispatch
-			}))
-	);
-*/
+	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
+	const [ itemToEdit, setItemToEdit ] = useState(Utils.blankItem);
 	const [ listData, setListData ] = useState(
 		_Pantries[currentPantry].inventory.filter(i => i.listed)
 	);
-/*
-		Utils.sortPantry(mode === 'list'
-			? _Pantries[currentPantry].inventory.filter(i => i.listed)
-			: _Pantries[currentPantry].inventory, sortOpts)
-	);
-*/
-/*
-	useEffect(_ => refreshListData(), [ mode ]);
 
-	useEffect(_ => refreshListData(), [ _Pantries[currentPantry].inventory ]);
-*/
+	// we want the list to refresh every time the mode or contents change and
+	// since state changes asynchronously we need to check against the state
+	// value rather than calling the update method after dispatching a state change
 	useEffect(_ => refreshListData(), [ mode, _Pantries[currentPantry].inventory ]);
 
 	const handleModeChange = targetMode => {
 		console.log('handleModeChange', mode, '->', targetMode);
 		setMode(targetMode);
+	}
 
-		//refreshListData();
+	const toggleEditItemVisible = _ => {
+		console.log('toggleEditItemVisible called');
+		setShowEditItemModal(!showEditItemModal);
 	}
 
 	const refreshListData = _ => {
@@ -128,8 +110,27 @@ export default function PantryScreen(props) {
 		}));
 	};
 
+	const editItem = item => {
+		console.log('setItemToEdit passed item:', item.id);
+		console.log('setItemToEdit pre:', itemToEdit.id);
+		setItemToEdit({ ...item });
+		console.log('Items equal after set?', item === itemToEdit.current ? 'yes' : 'no', item.id, ':', itemToEdit.id);
+
+		setShowEditItemModal(!showEditItemModal);
+	}
+
+	const handleDateChange = (item, date) => {
+		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
+		dispatch(Pantry.updateItem({
+			itemID: item.id,
+			updatedItem: {
+				...item,
+				purchaseBy: date.getTime()
+			}
+		}));
+	}
+
 	const renderItem = (data, rowMap) => {
-		//const { item: { item }} = data;
 		const { item } = data;
 		return (
 			<PantryItem
@@ -144,7 +145,6 @@ export default function PantryScreen(props) {
 	}
 
 	const renderHiddenItem = (data, rowMap) => {
-		//const { item: { item }} = data;
 		const { item } = data;
 		return (
 			<View style={{
@@ -213,6 +213,13 @@ export default function PantryScreen(props) {
 				closeOnScroll
 			/>
 			<Footer />
+			<EditItemModal
+				dispatch={dispatch}
+				visible={showEditItemModal}
+				setVisible={setShowEditItemModal}
+				item={itemToEdit}
+				key={itemToEdit.id}
+			/>
 		</>
 	);
 }

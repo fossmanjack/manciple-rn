@@ -5,6 +5,7 @@ export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-
 export const parseDate = i => new Date(i).toISOString().split("T")[0];
 export const daysBetween = (i, j) => (j - i) / (86400000);
 export const truncateString = (str, num) => str.length >= num ? str.slice(num)+' ...' : str;
+export const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 
 export const getDebugLvl = _ => useSelector(S => S.options).debug;
 
@@ -49,7 +50,49 @@ export const sortPantry = (inv, [ field, asc ]) => {
 	});
 }
 
+export const createPantryItem = props => {
+	const {
+		name = 'New item',
+		id = Utils.camelize(name),
+		qty = '1',
+		needed = true,
+		listed = true,
+		staple = false,
+		history = [],
+		images = [],
+		price = '',
+		loc = '',
+		url = '',
+		upc = '',
+		interval = 0,
+		purchaseBy = 0,
+		notes = '',
+		creationDate = Date.now(),
+		modifyDate = Date.now()
+	} = props;
 
+	return ({
+		name,
+		id,
+		qty,
+		needed,
+		listed,
+		staple,
+		history,
+		images,
+		price,
+		loc,
+		url,
+		upc,
+		interval,
+		purchaseBy,
+		notes,
+		creationDate,
+		modifyDate
+	});
+}
+
+export const blankItem = (createPantryItem({ name: 'Blank item', id: 'blankItem' }));
 /* debugging
 
 debug level (dlvl) is the debug value at which the message will trigger

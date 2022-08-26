@@ -28,7 +28,9 @@ export default function Header(props) {
 	const [ showSortDialog, setShowSortDialog ] = useState(false);
 
 	const handleToggleMode = _ => {
-		console.log(_Pantries[currentPantry]);
+		console.log('handleToggleMode', _Pantries[currentPantry].id, ':', _Pantries[currentPantry].name);
+		_Pantries[currentPantry].inventory.forEach(item => console.log(`Item ${item.id}: needed: ${item.needed}, listed: ${item.listed}`));
+		console.log('*******************');
 
 		const targetMode = mode === 'list' ? 'pantry' : 'list';
 		setMode(targetMode);
@@ -73,7 +75,7 @@ export default function Header(props) {
 							color='white'
 						/>
 					}
-					onPress={drawerCtl}
+					onPress={_ => drawerCtl(true)}
 				/>
 				<View style={{ flex: 10 }}>
 					<Text style={{ color: 'white', fontSize: 20 }}>

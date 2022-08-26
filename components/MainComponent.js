@@ -35,7 +35,6 @@ import PantryItem from './PantryItem';
 import Screen from './ScreenComponent';
 
 // Import dialogs and modals
-import EditItemModal from './EditItemModal';
 import NewPantryDialog from './NewPantryDialog';
 import PantryDetailDialog from './PantryDetailDialog';
 import PantryEditDialog from './PantryEditDialog';
@@ -51,18 +50,14 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function Main() {
-	const blankItem = (createPantryItem({ name: 'Blank item', id: 'blankItem' }));
-	const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 	const dispatch = useDispatch();
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { debug, sortOpts } = useSelector(S => S.options);
-	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
-	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
+	const [ pantryToEdit, setPantryToEdit ] = useState(Utils.blankPantry);
 	const [ nav, setNav ] = useState('pantry');
 	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
 
 	// Modal and Dialog toggles
-	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
 	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
 	const [ showPantryDetailDialog, setShowPantryDetailDialog ] = useState(false);
 	const [ showPantryEditDialog, setShowPantryEditDialog ] = useState(false);
@@ -81,45 +76,32 @@ export default function Main() {
 		drawer.current.closeDrawer();
 	};
 
-	const toggleDrawer = _ => drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+	//const drawerCtl = _ => drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+
+	const drawerCtl = newState => {
+		// if newState is undefined, toggle the drawer
+		// Otherwise, if "true" open the drawer, if "false" close the drawer
+		console.log('drawerCtl: drawerIsOpen?', drawerIsOpen, newState);
+
+		if(typeof newState === 'undefined') drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
+	}
 
 	const handlePantryChange = ptID => { console.log('handleListChange', ptID);
 
 		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
 		setNav('pantry');
-		setDrawerClosed();
+		drawerCtl(false);
 	};
 
 // modal functions
-	const toggleEditItemVisible = _ => {
-		console.log('toggleEditItemVisible called');
-		setShowEditItemModal(!showEditItemModal);
-	}
 
 	const showPantryDetail = ptID => {
 		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
 		setShowPantryDetailDialog(true);
 	}
 
-	const handleDateChange = (item, date) => {
-		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
-		dispatch(Pantry.updateItem({
-			itemID: item.id,
-			updatedItem: {
-				...item,
-				purchaseBy: date.getTime()
-			}
-		}));
-	}
 
-	const editItem = item => {
-		console.log('setItemToEdit passed item:', item.id);
-		console.log('setItemToEdit pre:', itemToEdit.id);
-		setItemToEdit({ ...item });
-		console.log('Items equal after set?', item === itemToEdit.current ? 'yes' : 'no', item.id, ':', itemToEdit.id);
-
-		setShowEditItemModal(!showEditItemModal);
-	}
 
 
 // render component
@@ -144,14 +126,7 @@ export default function Main() {
 			onDrawerOpen={_ => setDrawerIsOpen(true)}
 			onDrawerClose={_ => setDrawerIsOpen(false)}
 		>
-			<Screen exports={{ nav, setNav, drawerCtl: toggleDrawer }} />
-			<EditItemModal
-				dispatch={dispatch}
-				visible={showEditItemModal}
-				setVisible={setShowEditItemModal}
-				item={itemToEdit}
-				key={itemToEdit.id}
-			/>
+			<Screen exports={{ nav, setNav, drawerCtl }} />
 			<NewPantryDialog
 				visible={showNewPantryDialog}
 				setVisible={setShowNewPantryDialog}
