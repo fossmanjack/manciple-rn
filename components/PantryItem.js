@@ -30,8 +30,7 @@ import * as Utils from '../utils/utils';
 // { Picker } for implementing date selection
 
 
-export default function PantryItem({ item, exports }) {
-	const { mode } = useSelector(S => S.global);
+export default function PantryItem({ item, mode, exports }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));

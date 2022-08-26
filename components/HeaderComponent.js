@@ -15,7 +15,14 @@ import * as Global from '../slices/globalSlice';
 import * as Pantry from '../slices/pantriesSlice';
 
 // function def
-export default function Header({ drawerCtl, setMode, mode, nav }) {
+export default function Header(props) {
+	const {
+		drawerCtl,
+		titleTxt,
+		controls=false,
+		mode='list',
+		setMode
+	} = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const dispatch = useDispatch();
 	const [ showSortDialog, setShowSortDialog ] = useState(false);
@@ -24,9 +31,9 @@ export default function Header({ drawerCtl, setMode, mode, nav }) {
 		console.log(_Pantries[currentPantry]);
 
 		const targetMode = mode === 'list' ? 'pantry' : 'list';
-		setMode(mode);
+		setMode(targetMode);
 	}
-
+/*
 	const HeaderTitle = _ => {
 		let title;
 
@@ -52,6 +59,7 @@ export default function Header({ drawerCtl, setMode, mode, nav }) {
 			</Text>
 		);
 	}
+*/
 
 	return (
 		<>
@@ -68,9 +76,11 @@ export default function Header({ drawerCtl, setMode, mode, nav }) {
 					onPress={drawerCtl}
 				/>
 				<View style={{ flex: 10 }}>
-					<HeaderTitle />
+					<Text style={{ color: 'white', fontSize: 20 }}>
+						{titleTxt}
+					</Text>
 				</View>
-				{ nav === 'pantry' &&
+				{ controls &&
 					(
 						<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
 							<Button

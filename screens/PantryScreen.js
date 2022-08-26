@@ -4,13 +4,13 @@
 // selection buttons, etc
 
 // react, RN, community imports
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
 
 // third-party imports
-import SwipeListView from 'react-native-swipe-list-view';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 // custom component imports
 import Header from '../components/HeaderComponent';
@@ -24,11 +24,18 @@ import * as Pantry from '../slices/pantriesSlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function PantryScreen(props) => {
-	const { exports: { drawerCtl }} = props;
+export default function PantryScreen(props) {
+	const { exports: {
+		drawerCtl,
+		handleDateChange,
+	}} = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { sortOpts } = useSelector(S => S.options);
 	const [ mode, setMode ] = useState('list');
 	const dispatch = useDispatch();
+/* pretty sure this contains some legacy nonsense
+ * I don't think I need to hand dispatch down anymore so let's see if the
+ * key extractor can handle all the important details
 	const [ listData, setListData ] = useState(
 		Utils.sortPantry(mode === 'list'
 			? _Pantries[currentPantry].inventory.filter(i => i.listed)
@@ -39,6 +46,36 @@ export default function PantryScreen(props) => {
 				dispatch
 			}))
 	);
+*/
+	const [ listData, setListData ] = useState(
+		_Pantries[currentPantry].inventory.filter(i => i.listed)
+	);
+/*
+		Utils.sortPantry(mode === 'list'
+			? _Pantries[currentPantry].inventory.filter(i => i.listed)
+			: _Pantries[currentPantry].inventory, sortOpts)
+	);
+*/
+
+	useEffect(_ => refreshListData(), [ mode ]);
+
+	useEffect(_ => refreshListData(), [ _Pantries[currentPantry].inventory ]);
+
+	const handleModeChange = targetMode => {
+		console.log('handleModeChange', mode, '->', targetMode);
+		setMode(targetMode);
+
+		//refreshListData();
+	}
+
+	const refreshListData = _ => {
+		console.log('refreshListData', mode);
+
+		setListData(Utils.sortPantry(mode === 'list'
+			? _Pantries[currentPantry].inventory.filter(i => i.listed)
+			: _Pantries[currentPantry].inventory, sortOpts)
+		);
+	}
 
 	const handleCheckBox = itemID => {
 		console.log("handleCheckBox called with item", itemID);
@@ -52,9 +89,9 @@ export default function PantryScreen(props) => {
 	};
 
 	const handleSweep = (itemID, rowMap) => {
-		console.log('handleSweep:', itemID, rowMap[itemID].props.item.item);
+		console.log('handleSweep:', itemID, rowMap[itemID]);
 
-		const updatedItem = { ...rowMap[itemID].props.item.item };
+		const updatedItem = { ...rowMap[itemID].props.item };
 
 		if(!updatedItem.needed) updatedItem.history = [ Date.now(), ...updatedItem.history ];
 		updatedItem.listed = false;
@@ -62,13 +99,19 @@ export default function PantryScreen(props) => {
 
 		// let's try removing the row from the listData state before dispatching the update
 		rowMap[itemID].closeRow();
+		/*
+		console.log(listData);
 		setListData([...listData].splice(listData.findIndex(item => item.id === itemID), 1));
+		console.log(listData);
+		*/
 
 		// dispatch the updated item
 		dispatch(Pantry.updateItem({
 			itemID,
 			updatedItem
 		}));
+
+		// refresh list data
 	};
 
 	const handleToggleStaple = item => {
@@ -84,10 +127,12 @@ export default function PantryScreen(props) => {
 	};
 
 	const renderItem = (data, rowMap) => {
-		const { item: { item }} = data;
+		//const { item: { item }} = data;
+		const { item } = data;
 		return (
 			<PantryItem
 				item={item}
+				mode={mode}
 				exports={{
 					handleCheckBox,
 					handleDateChange
@@ -97,7 +142,8 @@ export default function PantryScreen(props) => {
 	}
 
 	const renderHiddenItem = (data, rowMap) => {
-		const { item: { item }} = data;
+		//const { item: { item }} = data;
+		const { item } = data;
 		return (
 			<View style={{
 				alignItems: 'flex-end',
@@ -140,12 +186,20 @@ export default function PantryScreen(props) => {
 
 	return (
 		<>
-			<Header exports={{ mode, setMode, nav, drawerCtl }}/>
+			<Header
+				drawerCtl={drawerCtl}
+				controls
+				mode={mode}
+				setMode={handleModeChange}
+				titleTxt={currentPantry === -1 ? 'No pantry loaded!' :
+					`${_Pantries[currentPantry].name}: ${mode === 'list' ? 'List' : 'Pantry'} view`
+				}
+			/>
 			<SwipeListView
 				data={listData}
-				keyExtractor={item => item.id}
 				renderItem={renderItem}
 				renderHiddenItem={renderHiddenItem}
+				keyExtractor={item => item.id}
 				rightOpenValue={-100}
 				leftActivationValue={75}
 				leftActionValue={500}

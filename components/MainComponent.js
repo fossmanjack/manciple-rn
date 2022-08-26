@@ -29,14 +29,10 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Dialog from 'react-native-dialog';
 
-// screen imports
-import HelpScreen from '../screens/HelpScreen';
-import OptionsScreen from '../screens/OptionsScreen';
-import PantryScreen from '../screens/PantryScreen';
-
 // Import local components
 import NavDrawer from './NavDrawerComponent';
 import PantryItem from './PantryItem';
+import Screen from './ScreenComponent';
 
 // Import dialogs and modals
 import EditItemModal from './EditItemModal';
@@ -62,7 +58,7 @@ export default function Main() {
 	const { debug, sortOpts } = useSelector(S => S.options);
 	const [ pantryToEdit, setPantryToEdit ] = useState(blankPantry);
 	const [ itemToEdit, setItemToEdit ] = useState(blankItem);
-	const [ nav, setNav ] = useState('options');
+	const [ nav, setNav ] = useState('pantry');
 
 	// Modal and Dialog toggles
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
@@ -130,7 +126,7 @@ export default function Main() {
 			drawerWidth={300}
 			drawerPosition='left'
 			renderNavigationView={_ =>
-				<NavDrawerComponent
+				<NavDrawer
 					exports={{
 						handlePantryChange,
 						setShowNewPantryDialog,
@@ -142,21 +138,7 @@ export default function Main() {
 			}
 			key={nav}
 		>
-			{
-				switch(nav) {
-					case 'options':
-						<OptionsScreen setNav={setNav} />;
-						break;
-					case 'pantry':
-						<PantryScreen exports={{ drawerCtl: setDrawerOpen }}/>;
-						break;
-					case 'help':
-						<HelpScreen />;
-						break;
-					default:
-						<View></View>;
-				}
-			}
+			<Screen exports={{ nav, setNav, drawerCtl: setDrawerOpen }} />
 			<EditItemModal
 				dispatch={dispatch}
 				visible={showEditItemModal}
