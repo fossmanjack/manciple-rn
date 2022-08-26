@@ -56,10 +56,12 @@ export default function PantryScreen(props) {
 			: _Pantries[currentPantry].inventory, sortOpts)
 	);
 */
-
+/*
 	useEffect(_ => refreshListData(), [ mode ]);
 
 	useEffect(_ => refreshListData(), [ _Pantries[currentPantry].inventory ]);
+*/
+	useEffect(_ => refreshListData(), [ mode, _Pantries[currentPantry].inventory ]);
 
 	const handleModeChange = targetMode => {
 		console.log('handleModeChange', mode, '->', targetMode);
