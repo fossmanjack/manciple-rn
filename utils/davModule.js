@@ -4,16 +4,14 @@ import { useSelector } from 'react-redux';
 import { _Store } from '../res/_Store';
 
 export async function saveStateToDAV() {
-	const state = _Store.getState();
-	const { dav } = state.global;
-	const ptr = state.pantries;
+	const { pantries, global: { dav, clientID }} = _Store.getState();
 
 	console.log(dav);
 
 	//const { username, password } = await JSON.parse(SecureStore.getItemAsync('userinfo'));
 
-	const username='';
-	const password='';
+	const username='dummy';
+	const password='atypical-humongous-glazing';
 
 	//const davPath = `${dav.url}${dav.path}`;
 
@@ -27,10 +25,17 @@ export async function saveStateToDAV() {
 		}
 	);
 
+	const mancipleData = {
+		timestamp: Date.now(),
+		clientID,
+		pantries
+	}
+
+
 	try {
 		console.log(`Trying to save state to ${davPath}/manciple.json...`);
 		//const res = await davClient.putFileContents(`${davPath}/manciple.json`, JSON.stringify(ptr));
-		const res = await davClient.putFileContents(`${davPath}/manciple.json`, 'This is a test');
+		const res = await davClient.putFileContents('/manciple.json', JSON.stringify(mancipleData));
 	} catch(err) {
 		console.log('Error saving data to remote host: ', err);
 	}

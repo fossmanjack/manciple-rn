@@ -16,10 +16,10 @@
 - [ ] Change out all the TouchableOpacities and Buttons for Pressables (RN)
 - [x] Convert accordion header to listItem
 - [x] Change staple? button to RNE Switch
-- [ ] Figure out that "unregistered element" bug when swiping an item off the list
+- [x] Figure out that "unregistered element" bug when swiping an item off the list
 - [ ] Set hidden button width equal to hidden drawer width
 - [ ] Move item to another list
-- [ ] Sort drop-down
+- [x] Sort drop-down
 - [x] Sort function -- Utils.sort(pantry, field, asc)
 - [ ] Add little up/down arrow next to field in detail view to show current sort by
 - [ ] Export pantry to JSON file
@@ -32,7 +32,16 @@ cancel and ok buttons), so next I should probably implement pantry mode.
 
 - [x] Implement sidebar
 - [ ] Options -- sort, auto-interval
-- [ ] Image carousel
-- [ ] Persistence
+- [x] Image carousel
+- [x] Persistence
 - [ ] Import/export
-- [ ] webDAV
+- [x] save to webdav
+- [ ] restore from webdav
+- [ ] login screen/options -> just put it on options page? like joplin?
+- [ ] user data screen
+- [ ] adjust global props
+- [ ] implement global and options reset
+- [ ] finish item edit dialog
+- [ ] fix calendar bug
+- [ ] auto-calculate intervals
+- [ ] import/export pantries
