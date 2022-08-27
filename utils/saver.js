@@ -1,3 +1,5 @@
+
+
 export function getRemoteState() {
 	console.log('getRemoteState called');
 	// outline:
@@ -14,4 +16,6 @@ export function getRemoteState() {
 	//         }
 	//     }
 	// }
+	const retriever = _ => {
+	};
 }
