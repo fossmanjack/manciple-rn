@@ -42,4 +42,4 @@ export const _Store = configureStore({
 		})
 });
 
-export const _Persist = persistStore(_Store, null, getRemoteState);
+export const _Persist = persistStore(_Store, null, getRemoteState(_Store.getState().global.remoteStorageType));
