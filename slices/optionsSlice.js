@@ -28,10 +28,11 @@ const optionsSlice = createSlice({
 	reducers: {
 		setDebugLevel: (optionsState, action) => { optionsState.debug = action.payload; },
 		setSortOpts: (optionsState, action) => { optionsState.sortOpts = action.payload; },
-		setSync: (optionsState, action) => { optionsState.sync = action.payload; }
+		setSync: (optionsState, action) => { optionsState.sync = action.payload; },
 		setSyncOpts: (optionsState, action) => {
 			// action.payload is { [sync]: { syncInfo } }
-			return { ...optionsState, ...action.payload }
+			return ({ ...optionsState, ...action.payload })
+		}
 	}
 });
 

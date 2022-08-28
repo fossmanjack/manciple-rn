@@ -16,13 +16,16 @@ import Header from '../components/HeaderComponent';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
-import * as Dav from '../utils/davModule';
+//import * as Dav from '../utils/davModule';
+import * as Saver from '../utils/saver';
 
 export default function OptionsScreen(props) {
 	const { setNav, drawerCtl } = props;
 	const _Opts = useSelector(S => S.options);
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
+	const [ url, setURL ] = useState('');
+	const [ path, setPath ] = useState('/Apps/Manciple');
 	const [ userdataSaved, setUserdataSaved ] = useState(false);
 	const [ syncOpen, setSyncOpen ] = useState(false);
 	const [ syncValue, setSyncValue ] = useState(_Opts.sync);
@@ -37,7 +40,7 @@ export default function OptionsScreen(props) {
 
 	const rehydrateUser = async _ => {
 		try {
-			const res = await SecureStore.getItemAsync('userinfo');
+			const res = await SecureStorage.getItemAsync('userinfo');
 			setUsername(userinfo.username);
 			setPassword(userinfo.password);
 		} catch(err) {
@@ -53,11 +56,12 @@ export default function OptionsScreen(props) {
 		dispatch(Options.setSync(val));
 		setSyncValue(val);
 		setSyncOpen(false);
-	}
+	};
 
 	const handleSave = async _ => {
+		dispatch(Options.setSyncOpts({ [sync]: { url, path }}));
 		try {
-			await(SecureStore.setItemAsync(
+			await(SecureStorage.setItemAsync(
 			'userinfo',
 			JSON.stringify({
 				username,
@@ -67,36 +71,54 @@ export default function OptionsScreen(props) {
 		} catch(err) {
 			console.log('Could not save user data!');
 		}
-	}
+	};
 
 	const restoreDefaults = _ => {
 		// purge store
 		console.log('Attempting to restore defaults!');
 		dispatch(Pantry.resetState());
-	}
+	};
 
 	const SyncForm = _ => {
-		switch(_Opts.sync) {
-			case 'nc':
+		//switch(_Opts.sync) {
+		////	case 'nc':
 				return (
 					<View>
 						<View style={{ flexDirection: 'row' }}>
-							<Text>
-								Nextcloud URL:
-							</Text>
-							<Input />
+							<Input
+								placeholder='Nextcloud URL'
+								onChangeText={text => setURL(text)}
+								value={url}
+								style={styles.formInput}
+								label='Nextcloud URL'
+							/>
 						</View>
 						<View style={{ flexDirection: 'row' }}>
-							<Text>
-								Nextcloud User:
-							</Text>
-							<Input />
+							<Input
+								placeholder='Application path'
+								onChangeText={text => setPath(text)}
+								value={path}
+								style={styles.formInput}
+								label='Application path'
+							/>
+						<View style={{ flexDirection: 'row' }}>
+							<Input
+								placeholder='Username'
+								onChangeText={text => setUsername(text)}
+								value={username}
+								style={styles.formInput}
+								label='Username'
+							/>
 						</View>
 						<View style={{ flexDirection: 'row' }}>
-							<Text>
-								Password:
-							</Text>
-							<Input />
+							<Input
+								secureTextEntry
+								placeholder=''
+								onChangeText={text => setPassword(text)}
+								value={password}
+								style={styles.formInput}
+								label='Password'
+							/>
 						</View>
 						<Button
 							title={userdataSaved ? 'Saved!' : 'Save'}
@@ -105,11 +127,11 @@ export default function OptionsScreen(props) {
 						/>
 					</View>
 				);
-				break;
-			default:
-				return (<View></View>);
-		}
-	}
+		//		break;
+		//	default:
+		//		return (<View></View>);
+		//}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -149,7 +171,7 @@ export default function OptionsScreen(props) {
 			</View>
 			<View>
 				<Button
-					onPress={_ => Dav.saveStateToDAV()}
+					onPress={_ => Saver.saveState(dispatch)}
 					title='State Save Test'
 				/>
 			</View>
@@ -158,7 +180,7 @@ export default function OptionsScreen(props) {
 			</View>
 		</View>
 	);
-}
+};
 
 const styles = StyleSheet.create({
 	container: {
@@ -166,5 +188,9 @@ const styles = StyleSheet.create({
 	},
 	row: {
 		flexDirection: 'row'
+	},
+	formInput: {
+		padding: 8,
+		height: 60
 	}
 });

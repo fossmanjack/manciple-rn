@@ -3,9 +3,57 @@ import { createClient } from 'webdav';
 import { useSelector } from 'react-redux';
 import { _Store } from '../res/_Store';
 
-export async function saveStateToDAV() {
-	const { pantries, global: { dav, clientID }} = _Store.getState();
+export default function davClient(filename) {
+	const { options: { dav }, global: { clientID }} = _Store.getState();
+	const [ username, setUsername ] = useState('');
+	const [ password, setPassword ] = useState('');
+	const [ retriever, setRetriever ] = useState('');
 
+	davPath = `${dav.url}/remote.php/dav/files/${username}/${dav.path}`;
+
+	const getUserinfo = async _ => await JSON.parse(SecureStore.getItemAsync('userinfo'));
+
+	useEffect(_ => {
+		const userinfo = getUserInfo();
+		setUsername(userinfo.username);
+		setPassword(userinfo.password);
+		setRetriever(createClient(
+			davPath,
+			{
+				username,
+				password
+			}
+		));
+	}, []);
+
+	const get = async filename => {
+		try {
+			const res = await JSON.parse(retriever.getFileContents(filename, { format: 'text' }));
+		} catch(err) {
+			console.log(`Could not retrieve ${filename}: ${err}`);
+			return false;
+		}
+		return res;
+	}
+
+	const put = async (filename, textData) => {
+		try {
+			const res = retriever.putFileContents(filename, textData);
+		} catch(err) {
+			console.log(`Could not save ${filename}: ${err}`);
+			return false;
+		}
+		return true;
+	}
+
+	return { get, put };
+}
+
+/*
+export async function saveStateToDAV() {
+	const { pantries, options: { dav }, global: { clientID }} = _Store.getState();
+
+	const { username, password } = await JSON.parse(SecureStore.getItemAsync('userinfo'));
 	console.log(dav);
 
 	//const { username, password } = await JSON.parse(SecureStore.getItemAsync('userinfo'));
@@ -42,7 +90,7 @@ export async function saveStateToDAV() {
 }
 
 export async function loadStateFromDav() {
-	const { dav } = useSelector(S => S.global);
+	const { dav } = _Store.getState().options;
 
 	const { username, password } = await JSON.parse(SecureStore.getItemAsync('userinfo'));
 
@@ -59,5 +107,6 @@ export async function loadStateFromDav() {
 	return JSON.parse(res);
 }
 
+*/
 
 
