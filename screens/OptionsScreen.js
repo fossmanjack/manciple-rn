@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Pressable,
 	StyleSheet,
@@ -7,11 +7,12 @@ import {
 	View
 } from 'react-native';
 import {
-	Button
+	Button,
+	Input
 } from 'react-native-elements';
 import { useSelector, useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
-import SecureStorage from 'expo-secure-storage';
+import * as SecureStore from 'expo-secure-store';
 import Header from '../components/HeaderComponent';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Options from '../slices/optionsSlice';
@@ -24,7 +25,7 @@ export default function OptionsScreen(props) {
 	const _Opts = useSelector(S => S.options);
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
-	const [ url, setURL ] = useState('');
+	const [ url, setURL ] = useState(_Opts[_Opts.sync].url);
 	const [ path, setPath ] = useState('/Apps/Manciple');
 	const [ userdataSaved, setUserdataSaved ] = useState(false);
 	const [ syncOpen, setSyncOpen ] = useState(false);
@@ -40,9 +41,12 @@ export default function OptionsScreen(props) {
 
 	const rehydrateUser = async _ => {
 		try {
-			const res = await SecureStorage.getItemAsync('userinfo');
-			setUsername(userinfo.username);
-			setPassword(userinfo.password);
+			const res = await SecureStore.getItemAsync('userinfo');
+			const userinfo = JSON.parse(res);
+			if(userinfo) {
+				setUsername(userinfo.username);
+				setPassword(userinfo.password);
+			}
 		} catch(err) {
 			console.log('Could not retrieve user info:', err);
 		}
@@ -51,6 +55,18 @@ export default function OptionsScreen(props) {
 	useEffect(_ => {
 		rehydrateUser();
 	}, []);
+/*
+	useEffect(_ => SecureStore.getItemAsync('userinfo')
+		.then(res => {
+			console.log(res);
+			const userinfo = JSON.parse(res);
+			console.log(userinfo);
+			if(userinfo) {
+				setUsername(userinfo.username);
+				setPassword(userinfo.password);
+			}
+		}), []);
+*/
 
 	const handleSetValue = val => {
 		dispatch(Options.setSync(val));
@@ -59,17 +75,22 @@ export default function OptionsScreen(props) {
 	};
 
 	const handleSave = async _ => {
-		dispatch(Options.setSyncOpts({ [sync]: { url, path }}));
+		//const userOb = { username, password };
+		//const userTxt = JSON.stringify(userOb);
+		dispatch(Options.setSyncOpts({ [syncValue]: { url, path }}));
 		try {
-			await(SecureStorage.setItemAsync(
-			'userinfo',
-			JSON.stringify({
-				username,
-				password
-			})));
-			setUserdataSaved(true);
+			//console.log('Attempting to set userinfo with', userTxt);
+			res = await SecureStore.setItemAsync(
+				'userinfo',
+				JSON.stringify({
+					username,
+					password
+				})
+			);
+			console.log(res);
+			res && setUserdataSaved(true);
 		} catch(err) {
-			console.log('Could not save user data!');
+			console.log('Could not save user data!', err);
 		}
 	};
 
@@ -83,11 +104,14 @@ export default function OptionsScreen(props) {
 		//switch(_Opts.sync) {
 		////	case 'nc':
 				return (
-					<View>
+					<>
 						<View style={{ flexDirection: 'row' }}>
 							<Input
 								placeholder='Nextcloud URL'
-								onChangeText={text => setURL(text)}
+								onChangeText={text => {
+									setURL(text);
+									setUserdataSaved(false);
+								}}
 								value={url}
 								style={styles.formInput}
 								label='Nextcloud URL'
@@ -96,15 +120,22 @@ export default function OptionsScreen(props) {
 						<View style={{ flexDirection: 'row' }}>
 							<Input
 								placeholder='Application path'
-								onChangeText={text => setPath(text)}
+								onChangeText={text => {
+									setPath(text);
+									setUserdataSaved(false);
+								}}
 								value={path}
 								style={styles.formInput}
 								label='Application path'
 							/>
+						</View>
 						<View style={{ flexDirection: 'row' }}>
 							<Input
 								placeholder='Username'
-								onChangeText={text => setUsername(text)}
+								onChangeText={text => {
+									setUsername(text);
+									setUserdataSaved(false);
+								}}
 								value={username}
 								style={styles.formInput}
 								label='Username'
@@ -114,7 +145,10 @@ export default function OptionsScreen(props) {
 							<Input
 								secureTextEntry
 								placeholder=''
-								onChangeText={text => setPassword(text)}
+								onChangeText={text => {
+									setPassword(text);
+									setUserdataSaved(false);
+								}}
 								value={password}
 								style={styles.formInput}
 								label='Password'
@@ -123,9 +157,9 @@ export default function OptionsScreen(props) {
 						<Button
 							title={userdataSaved ? 'Saved!' : 'Save'}
 							onPress={handleSave}
-							disabled={!userdataSaved}
+							disabled={userdataSaved}
 						/>
-					</View>
+					</>
 				);
 		//		break;
 		//	default:
@@ -134,15 +168,16 @@ export default function OptionsScreen(props) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View
+			keyboardShouldPersistTaps='always'
+			style={styles.mainContainer}
+		>
 			<Header
 				drawerCtl={drawerCtl}
 				title='Options'
 			/>
 			<Text>
 				TBI:
-					- Back-end storage option
-					- State reset button (flush persistent storage)
 					- Light/dark mode
 			</Text>
 			<View style={styles.row}>
@@ -180,10 +215,10 @@ export default function OptionsScreen(props) {
 			</View>
 		</View>
 	);
-};
+}
 
 const styles = StyleSheet.create({
-	container: {
+	mainContainer: {
 		flex: 1
 	},
 	row: {
@@ -194,3 +229,4 @@ const styles = StyleSheet.create({
 		height: 60
 	}
 });
+

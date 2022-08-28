@@ -1,29 +1,29 @@
 import * as SecureStore from 'expo-secure-store';
 import { createClient } from 'webdav';
 import { useSelector } from 'react-redux';
-import { _Store } from '../res/_Store';
+//import { _Store } from '../res/_Store';
 
-export default function davClient(filename) {
-	const { options: { dav }, global: { clientID }} = _Store.getState();
-	const [ username, setUsername ] = useState('');
-	const [ password, setPassword ] = useState('');
-	const [ retriever, setRetriever ] = useState('');
+export default function davClient(state) {
+	const { options: { dav }, global: { clientID }} = state;
+	let username, password, davPath, retriever;
+	//const [ username, setUsername ] = useState('');
+	//const [ password, setPassword ] = useState('');
 
-	davPath = `${dav.url}/remote.php/dav/files/${username}/${dav.path}`;
+	//let davPath = `${dav.url}/remote.php/dav/files/${username}/${dav.path}`;
 
 	const getUserinfo = async _ => await JSON.parse(SecureStore.getItemAsync('userinfo'));
 
 	useEffect(_ => {
-		const userinfo = getUserInfo();
-		setUsername(userinfo.username);
-		setPassword(userinfo.password);
-		setRetriever(createClient(
+		const { username, password } = getUserInfo();
+		//setUsername(userinfo.username);
+		//setPassword(userinfo.password);
+		retriever = createClient(
 			davPath,
 			{
 				username,
 				password
 			}
-		));
+		);
 	}, []);
 
 	const get = async filename => {
@@ -46,7 +46,7 @@ export default function davClient(filename) {
 		return true;
 	}
 
-	return { get, put };
+	return { ...retriever, get, put };
 }
 
 /*

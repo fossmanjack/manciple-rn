@@ -126,6 +126,7 @@ export default function Main() {
 			key={nav}
 			onDrawerOpen={_ => setDrawerIsOpen(true)}
 			onDrawerClose={_ => setDrawerIsOpen(false)}
+			keyboardShouldPersistTaps='always'
 		>
 			<Screen exports={{ nav, setNav, drawerCtl }} />
 			<NewPantryDialog
