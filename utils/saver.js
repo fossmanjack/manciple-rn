@@ -29,8 +29,21 @@ export function loadState(_Store) {
 	const dispatch = _Store.dispatch;
 	const local = generateManifest(state);
 
+	// check to see if manifest exists -- if yes, grab it, if no, initRemoteRepo()
+
 	console.log('loadState', local);
 }
+
+export function initRemoteRepo(_Store) {
+	const state = _Store.getState();
+	const dispatch = _Store.dispatch;
+	const local = generateManifest(state);
+	const syncClient = Dav.davClient(state);
+
+	// create remote directory and save manifest and pantry files
+}
+
+
 /*
 export async function getRemoteState(dispatch) {
 	const state = _Store.getState();
