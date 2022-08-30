@@ -39,22 +39,6 @@ export default function OptionsScreen(props) {
 
 	const dispatch = useDispatch();
 
-	const rehydrateUser = async _ => {
-		try {
-			const res = await SecureStore.getItemAsync('userinfo');
-			const userinfo = JSON.parse(res);
-			if(userinfo) {
-				setUsername(userinfo.username);
-				setPassword(userinfo.password);
-			}
-		} catch(err) {
-			console.log('Could not retrieve user info:', err);
-		}
-	};
-
-	useEffect(_ => {
-		rehydrateUser();
-	}, []);
 /*
 	useEffect(_ => SecureStore.getItemAsync('userinfo')
 		.then(res => {
@@ -103,64 +87,7 @@ export default function OptionsScreen(props) {
 	const SyncForm = _ => {
 		//switch(_Opts.sync) {
 		////	case 'nc':
-				return (
-					<>
-						<View style={{ flexDirection: 'row' }}>
-							<Input
-								placeholder='Nextcloud URL'
-								onChangeText={text => {
-									setURL(text);
-									setUserdataSaved(false);
-								}}
-								value={url}
-								style={styles.formInput}
-								label='Nextcloud URL'
-							/>
-						</View>
-						<View style={{ flexDirection: 'row' }}>
-							<Input
-								placeholder='Application path'
-								onChangeText={text => {
-									setPath(text);
-									setUserdataSaved(false);
-								}}
-								value={path}
-								style={styles.formInput}
-								label='Application path'
-							/>
-						</View>
-						<View style={{ flexDirection: 'row' }}>
-							<Input
-								placeholder='Username'
-								onChangeText={text => {
-									setUsername(text);
-									setUserdataSaved(false);
-								}}
-								value={username}
-								style={styles.formInput}
-								label='Username'
-							/>
-						</View>
-						<View style={{ flexDirection: 'row' }}>
-							<Input
-								secureTextEntry
-								placeholder=''
-								onChangeText={text => {
-									setPassword(text);
-									setUserdataSaved(false);
-								}}
-								value={password}
-								style={styles.formInput}
-								label='Password'
-							/>
-						</View>
-						<Button
-							title={userdataSaved ? 'Saved!' : 'Save'}
-							onPress={handleSave}
-							disabled={userdataSaved}
-						/>
-					</>
-				);
+		return ( <View></View> );
 		//		break;
 		//	default:
 		//		return (<View></View>);
