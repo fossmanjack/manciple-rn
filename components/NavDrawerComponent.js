@@ -32,7 +32,7 @@ export default function NavDrawer(props) {
 
 	return (
 		<>
-			<UserComponent />
+			<UserComponent setNav={setNav} drawer={drawer} />
 			{ _Pantries.length > 0 &&
 				<FlatList
 					data={_Pantries}

@@ -2,14 +2,37 @@
 // Provides badge, name, title info for logged-in user
 
 import {
-	Text
+	Pressable,
+	Text,
+	View
 } from 'react-native';
+import {
+	Avatar
+} from 'react-native-elements';
 
-export default function UserComponent(props) {
+export default function UserComponent({ setNav, drawer }) {
+
+	const handlePress = {
+		setNav('user');
+		drawer.closeDrawer();
+	};
 
 	return (
-		<Text>
-			User Component
-		</Text>
+		<Pressable onPress={handlePress} style={{ backgroundColor: 'royalblue' }}>>
+			<View style={{ flexDirection: 'row' }}>
+				<Avatar
+					rounded
+					icon={{ name: 'user-circle', type: 'fontawesome' }}
+				/>
+				<View>
+					<Text>
+						User Login
+					</Text>
+					<Text>
+						https://
+					</Text>
+				</View>
+			</View>
+		</Pressable>
 	);
 }

@@ -13,13 +13,14 @@ import {
 import * as SecureStore from 'expo-secure-store';
 import * as User from '../slices/userSlice';
 
-export default function LoginScreen(props) {
+export default function UserScreen(props) {
 	const { dav: { url, path }, sync, userAvi } = useSelector(S => S.user);
 	const [ urlTxt, setURLTxt ] = useState('https://');
 	const [ pathTxt,setPathTxt ] = useState('/Apps/Manciple');
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
 	const [ userdataSaved, setUserdataSaved ] = useState(true);
+	const [ userLoggedIn, setUserLoggedIn ] = useState(false);
 	const dispatch = useDispatch();
 
 
@@ -32,6 +33,7 @@ export default function LoginScreen(props) {
 				setPassword(userinfo.password);
 				setUrlTxt(url);
 				setPathTxt(path);
+				setUserLoggedIn(true);
 			}
 		} catch(err) {
 			console.log('Could not retrieve user info:', err);
@@ -41,6 +43,24 @@ export default function LoginScreen(props) {
 	useEffect(_ => {
 		rehydrateUser();
 	}, []);
+
+	const handleLogin = _ => {
+		// first save userpass to secure storage
+		// dispatch the user state update
+		// call share for userAvi
+		// initPath()
+		// get digest if it exists
+		// sync
+		setUserdataSaved(true);
+	};
+
+	const handleLogout = _ => {
+		// delete userinfo
+		// dispatch state resets
+		// set username and password to ''
+		// setUserLoggedIn to false
+		//
+	}
 
 	return (
 		<>
@@ -100,17 +120,37 @@ export default function LoginScreen(props) {
 					label='Password'
 				/>
 			</View>
-			<Button
-				title={userdataSaved ? 'Saved!' : 'Save'}
-				onPress={handleSave}
-				disabled={userdataSaved}
-			/>
+			{
+				userLoggedIn ? (
+					<Button
+						title='Logout'
+						onPress={handleLogout}
+					/>
+				) : (
+					<Button
+						title='Login'
+						onPress={handleLogin}
+						disabled={username}
+					/>
+				)
+			}
 		</>
 	);
 }
 
 /*
 
+Put all userinfo {
+	username
+	password
+	userAvi ref
+	fullname
+	url
+	port
+	path
+} into securestorage
+
+figure out how to ref to userAvi, or just store that one in state
 
 
 
