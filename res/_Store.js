@@ -10,6 +10,7 @@ import {
 	REGISTER
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { transientReducer } from '../slices/transientSlice';
 import { pantriesReducer } from '../slices/pantriesSlice';
 import { optionsReducer } from '../slices/optionsSlice';
 import { globalReducer } from '../slices/globalSlice';
@@ -19,6 +20,7 @@ import { loadState } from '../utils/saver.js';
 const config = {
 	key: 'root',
 	storage: AsyncStorage,
+	blacklist: ['user'],
 	debug: true
 }
 
@@ -27,7 +29,7 @@ export const _Store = configureStore({
 		global: globalReducer,
 		options: optionsReducer,
 		pantries: pantriesReducer,
-		user: userReducer
+		user: userReducer,
 	}),
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

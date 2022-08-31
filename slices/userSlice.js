@@ -1,32 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+	username: null,
+	password: null,
 	userAvi: null,
-	sync: 'dav',
-	dav: {
-		url: 'https://',
-		path: '/Apps/Manciple'
-	},
-	nc: { },
-	note: { },
 }
 
 const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
-		setUserAvi: (userState, action) => { { ...userState, userAvi: action.payload } },
-		setSync: (userState, action) => { { ...userState, sync: action.payload } },
-		setSyncOpts: (userState, action) =>
-		{ { ...userState, [`${userState.sync}`]: { ...userState[`${userState.sync}`], ...action.payload }} }
-
+		setUserAvi: (userState, action) => { return { ...userState, userAvi: action.payload }},
+		setUsername: (userState, action) => { return { ...userState, username: action.payload }},
+		setPassword: (userState, action) => { return { ...userState, password: action.payload }}
 	},
-}
+});
 
-export cost userReducer = userSlice.reducer();
+export const userReducer = userSlice.reducer;
 
 export const {
+	setUsername,
+	setPassword,
 	setUserAvi,
-	setSync,
-	setSyncOpts
 } = userSlice.actions;

@@ -7,17 +7,10 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
 	debug: 9, // 0 = none, 1 = error, 3 = warn, 5 = debug, 7 = v-debug, 9 = vv-debug
 	sortOpts: [ 'name', true ],
-	sync: 'none',
-	dav: {
+	syncType: 'none',
+	syncOpts: {
 		url: null,
-		path: null
-	},
-	nc: {
-		url: null,
-		path: null
-	},
-	node: {
-		url: null,
+		path: null,
 		port: null
 	}
 }
@@ -30,8 +23,8 @@ const optionsSlice = createSlice({
 		setSortOpts: (optionsState, action) => { optionsState.sortOpts = action.payload; },
 		setSync: (optionsState, action) => { optionsState.sync = action.payload; },
 		setSyncOpts: (optionsState, action) => {
-			// action.payload is { [sync]: { syncInfo } }
-			return ({ ...optionsState, ...action.payload })
+			// action.payload is { syncInfo }
+			return { ...optionsState, syncOpts: { ...action.payload }}
 		}
 	}
 });

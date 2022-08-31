@@ -1,5 +1,76 @@
 import { useDispatch } from 'react-redux';
-import * as Dav from './davModule';
+import * as Dav from 'webdav';
+import * as SecureStore from 'expo-secure-store';
+//import { _Store } from '../res/_Store';
+
+export const getClient = args => {
+	// Returns a client interface based on sync type
+	// Takes an object with { username, password, sync, url, path, port }
+	const { username, password, sync, url, path, port } = args;
+
+	switch(sync) {
+		case 'nc': case 'dav':
+			return Dav.createClient(
+				`${url}/remote.php/dav/${username}/files`,
+				{ username, password }
+			);
+			break;
+		case 'node':
+			console.log('Node support not yet implemented!');
+			return false;
+			break;
+		default:
+			console.log('No sync support configured!');
+	}
+
+	return false;
+}
+
+export const login = async _Store => {
+	// called from UserScreen
+	const state = _Store.getState();
+	const dispatch = _Store.dispatch();
+	const clientInfo = {
+		username: null,
+		password: null,
+		sync: state.options.syncType,
+		url: state.options.syncOpts.url,
+		path: state.options.syncOpts.path,
+		port: state.options.syncOpts.port
+	}
+
+	try {
+		let res = await SecureStore.getItemAsync('userinfo');
+		let userinfo = JSON.parse(res);
+		if(userinfo) {
+			clientInfo.username = userinfo.username;
+			clientInfo.password = userinfo.password;
+			dispatch(User.setUsername(userinfo.username));
+			dispatch(User.setPassword(userinfo.password));
+			dispatch(User.setUserAvi(userinfo.userAvi));
+		}
+	} catch(err) {
+		console.log('Could not load userinfo ---', err);
+	}
+
+	const client = getClient(clientInfo);
+	const localManifest = generateManifest();
+
+	// does path exist?  if not, create
+
+	if(await !client.exists(path)) {
+		await client.createDirectory(path);
+	}
+
+	// does manifest exist?  if not, initial save
+
+	if(await !client.exists(`${path}/manifest.json`)) {
+		await client.putFileContents(`${path}/manifest.json`, JSON.stringify(localManifest), { overwrite: true });
+	}
+
+	// run syncToRemote
+}
+
 
 export async function saveState(_Store) {
 	const state = _Store.getState();
