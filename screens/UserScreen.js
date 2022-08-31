@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+	StyleSheet,
 	Text,
 	View
 } from 'react-native';
@@ -12,11 +13,14 @@ import {
 } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import * as User from '../slices/userSlice';
+import * as Saver from '../utils/saver';
+import Header from '../components/HeaderComponent';
 
-export default function UserScreen(props) {
-	const { dav: { url, path }, sync, userAvi } = useSelector(S => S.user);
-	const [ urlTxt, setURLTxt ] = useState('https://');
-	const [ pathTxt,setPathTxt ] = useState('/Apps/Manciple');
+export default function UserScreen({ drawerCtl, setNav }) {
+	const userState = useSelector(S => S.user);
+	const { dav: { url: savedURL, path: savedPath }, sync, userAvi } = userState;
+	const [ url, setUrl ] = useState('https://');
+	const [ path,setPath ] = useState('/Apps/Manciple');
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
 	const [ userdataSaved, setUserdataSaved ] = useState(true);
@@ -31,8 +35,8 @@ export default function UserScreen(props) {
 			if(userinfo) {
 				setUsername(userinfo.username);
 				setPassword(userinfo.password);
-				setUrlTxt(url);
-				setPathTxt(path);
+				setUrl(savedURL);
+				setPath(savedPath);
 				setUserLoggedIn(true);
 			}
 		} catch(err) {
@@ -45,6 +49,23 @@ export default function UserScreen(props) {
 	}, []);
 
 	const handleLogin = _ => {
+		SecureStore.setItemAsync(
+			'userinfo',
+			JSON.stringify({
+				username,
+				password
+			})
+		)
+		.then(_ => dispatch(User.setSync('nc'))
+		.then(_ => dispatch(User.setSyncOpts({ url, path }))
+		.then(_ => setUserLoggedIn(true))
+		.catch(err => console.log('Could not save userinfo:', err));
+	}
+
+	useEffect(_ => {
+		userLoggedIn && Saver.login(userState)
+	}, [ userLoggedIn ]);
+
 		// first save userpass to secure storage
 		// dispatch the user state update
 		// call share for userAvi
@@ -62,20 +83,37 @@ export default function UserScreen(props) {
 		//
 	}
 
+	const UserAvi = _ => {
+		return !username ? (
+			<Avatar
+				rounded
+				icon={{ name: 'user-circle', type: 'font-awesome' }}
+			/>
+		) : !userAvi ? (
+			<Avatar
+				rounded
+				title={`${username[0]}${username[1]}`}
+			/>
+		) : (
+			<Avatar
+				rounded
+				source={userAvi}
+			/>
+		);
+	}
+
 	return (
 		<>
-			<Avatar
-				{ !username && icon={{ name: 'user-circle' type: 'fontawesome' }}
-					|| !userAvi && title={`${username[0]}${username[1]}`}
-					|| source={userAvi}
-				}
-				rounded
+			<Header
+				drawerCtl={drawerCtl}
+				title='User Login'
 			/>
+			<UserAvi />
 			<View style={{ flexDirection: 'row' }}>
 				<Input
 					placeholder='Nextcloud URL'
 					onChangeText={text => {
-						setURL(text);
+						setUrl(text);
 						setUserdataSaved(false);
 					}}
 					value={url}
@@ -130,7 +168,7 @@ export default function UserScreen(props) {
 					<Button
 						title='Login'
 						onPress={handleLogin}
-						disabled={username}
+						disabled={!username}
 					/>
 				)
 			}
@@ -138,6 +176,18 @@ export default function UserScreen(props) {
 	);
 }
 
+const styles = StyleSheet.create({
+	mainContainer: {
+		flex: 1
+	},
+	row: {
+		flexDirection: 'row'
+	},
+	formInput: {
+		padding: 8,
+		height: 60
+	}
+});
 /*
 
 Put all userinfo {

@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import HelpScreen from '../screens/HelpScreen';
 import OptionsScreen from '../screens/OptionsScreen';
 import PantryScreen from '../screens/PantryScreen';
+import UserScreen from '../screens/UserScreen';
 
 export default function Screen(props) {
 	const { exports: { nav, setNav, drawerCtl }} = props;
@@ -38,5 +39,10 @@ export default function Screen(props) {
 					drawerCtl={drawerCtl}
 					setNav={setNav}
 				/>
-				: (<View><Text>Oops!</Text></View>);
+				: nav === 'user'
+					? <UserScreen
+						drawerCtl={drawerCtl}
+						setNav={setNav}
+					/>
+					: (<View><Text>Oops!</Text></View>);
 }
