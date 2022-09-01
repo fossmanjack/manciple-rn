@@ -19,15 +19,16 @@ import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
 //import * as Dav from '../utils/davModule';
 import * as Saver from '../utils/saver';
+import { _Persist } from '../res/_Store';
 
 export default function OptionsScreen(props) {
 	const { setNav, drawerCtl } = props;
 	const _Opts = useSelector(S => S.options);
-	const [ username, setUsername ] = useState('');
-	const [ password, setPassword ] = useState('');
-	const [ url, setURL ] = useState(_Opts[_Opts.sync].url);
-	const [ path, setPath ] = useState('/Apps/Manciple');
-	const [ userdataSaved, setUserdataSaved ] = useState(false);
+//	const [ username, setUsername ] = useState('');
+//	const [ password, setPassword ] = useState('');
+//	const [ url, setURL ] = useState(_Opts[_Opts.sync].url);
+//	const [ path, setPath ] = useState('/Apps/Manciple');
+//	const [ userdataSaved, setUserdataSaved ] = useState(false);
 	const [ syncOpen, setSyncOpen ] = useState(false);
 	const [ syncValue, setSyncValue ] = useState(_Opts.sync);
 	const [ syncItems, setSyncItems ] = useState([
@@ -53,11 +54,11 @@ export default function OptionsScreen(props) {
 */
 
 	const handleSetValue = val => {
-		dispatch(Options.setSync(val));
+		dispatch(Options.setSyncType(val));
 		setSyncValue(val);
 		setSyncOpen(false);
 	};
-
+/*
 	const handleSave = async _ => {
 		//const userOb = { username, password };
 		//const userTxt = JSON.stringify(userOb);
@@ -77,11 +78,26 @@ export default function OptionsScreen(props) {
 			console.log('Could not save user data!', err);
 		}
 	};
+*/
 
 	const restoreDefaults = _ => {
 		// purge store
 		console.log('Attempting to restore defaults!');
-		dispatch(Pantry.resetState());
+		Alert.alert(
+			'Reset Application State',
+			'Are you sure you want to reset the application state?  This will delete all pantry content and purchase history!',
+			[
+				{
+					text: 'Cancel',
+					style: 'cancel'
+				},
+				{
+					text: 'Confirm',
+					onPress: _ => _Persist.purge()
+				}
+			],
+
+		);
 	};
 
 	const SyncForm = _ => {
@@ -123,6 +139,7 @@ export default function OptionsScreen(props) {
 				<Button
 					onPress={restoreDefaults}
 					title='Restore Factory Defaults'
+					color='red'
 				/>
 			</View>
 			<View>

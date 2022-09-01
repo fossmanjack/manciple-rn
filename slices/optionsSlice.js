@@ -21,7 +21,7 @@ const optionsSlice = createSlice({
 	reducers: {
 		setDebugLevel: (optionsState, action) => { optionsState.debug = action.payload; },
 		setSortOpts: (optionsState, action) => { optionsState.sortOpts = action.payload; },
-		setSync: (optionsState, action) => { optionsState.sync = action.payload; },
+		setSyncType: (optionsState, action) => { optionsState.syncType = action.payload; },
 		setSyncOpts: (optionsState, action) => {
 			// action.payload is { syncInfo }
 			return { ...optionsState, syncOpts: { ...action.payload }}
@@ -34,7 +34,7 @@ export const optionsReducer = optionsSlice.reducer;
 export const {
 	setDebugLevel,
 	setSortOpts,
-	setSync,
+	setSyncType,
 	setSyncOpts
 } = optionsSlice.actions;
 

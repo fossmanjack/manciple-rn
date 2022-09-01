@@ -1,6 +1,9 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux'
 import * as Dav from 'webdav';
 import * as SecureStore from 'expo-secure-store';
+import * as User from '../slices/userSlice';
+import * as Options from '../slices/optionsSlice';
+import * as Global from '../slices/globalSlice';
 //import { _Store } from '../res/_Store';
 
 export const getClient = args => {
@@ -26,10 +29,10 @@ export const getClient = args => {
 	return false;
 }
 
-export const login = async _Store => {
+export function login(_Store) {
 	// called from UserScreen
 	const state = _Store.getState();
-	const dispatch = _Store.dispatch();
+	const dispatch = _Store.dispatch;
 	const clientInfo = {
 		username: null,
 		password: null,
@@ -39,36 +42,47 @@ export const login = async _Store => {
 		port: state.options.syncOpts.port
 	}
 
-	try {
-		let res = await SecureStore.getItemAsync('userinfo');
-		let userinfo = JSON.parse(res);
+	console.log('Attempting to retrieve userinfo...');
+	SecureStore.getItemAsync('userinfo')
+	.then(res => JSON.parse(res))
+	.then(userinfo => {
 		if(userinfo) {
+			console.log('Loading userinfo', userinfo);
 			clientInfo.username = userinfo.username;
 			clientInfo.password = userinfo.password;
 			dispatch(User.setUsername(userinfo.username));
 			dispatch(User.setPassword(userinfo.password));
 			dispatch(User.setUserAvi(userinfo.userAvi));
+			dispatch(Global.setLastUse(Date.now()));
+			console.log('Done');
+		} else {
+			console.log('No userinfo found, aborting...');
+			return null;
 		}
-	} catch(err) {
-		console.log('Could not load userinfo ---', err);
-	}
+	})
+	.then(_ => {
+		console.log('Attempting to get client with:', clientInfo);
+		const client = getClient(clientInfo);
+		const localManifest = generateManifest(state);
+		console.log(client);
+	})
+	.catch(err => {
+		console.log('Error in login ---', err);
+	});
 
-	const client = getClient(clientInfo);
-	const localManifest = generateManifest();
+}
 
-	// does path exist?  if not, create
+export function logout(_Store) {
+	const dispatch = _Store.dispatch;
 
-	if(await !client.exists(path)) {
-		await client.createDirectory(path);
-	}
-
-	// does manifest exist?  if not, initial save
-
-	if(await !client.exists(`${path}/manifest.json`)) {
-		await client.putFileContents(`${path}/manifest.json`, JSON.stringify(localManifest), { overwrite: true });
-	}
-
-	// run syncToRemote
+	SecureStore.deleteItemAsync('userinfo');
+	dispatch(Options.setSyncOpts({
+		url: 'https://',
+		path: '/App/Manciple'
+	}));
+	dispatch(User.setUsername(''));
+	dispatch(User.setPassword(''));
+	dispatch(User.setUserAvi(''));
 }
 
 
@@ -115,6 +129,61 @@ export function initRemoteRepo(_Store) {
 }
 
 
+export function generateManifest(state) {
+
+	const ret = {
+		timestamp: state.global.lastUse,
+		clientID: state.global.clientID,
+		pantries: { }
+	}
+
+	state.pantries._Pantries.forEach(ptr => ret.pantries[ptr.id] = ptr.modifyDate);
+
+	return ret;
+}
+
+
+/*
+	try {
+		let res = await SecureStore.getItemAsync('userinfo');
+		let userinfo = JSON.parse(res);
+		if(userinfo) {
+			console.log('Loading userinfo', userinfo);
+			clientInfo.username = userinfo.username;
+			clientInfo.password = userinfo.password;
+			dispatch(User.setUsername(userinfo.username));
+			dispatch(User.setPassword(userinfo.password));
+			dispatch(User.setUserAvi(userinfo.userAvi));
+			console.log('Done');
+		} else {
+			console.log('No userinfo found, aborting...');
+			return;
+		}
+	} catch(err) {
+		console.log('Could not load userinfo ---', err);
+		return;
+	}
+
+	const client = getClient(clientInfo);
+	const localManifest = generateManifest();
+
+	console.log(client);
+*/
+/*
+	// does path exist?  if not, create
+
+	if(await client.exists(path) === false) {
+		await client.createDirectory(path);
+	}
+
+	// does manifest exist?  if not, initial save
+
+	if(await client.exists(`${path}/manifest.json`) === false) {
+		await client.putFileContents(`${path}/manifest.json`, JSON.stringify(localManifest), { overwrite: true });
+	}
+
+	// run syncToRemote
+*/
 /*
 export async function getRemoteState(dispatch) {
 	const state = _Store.getState();
@@ -169,15 +238,3 @@ export async function getRemoteState(dispatch) {
 
 }
 */
-export function generateManifest(state) {
-
-	const ret = {
-		timestamp: state.global.lastUse,
-		clientID: state.global.clientID,
-		pantries: { }
-	}
-
-	state.pantries._Pantries.forEach(ptr => ret.pantries[ptr.id] = ptr.modifyDate);
-
-	return ret;
-}

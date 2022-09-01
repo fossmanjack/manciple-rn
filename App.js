@@ -16,17 +16,17 @@ export default function App() {
 	console.log('Persistor:', _Persist);
 
 	return (
-		<NavigationContainer>
-			<Provider store={_Store}>
-				<PersistGate
-					loading={<Loading />}
-					persistor={_Persist}
-				>
+		<Provider store={_Store}>
+			<PersistGate
+				loading={<Loading />}
+				persistor={_Persist}
+			>
+				<NavigationContainer>
 					<View style={_Styles.viewMain}>
 						<Main />
 					</View>
-				</PersistGate>
-			</Provider>
-		</NavigationContainer>
+				</NavigationContainer>
+			</PersistGate>
+		</Provider>
 	);
 }

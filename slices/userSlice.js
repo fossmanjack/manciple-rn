@@ -1,3 +1,5 @@
+// Hopefully excluded from persistence, this slice handles the logged in
+// user's userinfo
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {

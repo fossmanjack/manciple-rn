@@ -10,12 +10,11 @@ import {
 	REGISTER
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { transientReducer } from '../slices/transientSlice';
 import { pantriesReducer } from '../slices/pantriesSlice';
 import { optionsReducer } from '../slices/optionsSlice';
 import { globalReducer } from '../slices/globalSlice';
 import { userReducer } from '../slices/userSlice';
-import { loadState } from '../utils/saver.js';
+import * as Saver from '../utils/saver.js';
 
 const config = {
 	key: 'root',
@@ -46,4 +45,4 @@ export const _Store = configureStore({
 		})
 });
 
-export const _Persist = persistStore(_Store, null, loadState(_Store));
+export const _Persist = persistStore(_Store, null, _ => Saver.login(_Store));
