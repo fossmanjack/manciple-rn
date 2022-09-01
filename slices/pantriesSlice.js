@@ -60,6 +60,7 @@ const pantriesSlice = createSlice({
 		updatePantry: (pantriesState, action) => {
 			// action.payload is updated pantry object; ID won't have changed
 			const updateID = action.payload.id;
+			action.payload.modifyDate = Date.now();
 			const updateIdx = pantriesState._Pantries.indexOf(pantriesState._Pantries.find(pt => pt.id === updateID));
 			console.log('updatePantry called:', action.payload);
 			updateIdx !== -1
