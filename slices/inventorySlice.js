@@ -6,7 +6,7 @@ import { INVENTORY } from '../res/DEFAULT';
 import * as Utils from '../utils/utils';
 
 const initialState = {
-	inventory: INVENTORY,
+	_Inventory: INVENTORY,
 	deleted: [ ]
 }
 
@@ -20,13 +20,13 @@ const inventorySlice = createSlice({
 			if(!action.payload) return iState;
 			if(action.payload.type !== 'item') return iState;
 
-			let idx = iState.inventory.indexOf(iState.inventory.find(item => item.id === action.payload.id));
+			let idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === action.payload.id));
 			if(idx !== -1) {
 				// if item with matching id is already in state, update it
-				iState.inventory.splice({ ...iState.inventory[idx], ...action.payload }, idx, 1);
+				iState._Inventory.splice({ ...iState._Inventory[idx], ...action.payload }, idx, 1);
 			} else {
 				// otherwise push item to inventory
-				iState.inventory.push(action.payload);
+				iState._Inventory.push(action.payload);
 			}
 		},
 		updateItem: (iState, action) => {
@@ -38,12 +38,12 @@ const inventorySlice = createSlice({
 
 			props = { ...props, modifyDate: Date.now() };
 
-			let idx = iState.inventory.indexOf(iState.inventory.find(item => item.id === id));
+			let idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === id));
 			if(idx === -1) return iState;
 
-			const newItem = { ...iState.inventory[idx], ...action.payload };
+			const newItem = { ...iState._Inventory[idx], ...action.payload };
 
-			iState.inventory.splice(newItem, idx, 1);
+			iState._Inventory.splice(newItem, idx, 1);
 		},
 		deleteItem: (iState, action) => {
 			// For deleting an item from inventory
@@ -51,8 +51,8 @@ const inventorySlice = createSlice({
 			if(!action.payload) return iState;
 
 			return {
-				inventory: iState.inventory.filter(item => item.id !== action.payload),
-				deleted: [ ...iState.deleted.push(action.payload)]
+				_Inventory: iState._Inventory.filter(item => item.id !== action.payload),
+				deleted: [ ...iState.deleted.push(action.payload) ]
 			};
 		},
 		clearDeleted: (iState, action) => {

@@ -20,7 +20,6 @@ import PantryItem from '../components/PantryItem';
 
 // slice imports
 import * as Pantry from '../slices/pantriesSlice';
-import * as Inv from '../slices/inventorySlice';
 
 // utility imports
 import { _Styles } from '../res/_Styles';
@@ -29,58 +28,39 @@ import * as Utils from '../utils/utils';
 export default function PantryScreen(props) {
 	const { drawerCtl, setNav } = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { _Inventory } = useSelector(S => S.inventory);
 	const { sortOpts } = useSelector(S => S.options);
+	const [ mode, setMode ] = useState('list');
 	const dispatch = useDispatch();
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
 	const [ itemToEdit, setItemToEdit ] = useState(Utils.blankItem);
-	const [ listData, setListData ] = useState([]);
+	const [ listData, setListData ] = useState(
+		_Pantries[currentPantry].inventory.filter(i => i.listed)
+	);
 
 	// we want the list to refresh every time the mode or contents change and
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
-	useEffect(_ => setListData(generateListData()), [ mode, _Pantries[currentPantry].inventory ]);
-/*
+	useEffect(_ => refreshListData(), [ mode, _Pantries[currentPantry].inventory ]);
+
 	const handleModeChange = targetMode => {
 		console.log('handleModeChange', mode, '->', targetMode);
 		setMode(targetMode);
 	}
-*/
 
 	const toggleEditItemVisible = _ => {
 		console.log('toggleEditItemVisible called');
 		setShowEditItemModal(!showEditItemModal);
 	}
 
-	const generateListData = _ => {
+	const refreshListData = _ => {
 		console.log('refreshListData', mode);
-
-		return Utils.sortPantry(
-			Object.keys(_Pantries[currentPantry].inventory).map(id => {
-				return {
-					..._Inventory.find(ob = ob.id === id),
-					..._Pantries[currentPantry].inventory[id]
-				}
-			}), sortOpts);
-	}
-	/*
-		const inv = _Pantries[currentPantry].inventory;
-
-		return inventory.map(id => {
-			const item = {
-				.refreshListData.._Inventory.find(ob = ob.id === id),
-				..._Pantries[currentPantry].inventory[id]
-			}
-		});
 
 		setListData(Utils.sortPantry(mode === 'list'
 			? _Pantries[currentPantry].inventory.filter(i => i.listed)
 			: _Pantries[currentPantry].inventory, sortOpts)
 		);
 	}
-	*/
 
-/*
 	const handleCheckBox = itemID => {
 		console.log("handleCheckBox called with item", itemID);
 
@@ -91,22 +71,7 @@ export default function PantryScreen(props) {
 
 		dispatch(Pantry.updateItem({ itemID, updatedItem }));
 	};
-*/
-	const handleCheckBox = itemID => {
-		console.log('handleCheckBox called with item', itemID);
 
-		dispatch(Pantry.updateItemInPantry([ itemID, { inCart: !_Pantries[currentPantry].inventory[itemID].inCart } ]);
-	}
-
-	const handleSweep = (itemID, rowMap) => {
-		// remove item from pantry, conditionally update item history,
-		// close row, regenerating list data should happen automatically
-		// Pantry.deleteItemFromPantry(itemID)
-		// Inv.updateItem(itemID, { updated props })
-
-	}
-
-/*
 	const handleSweep = (itemID, rowMap) => {
 		console.log('handleSweep:', itemID, rowMap[itemID]);
 
@@ -118,11 +83,11 @@ export default function PantryScreen(props) {
 
 		// let's try removing the row from the listData state before dispatching the update
 		rowMap[itemID].closeRow();
-
-		//console.log(listData);
-		//setListData([...listData].splice(listData.findIndex(item => item.id === itemID), 1));
-		//console.log(listData);
-
+		/*
+		console.log(listData);
+		setListData([...listData].splice(listData.findIndex(item => item.id === itemID), 1));
+		console.log(listData);
+		*/
 
 		// dispatch the updated item
 		dispatch(Pantry.updateItem({
@@ -132,7 +97,6 @@ export default function PantryScreen(props) {
 
 		// refresh list data
 	};
-*/
 
 	const handleToggleStaple = item => {
 		console.log('handleToggleStaple called with item', item);
