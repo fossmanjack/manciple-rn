@@ -5,6 +5,7 @@ export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-
 export const parseDate = i => new Date(i).toISOString().split("T")[0];
 export const daysBetween = (i, j) => (j - i) / (86400000);
 export const truncateString = (str, num) => str.length >= num ? str.slice(num)+' ...' : str;
+export const nullp = val => (typeof val === 'undefined' || val === null);
 export const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 
 export const getDebugLvl = _ => useSelector(S => S.options).debug;
