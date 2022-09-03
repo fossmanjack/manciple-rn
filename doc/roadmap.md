@@ -1,3 +1,13 @@
+### Next Steps (2022-09-03)
+
+- [ ] Remove persistence until testing revised back-end is done
+- [ ] Finish InventoryScreen
+- [ ] Update Footer -> handleSweep
+- [ ] Review code flow from App down to rendering items
+- [ ] Test
+- [ ] Add persistence back in
+- [ ] Write DAV saving
+
 ### Things to Implement
 
 - [ ] Add staple -> sets "purchase by" equal to last purchase + interval
@@ -45,3 +55,6 @@ cancel and ok buttons), so next I should probably implement pantry mode.
 - [ ] fix calendar bug
 - [ ] auto-calculate intervals
 - [ ] import/export pantries
+- [x] move item status icons to IconTray component
+- [ ] add chips for tag management to item and pantry detail
+- [ ] convert item and pantry dates to human-readable format

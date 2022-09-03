@@ -1,4 +1,6 @@
 import { useSelector } from 'react-redux';
+import uuid from 'react-native-uuid';
+import { _Store } from '../res/_Store';
 
 export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
 export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-\[\]\{\}\\\|\`]/g, '') : false;
@@ -8,15 +10,18 @@ export const truncateString = (str, num) => str.length >= num ? str.slice(num)+'
 export const nullp = val => (typeof val === 'undefined' || val === null);
 export const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 
-export const getDebugLvl = _ => useSelector(S => S.options).debug;
+export const getDebugLvl = _ => _Store.getState().options.debug;
 
-export const debugMsg = (fun, params, dlvl=9) => {
+// Writing debug message guidance: the higher the options debug level, the more
+// noisy and granular the log will be.  Each debug message instance should consider
+// whether the data should always be logged (low dlvl) or rarely be logged (high
+// dlvl).  ERROR = 1, WARN = 3, INFO = 5, DEBUG = 7, VV_DEBUG = 9
+
+export const debugMsg = (fun, params=[], dlvl=9) => {
 	if(dlvl >= getDebugLvl()) {
 		console.log("****** DEBUG ******");
 		console.log(`Calling function ${fun} with:`);
-		for(i in params) {
-			console.log("\t", truncateString(JSON.stringify(params[i]), 60));
-		}
+		params.map(p => console.log("\t", truncateString(JSON.stringify(p), 60)));
 		console.log("*******************");
 	}
 }
@@ -54,11 +59,8 @@ export const sortPantry = (inv, [ field, asc ]) => {
 export const createPantryItem = props => {
 	const {
 		name = 'New item',
-		id = Utils.camelize(name),
-		qty = '1',
-		needed = true,
-		listed = true,
-		staple = false,
+		id = uuid.v4(),
+		tags = [],
 		history = [],
 		images = [],
 		price = '',
@@ -66,7 +68,6 @@ export const createPantryItem = props => {
 		url = '',
 		upc = '',
 		interval = 0,
-		purchaseBy = 0,
 		notes = '',
 		creationDate = Date.now(),
 		modifyDate = Date.now()
@@ -75,10 +76,9 @@ export const createPantryItem = props => {
 	return ({
 		name,
 		id,
-		qty,
-		needed,
-		listed,
-		staple,
+		type: 'item',
+		version: 1,
+		tags,
 		history,
 		images,
 		price,
@@ -86,14 +86,13 @@ export const createPantryItem = props => {
 		url,
 		upc,
 		interval,
-		purchaseBy,
 		notes,
 		creationDate,
 		modifyDate
 	});
 }
 
-export const blankItem = (createPantryItem({ name: 'Blank item', id: 'blankItem' }));
+export const blankItem = (createPantryItem({ name: 'Blank item' }));
 /* debugging
 
 debug level (dlvl) is the debug value at which the message will trigger

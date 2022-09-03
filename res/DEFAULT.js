@@ -8,7 +8,7 @@ export const PANTRIES = [
 		creationDate: Date.now(),
 		modifyDate: Date.now(),
 		inventory: {
-			d3bebaa4-d834-49cd-852e-a64f6638a2b4: { qty: '1 gal', purchaseBy: 0, inCart: false },
+			d3bebaa4-d834-49cd-852e-a64f6638a2b4: { qty: '1 gal', purchaseBy: 1660532115847, inCart: false },
 			3b706aa4-5f33-4aff-95ee-158c0523adea: { qty: '1', purchaseBy: 0, inCart: false },
 			910f2d0e-be22-4957-9e16-a716649837bd: { qty: '1', purchaseBy: 0, inCart: true },
 			09ec4d24-5f47-48c0-9d44-5c6f297fd640: { qty: '2', purchaseBy: 0, inCart: false }

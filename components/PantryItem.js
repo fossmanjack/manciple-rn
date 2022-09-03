@@ -30,7 +30,7 @@ import * as Utils from '../utils/utils';
 // { Picker } for implementing date selection
 
 
-export default function PantryItem({ item, mode, exports }) {
+export default function PantryItem({ item, exports }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
@@ -47,7 +47,7 @@ export default function PantryItem({ item, mode, exports }) {
 		setShowCalendar(!showCalendar);
 	}
 
-	const ListViewCheckBox = _ => {
+	const CheckBox = _ => {
 		return (
 			<Button
 				type='clear'
@@ -63,6 +63,52 @@ export default function PantryItem({ item, mode, exports }) {
 		);
 	}
 
+	const IconDrawer = item => {
+		return (
+			<View style={{
+				flex: 4,
+				flexDirection: 'row-reverse',
+				alignItems: 'flex-end',
+				alignSelf: 'flex-end',
+				justifyContent: 'center',
+			}}>
+				{
+					item.staple && <Icon
+						name='refresh'
+						type='font-awesome'
+						size={20}
+						color='gray'
+						style={{
+							marginLeft: 5
+						}}
+					/>
+				}
+				{
+					(item.notes !== '') && <Icon
+						name='note-alert-outline'
+						type='material-community'
+						size={20}
+						color='gray'
+						style={{
+							marginLeft: 5
+						}}
+					/>
+				}
+				{
+					(item.purchaseBy !== 0 && item.purchaseBy < Date.now()) && <Icon
+						name='calendar-alert'
+						type='material-community'
+						size={20}
+						color='red'
+						style={{
+							marginLeft: 5
+						}}
+					/>
+				}
+			</View>
+		);
+	}
+/*
 	const PantryViewCheckBox = _ => {
 		return (
 			<Button
@@ -79,6 +125,7 @@ export default function PantryItem({ item, mode, exports }) {
 			/>
 		);
 	}
+*/
 
 // Doing it with listview
 
@@ -90,13 +137,21 @@ export default function PantryItem({ item, mode, exports }) {
 		}}>
 			<CollapseHeader>
 				<ListItem>
-					{ mode === 'list' ? <ListViewCheckBox /> : <PantryViewCheckBox /> }
+					<Button
+						type='clear'
+						icon={_ => (
+							<Icon
+								name={item.inCart ? 'check-square-o' : 'square-o'}
+								type='font-awesome'
+								size={32}
+							/>
+						)}
+						onPress={_ => handleCheckBox(item.id)}
+					/>
 					<ListItem.Content>
 						<ListItem.Title
-							style={mode === 'list'
-								? item.needed
-									? _Styles.textItemName
-									: _Styles.textItemNameChecked
+							style={item.inCart
+								? _Styles.textItemNameChecked
 								: _Styles.textItemName
 							}
 						>
@@ -118,47 +173,7 @@ export default function PantryItem({ item, mode, exports }) {
 									{item.qty}
 								</Text>
 							</View>
-							<View style={{
-								flex: 4,
-								flexDirection: 'row-reverse',
-								alignItems: 'flex-end',
-								alignSelf: 'flex-end',
-								justifyContent: 'center',
-							}}>
-								{
-									item.staple && <Icon
-										name='refresh'
-										type='font-awesome'
-										size={20}
-										color='gray'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-								{
-									(item.notes !== '') && <Icon
-										name='note-alert-outline'
-										type='material-community'
-										size={20}
-										color='gray'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-								{
-									(item.purchaseBy !== 0 && item.purchaseBy < Date.now()) && <Icon
-										name='calendar-alert'
-										type='material-community'
-										size={20}
-										color='red'
-										style={{
-											marginLeft: 5
-										}}
-									/>
-								}
-							</View>
+							<IconDrawer item={item} />
 						</ListItem.Subtitle>
 					</ListItem.Content>
 				</ListItem>

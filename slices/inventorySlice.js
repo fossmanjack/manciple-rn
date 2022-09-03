@@ -41,9 +41,12 @@ const inventorySlice = createSlice({
 			let idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === id));
 			if(idx === -1) return iState;
 
-			const newItem = { ...iState._Inventory[idx], ...action.payload };
-
-			iState._Inventory.splice(newItem, idx, 1);
+			return {
+				...iState,
+				_Inventory: [
+					...[ ...iState._Inventory ].splice({ ...iState._Inventory[idx], ...action.payload }, idx, 1);
+				]
+			}
 		},
 		deleteItem: (iState, action) => {
 			// For deleting an item from inventory
@@ -51,13 +54,32 @@ const inventorySlice = createSlice({
 			if(!action.payload) return iState;
 
 			return {
-				_Inventory: iState._Inventory.filter(item => item.id !== action.payload),
+				_Inventory: ...[ ...iState._Inventory ].filter(item => item.id !== action.payload),
 				deleted: [ ...iState.deleted.push(action.payload) ]
 			};
 		},
 		clearDeleted: (iState, action) => {
 			// once the remote delete operation has run, clear the state
 			return { ...iState, deleted: [ ] };
+		},
+		updateInterval: (iState, action) => {
+			// update the purchase interval of an item
+			// expects itemID as payload
+			if(!action.payload) return iState;
+			const updatedItem = iState.inventory.find(item => item.id === action.payload);
+			if(Utils.nullp(updatedItem)) return iState;
+
+			const idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === updatedItem.id));
+			if(idx === -1) return iState;
+
+			updatedItem.interval = Utils.calculateInterval(updatedItem);
+
+			return {
+				...iState,
+				_Inventory: [
+					...[ ...iState._Inventory ].splice(updatedItem, idx, 1);
+				]
+			}
 		}
 	}
 });
@@ -67,6 +89,8 @@ export const inventoryReducer = inventorySlice.reducer;
 export const {
 	addItem,
 	updateItem,
-	deleteItem
+	deleteItem,
+	clearDeleted,
+	updateInterval
 } = inventorySlice.actions;
 
