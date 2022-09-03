@@ -5,6 +5,7 @@ import HelpScreen from '../screens/HelpScreen';
 import OptionsScreen from '../screens/OptionsScreen';
 import PantryScreen from '../screens/PantryScreen';
 import UserScreen from '../screens/UserScreen';
+import InventoryScreen from '../screens/InventoryScreen';
 
 export default function Screen(props) {
 	const { exports: { nav, setNav, drawerCtl }} = props;
@@ -37,6 +38,7 @@ export default function Screen(props) {
 			: nav === 'pantry'
 				? <PantryScreen
 					drawerCtl={drawerCtl}
+					nav={nav}
 					setNav={setNav}
 				/>
 				: nav === 'user'
@@ -44,5 +46,11 @@ export default function Screen(props) {
 						drawerCtl={drawerCtl}
 						setNav={setNav}
 					/>
-					: (<View><Text>Oops!</Text></View>);
+					: nav === 'inventory'
+						? <InventoryScreen
+							drawerCtl={drawerCtl}
+							nav={nav}
+							setNav={setNav}
+						/>
+						: (<View><Text>Oops!</Text></View>);
 }

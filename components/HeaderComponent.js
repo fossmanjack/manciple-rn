@@ -20,8 +20,8 @@ export default function Header(props) {
 		drawerCtl,
 		title,
 		controls=false,
-		mode='list',
-		setMode
+		nav,
+		setNav,
 	} = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const dispatch = useDispatch();
@@ -29,16 +29,16 @@ export default function Header(props) {
 
 	const handleToggleMode = _ => {
 		console.log('handleToggleMode', _Pantries[currentPantry].id, ':', _Pantries[currentPantry].name);
-		_Pantries[currentPantry].inventory.forEach(item => console.log(`Item ${item.id}: needed: ${item.needed}, listed: ${item.listed}`));
+		//_Pantries[currentPantry].inventory.forEach(item => console.log(`Item ${item.id}: needed: ${item.needed}, listed: ${item.listed}`));
 		console.log('*******************');
 
-		const targetMode = mode === 'list' ? 'pantry' : 'list';
-		setMode(targetMode);
+		const target = nav === 'pantry' ? 'inventory' : 'pantry';
+		setNav(target);
 	}
 
 	return (
 		<>
-			<View style={{ flexDirection: 'row', backgroundColor: 'royalblue', alignItems: 'center' }}>
+			<View style={{ flexDirection: 'row', backgroundColor: 'royalblue', alignItems: 'center', height: 60 }}>
 				<Button
 					type='outline'
 					icon={
@@ -60,7 +60,7 @@ export default function Header(props) {
 						<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
 							<Button
 								onPress={handleToggleMode}
-								icon={mode === 'list'
+								icon={nav === 'pantry'
 									? <Icon
 										name='list-status'
 										type='material-community'

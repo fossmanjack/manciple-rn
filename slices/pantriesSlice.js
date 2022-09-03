@@ -85,6 +85,28 @@ const pantriesSlice = createSlice({
 				}
 			}
 		},
+		toggleInCart: (pState, action) => {
+			// toggle the inCart flag for the passed item
+			// action payload is just the itemID
+			if(!action.payload) return pState;
+
+			ob = pState._Pantries[pState.currentPantry].inventory.find(item => item.id === action.payload);
+			if(Utils.nullp(ob)) return pState;
+
+			return {
+				...pState,
+				pState._Pantries[pState.currentPantry]: {
+					...pState._Pantries[pState.currentPantry],
+					inventory: {
+						...pState._Pantries[pState.currentPantry].inventory,
+						[action.payload]: {
+							...pState._Pantries[pState.currentPantry].inventory[itemID],
+							inCart: !...pState._Pantries[pState.currentPantry].inventory[itemID].inCart
+						}
+					}
+				}
+			}
+		},
 		addItemToPantry: (pState, action) => {
 			// Insert an item into inventory object
 			// action payload is { itemID: { qty, purchaseBy, inCart }}
@@ -213,6 +235,7 @@ export const {
 	deletePantry,
 	updatePantry,
 	toggleStaple,
+	toggleInCart,
 	addItemToPantry,
 	deleteItemFromPantry,
 	updateItemInPantry
