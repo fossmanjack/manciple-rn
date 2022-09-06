@@ -5,7 +5,7 @@
 
 // react, RN, community imports
 import { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
 
@@ -66,6 +66,15 @@ export default function InventoryScreen(props) {
 					qty: itemRef.defaultQty || '1'
 				}
 			]));
+			if(!itemRef.parents.includes(_Pantries[currentPantry].id))
+				dispatch(Inv.updateItem([ itemID,
+					{
+						parents: [
+							...itemRef.parents,
+							_Pantries[currentPantry].id
+						]
+					}
+				]));
 		}
 	}
 

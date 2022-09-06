@@ -71,7 +71,7 @@ const inventorySlice = createSlice({
 
 			return {
 				_Inventory: [ ...[ ...iState._Inventory ].filter(item => item.id !== action.payload) ],
-				deleted: [ ...iState.deleted.push(action.payload) ]
+				deleted: [ ...iState.deleted, action.payload ]
 			};
 		},
 		clearDeleted: (iState, action) => {

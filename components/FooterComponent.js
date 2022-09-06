@@ -21,30 +21,6 @@ export default function Footer(props) {
 	const { handleSweepAll, dumpListData } = props;
 	const dispatch = useDispatch();
 
-/*
-	const handleSubmit = _ => {
-		console.log('handleSubmit:', currentPantry, inputText);
-
-		// if the input field is empty, set all staples to needed
-		// otherwise attempt to add the input field text as an item
-
-		if(inputText) {
-			dispatch(Pantry.addItem(inputText));
-		} else {
-			_Pantries[currentPantry].inventory.filter(item => item.staple && !item.listed)
-				.forEach(item => dispatch(Pantry.updateItem({
-					itemID: item.id,
-					updatedItem: {
-						...item,
-						listed: true,
-						needed: true
-					}
-				}))
-			);
-		}
-		setInputText('');
-	}
-*/
 	const handleSubmit = _ => {
 		console.log('handleSubmit', currentPantry, inputText);
 
@@ -56,14 +32,25 @@ export default function Footer(props) {
 
 			if(Utils.nullp(invItem)) {
 				// if item doesn't exist, push it to _Inventory
-				invItem = Utils.createPantryItem({
+				const newItem = Utils.createPantryItem({
 					name,
 					id,
 					tags,
+					parents: [ _Pantries[currentPantry].id ],
 					defaultQty: qty || '1'
 				});
-				dispatch(Inv.addItem(invItem));
+				dispatch(Inv.addItem(newItem));
 			}
+
+			if(invItem && !invItem.parents.includes(_Pantries[currentPantry].id))
+				dispatch(Inv.updateItem(invItem.id,
+					{
+						parents: [
+							...invItem.parents,
+							_Pantries[currentPantry].id
+						]
+					}
+				));
 
 			dispatch(Pantry.addItemToPantry([ id,
 				{
@@ -106,22 +93,6 @@ export default function Footer(props) {
 		setInputText('');
 
 	}
-
-/*
-	const sweepAll = _ => {
-		_Pantries[currentPantry].inventory.filter(i => !i.needed)
-			.forEach(item => dispatch(Pantry.updateItem({
-				itemID: item.id,
-				updatedItem: {
-					...item,
-					listed: false,
-					needed: true,
-					history: [ Date.now(), ...item.history ]
-				}
-			}))
-		);
-	}
-*/
 
 	const dumpState = _ => {
 		const state = _Store.getState();

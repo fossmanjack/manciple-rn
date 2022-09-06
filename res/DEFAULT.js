@@ -57,6 +57,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -75,6 +76,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -93,6 +95,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -111,6 +114,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -129,6 +133,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -147,6 +152,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -165,6 +171,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -183,6 +190,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -201,6 +209,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -219,6 +228,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	}
