@@ -27,7 +27,7 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function PantryScreen(props) {
-	const { drawerCtl, setNav } = props;
+	const { drawerCtl, nav, setNav } = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { _Inventory } = useSelector(S => S.inventory);
 	const { sortOpts } = useSelector(S => S.options);
@@ -42,7 +42,7 @@ export default function PantryScreen(props) {
 	}
 
 	const generateListData = _ => {
-		console.log('refreshListData', mode);
+		console.log('refreshListData');
 
 		// Data for each listed item is stored in two places: Inventory has the
 		// largely-immutable stuff and Pantry has the daily changes.  The props
@@ -50,8 +50,9 @@ export default function PantryScreen(props) {
 		return Utils.sortPantry(
 			Object.keys(_Pantries[currentPantry].inventory).map(id => {
 				return {
-					..._Inventory.find(ob = ob.id === id),
-					..._Pantries[currentPantry].inventory[id]
+					..._Inventory.find(ob => ob.id === id),
+					..._Pantries[currentPantry].inventory[id],
+					staple: _Pantries[currentPantry].staples.includes(id)
 				}
 			}), sortOpts);
 	}
@@ -59,8 +60,12 @@ export default function PantryScreen(props) {
 	const handleCheckBox = itemID => {
 		// Toggle inCart, re-render should happen automatically
 		console.log('handleCheckBox called with item', itemID);
+		const newItem = { ..._Pantries[currentPantry].inventory[itemID] };
+		newItem.inCart = !newItem.inCart;
 
-		dispatch(Pantry.toggleInCart(itemID));
+		dispatch(Pantry.updateItemInPantry([ itemID, newItem ]));
+
+		//dispatch(Pantry.toggleInCart(itemID));
 	}
 
 	const handleSweep = (itemID, rowMap) => {
@@ -81,16 +86,47 @@ export default function PantryScreen(props) {
 		dispatch(Pantry.deleteItemFromPantry(itemID));
 	}
 
-	const handleToggleStaple = item => {
-		console.log('handleToggleStaple called with item', item);
+	const handleSweepAll = _ => {
 
-		dispatch(Pantry.toggleStaple(item.id));
+		listData.filter(item => item.inCart).forEach(item => {
+			dispatch(Inv.updateItem(
+				item.id,
+				{
+					history: [ Date.now(), ...item.history ],
+				}
+			));
+			dispatch(Pantry.deleteItemFromPantry(item.id));
+		});
+	}
+
+	const handleToggleStaple = itemID => {
+		console.log('handleToggleStaple called with item', itemID);
+
+		const staples = [ ..._Pantries[currentPantry].staples ];
+
+		if(staples.includes(itemID)) // remove itemID from array
+			dispatch(Pantry.updatePantry({
+				..._Pantries[currentPantry],
+				staples: staples.filter(i => i !== itemID)
+			}));
+		else // add itemID to array
+			dispatch(Pantry.updatePantry({
+				..._Pantries[currentPantry],
+				staples: [ ...staples, itemID ]
+			}));
+		/*
+		const newItem = { ..._Pantries[currentPantry].inventory.find(i => i.id === itemID) };
+		newItem.staple == !newItem.staple;
+
+		dispatch(Pantry.updateItemInPantry([ itemID, newItem ]));
+		//dispatch(Pantry.updateItemInPantry(itemID, newItem));
+		*/
 	};
 
-	const editItem = item => {
-		console.log('setItemToEdit passed item:', item.id);
+	const editItem = itemID => {
+		console.log('setItemToEdit passed item:', itemID);
 		console.log('setItemToEdit pre:', itemToEdit.id);
-		setItemToEdit({ ...item });
+		setItemToEdit({ ..._Inventory.find(i => i.id === itemID) });
 		console.log('Items equal after set?', item === itemToEdit.current ? 'yes' : 'no', item.id, ':', itemToEdit.id);
 
 		setShowEditItemModal(!showEditItemModal);
@@ -115,7 +151,7 @@ export default function PantryScreen(props) {
 		return (
 			<PantryItem
 				item={item}
-				mode={mode}
+				mode='pantry'
 				exports={{
 					handleCheckBox,
 					handleDateChange
@@ -135,7 +171,7 @@ export default function PantryScreen(props) {
 			}}>
 				<Button
 					onPress={_ => {
-							editItem(item);
+							editItem(item.id);
 						}
 					}
 					icon={
@@ -150,10 +186,10 @@ export default function PantryScreen(props) {
 					style={{ width: 100 }}
 				/>
 				<Button
-					onPress={_ => handleToggleStaple(item)}
+					onPress={_ => handleToggleStaple(item.id)}
 					icon={
 						<Icon
-							name={item.staple ? 'toggle-on' : 'toggle-off'}
+							name={_Pantries[currentPantry].staples.includes(item.id) ? 'toggle-on' : 'toggle-off'}
 							type='font-awesome'
 							color='black'
 							style={{ marginRight: 5 }}
@@ -178,11 +214,10 @@ export default function PantryScreen(props) {
 			<Header
 				drawerCtl={drawerCtl}
 				controls
-				mode={mode}
+				nav={nav}
 				setNav={setNav}
-				setMode={handleModeChange}
 				title={currentPantry === -1 ? 'No pantry loaded!' :
-					`${_Pantries[currentPantry].name}: ${mode === 'list' ? 'List' : 'Pantry'} view`
+					`${_Pantries[currentPantry].name}: Pantry view`
 				}
 			/>
 			<SwipeListView
@@ -200,7 +235,7 @@ export default function PantryScreen(props) {
 				closeOnRowOpen
 				closeOnScroll
 			/>
-			<Footer handleSweep={handleSweep} />
+			<Footer handleSweepAll={handleSweepAll} />
 			<EditItemModal
 				dispatch={dispatch}
 				visible={showEditItemModal}

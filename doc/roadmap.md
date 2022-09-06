@@ -1,8 +1,9 @@
 ### Next Steps (2022-09-03)
 
-- [ ] Remove persistence until testing revised back-end is done
+- [x] Remove persistence until testing revised back-end is done
 - [ ] Finish InventoryScreen
-- [ ] Update Footer -> handleSweep
+- [x] Update Footer -> handleSweep
+- [ ] Add in navigation object update?
 - [ ] Review code flow from App down to rendering items
 - [ ] Test
 - [ ] Add persistence back in
@@ -11,7 +12,7 @@
 ### Things to Implement
 
 - [ ] Add staple -> sets "purchase by" equal to last purchase + interval
-- [ ] Calculate purchase interval
+- [x] Calculate purchase interval
 - [ ] Little icons for "has notes" and "changed since last visit"
 - [ ] Notification that list has changed since last visit (potentially with changes?)
 - [x] State persistence
@@ -58,3 +59,9 @@ cancel and ok buttons), so next I should probably implement pantry mode.
 - [x] move item status icons to IconTray component
 - [ ] add chips for tag management to item and pantry detail
 - [ ] convert item and pantry dates to human-readable format
+
+### A cool idea
+
+"Collections" of items and quantities that you can add to the current list with a
+single click.  Credit to my wife, and also implementing this feature would greatly
+facilitate recipe book integration.

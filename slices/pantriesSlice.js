@@ -56,7 +56,14 @@ const pantriesSlice = createSlice({
 		},
 		deletePantry: (pState, action) => {
 			// action.payload = pantry index
-			pState._Pantries.splice(action.payload, 1);
+			return {
+				...pState,
+				_Pantries: [
+					...pState._Pantries.slice(0, action.payload),
+					...pState._Pantries.slice(action.payload + 1)
+				]
+			};
+			//pState._Pantries.splice(action.payload, 1);
 		},
 		updatePantry: (pState, action) => {
 			// action.payload is updated pantry object; ID won't have changed
@@ -68,6 +75,7 @@ const pantriesSlice = createSlice({
 				&& pState._Pantries.splice(updateIdx, 1, action.payload)
 				|| pState._Pantries.push(action.payload);
 		},
+/*
 		toggleStaple: (pState, action) => {
 			if(!action.payload) return pState;
 			const retArr = [ ...pState._Pantries[pState.currentPantry].staples ];
@@ -76,63 +84,121 @@ const pantriesSlice = createSlice({
 			else
 				retArr.push(action.payload);
 
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				staples: retArr,
+			};
+
 			return {
 				...pState,
-				pState._Pantries[pState.currentPantry]: {
-					...pState._Pantries[pState.currentPantry],
-					staples: retArr,
-					modifyDate: Date.now()
-				}
-			}
+				_Pantries: [
+					...[ ...pState._Pantries ].splice(pState.currentPantry, 1, updatedPantry)
+				]
+			};
 		},
 		toggleInCart: (pState, action) => {
 			// toggle the inCart flag for the passed item
 			// action payload is just the itemID
 			if(!action.payload) return pState;
 
-			ob = pState._Pantries[pState.currentPantry].inventory.find(item => item.id === action.payload);
-			if(Utils.nullp(ob)) return pState;
+			insert = { ...pState._Pantries[pState.currentPantry].inventory.find(item => item.id === action.payload)};
+			if(Utils.nullp(insert)) return pState;
+
+			insert.inCart = !insert.inCart;
+
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				inventory: {
+					...pState._Pantries[pState.currentPantry].inventory,
+					[insert.id]: { ...insert }
+				}
+			};
 
 			return {
 				...pState,
-				pState._Pantries[pState.currentPantry]: {
-					...pState._Pantries[pState.currentPantry],
-					inventory: {
-						...pState._Pantries[pState.currentPantry].inventory,
-						[action.payload]: {
-							...pState._Pantries[pState.currentPantry].inventory[itemID],
-							inCart: !...pState._Pantries[pState.currentPantry].inventory[itemID].inCart
-						}
-					}
-				}
-			}
+				_Pantries: [
+					...[ ...pState._Pantries ].splice(pState.currentPantry, 1, updatedPantry)
+				]
+			};
 		},
+*/
 		addItemToPantry: (pState, action) => {
+			// Update an item in inventory
+			// action.payload is [ itemID, { props }]
+			// Note that if item is in inventory already it'll be overwritten
+			console.log('addItemToPantry', pState, action);
+			if(!action.payload) return pState;
+			const [ itemID, props ] = action.payload;
+			if(!itemID || !props) return pState;
+			console.log('addItemToPantry deconstruct:', itemID, props);
+			console.log('addItemToPantry pantry info:\n',
+				pState._Pantries[pState.currentPantry].inventory[itemID]);
+
+			const insert = {
+				qty: '1',
+				purchaseBy: 0,
+				inCart: false,
+				...props
+			};
+			if(!insert) return pState;
+
+			console.log('addItemToPantry insert:', insert);
+
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				inventory: {
+					...pState._Pantries[pState.currentPantry].inventory,
+					[itemID]: insert
+				}
+			};
+
+			console.log('addItemToPantry updatedPantry:', updatedPantry);
+
+			return {
+				...pState,
+				_Pantries: [
+					...pState._Pantries.slice(0, pState.currentPantry),
+					updatedPantry,
+					...pState._Pantries.slice(pState.currentPantry + 1)
+				]
+			};
+/*
 			// Insert an item into inventory object
 			// action payload is { itemID: { qty, purchaseBy, inCart }}
 			if(!action.payload) return pState;
 
 			const itemID = Object.keys(action.payload)[0];
 			const insert = {
-				itemID: {
+				[itemID]: {
 					qty: '1',
 					purchaseBy: 0,
-					inCart: true,
+					inCart: false,
 					...action.payload[itemID]
+				}
+			};
+
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				inventory: {
+					...pState._Pantries[pState.currentPantry].inventory,
+					...insert
+					//[insert.id]: { ...insert }
 				}
 			};
 
 			return {
 				...pState,
-				pState._Pantries[pState.currentPantry]: {
-					...pState._Pantries[pState.currentPantry],
-					inventory: {
-						...pState._Pantries[pState.currentPantry].inventory,
-						...insert
-					},
-					modifyDate: Date.now()
-				}
+				_Pantries: [
+					...pState._Pantries.slice(0, pState.currentPantry),
+					updatedPantry,
+					...pState._Pantries.slice(pState.currentPantry + 1)
+				]
 			};
+*/
 		},
 		deleteItemFromPantry: (pState, action) => {
 			// Delete an item from pantry inventory object
@@ -142,88 +208,59 @@ const pantriesSlice = createSlice({
 			const ret = { ...pState._Pantries[pState.currentPantry].inventory };
 			delete ret[action.payload];
 
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				inventory: {
+					...ret
+				}
+			};
+
 			return {
 				...pState,
-				pState._Pantries[pState.currentPantry]: {
-					...pState._Pantries[pState.currentPantry],
-					inventory: ret,
-					modifyDate: Date.now()
-				}
-			}
+				_Pantries: [
+					...pState._Pantries.slice(0, pState.currentPantry),
+					updatedPantry,
+					...pState._Pantries.slice(pState.currentPantry + 1)
+				]
+			};
 		},
 		updateItemInPantry: (pState, action) => {
 			// Update an item in inventory
 			// action.payload is [ itemID, { props }]
+			console.log('updateItemInPantry', pState, action);
 			if(!action.payload) return pState;
 			const [ itemID, props ] = action.payload;
 			if(!itemID || !props) return pState;
+			console.log('updateItemInPantry deconstruct:', itemID, props);
+			console.log('updateItemInPantry pantry info:\n',
+				pState._Pantries[pState.currentPantry].inventory[itemID]);
 
-			const retItem = { ...pState._Pantries[pState.currentPantry].inventory[itemID] };
-			if(!retItem) return pState;
+			const insert = { ...pState._Pantries[pState.currentPantry].inventory[itemID], ...props };
+			if(!insert) return pState;
+
+			console.log('updateItemInPantry insert:', insert);
+
+			const updatedPantry = {
+				...pState._Pantries[pState.currentPantry],
+				modifyDate: Date.now(),
+				inventory: {
+					...pState._Pantries[pState.currentPantry].inventory,
+					[itemID]: { ...insert }
+				}
+			};
+
+			console.log('updateItemInPantry updatedPantry:', updatedPantry);
 
 			return {
 				...pState,
-				pState._Pantries[pState.currentPantry]: {
-					...pState._Pantries[pState.currentPantry],
-					modifyDate: Date.now(),
-					inventory: {
-						...pState._Pantries[pState.currentPantry].inventory,
-						[itemID]: { ...retItem, ...props }
-					}
-				}
+				_Pantries: [
+					...pState._Pantries.slice(0, pState.currentPantry),
+					updatedPantry,
+					...pState._Pantries.slice(pState.currentPantry + 1)
+				]
 			};
 		}
-/*
-		addItem: (pState, action) => {
-			// Expects a string as an action payload, which it then splits at the parentheses
-			// searches the inventory for the action payload, then toggles its needed/listed states if found
-			// or adds a new item if not found
-			if(!action.payload) return pState;
-			let [ name = 'New item', qty = '1' ] = action.payload.split(',', 2);
-			const idx = Utils.camelize(name);
-
-			item = pState._Pantries[pState.currentPantry].inventory.find(i => i.id === idx);
-			if(typeof(item) === 'object')
-			{
-				item.listed = true;
-				item.needed = true;
-				if(item.qty !== qty) item.qty = qty;
-				pState._Pantries[pState.currentPantry].modifyDate = Date.now();
-			} else {
-				pState._Pantries[pState.currentPantry].inventory.push(Utils.createPantryItem({ name, id: idx, qty }));
-				pState._Pantries[pState.currentPantry].modifyDate = Date.now();
-			}
-		},
-		deleteItem: (pState, action) => {
-			// Expects an item ID as the action payload
-			console.log('deleteItem', action);
-			pState._Pantries[pState.currentPantry].inventory =
-				pState._Pantries[pState.currentPantry].inventory.filter(i => i.id !== action.payload);
-		},
-		updateItem: (pState, action) => {
-			// Expects { origItemID, newItemOb } as action.payload
-			const { itemID, updatedItem } = action.payload;
-			const index = pState._Pantries[pState.currentPantry].inventory.indexOf(
-				pState._Pantries[pState.currentPantry].inventory.find(i => i.id === itemID));;
-			console.log('updateItem called:', updatedItem, index);
-			index !== -1
-				&& pState._Pantries[pState.currentPantry].inventory.splice(index, 1, updatedItem)
-				|| pState._Pantries[pState.currentPantry].inventory.push(updatedItem);
-		},
-		sortList: (pState, action) => {
-			// Expects [ field(string), asc(bool) ] as action payload
-			const [ field, asc ] = action.payload;
-		},
-		resetState: (pState, action) => {
-			// no payload
-			//purgeStoredState();
-			return initialState;
-		},
-		overwriteState: (pState, action) => {
-			// action.payload is { _Pantries: [], currentPantry: int } loaded from remote store
-			return action.payload;
-		}
-*/
 	}
 });
 
@@ -234,8 +271,6 @@ export const {
 	addPantry,
 	deletePantry,
 	updatePantry,
-	toggleStaple,
-	toggleInCart,
 	addItemToPantry,
 	deleteItemFromPantry,
 	updateItemInPantry

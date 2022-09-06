@@ -59,7 +59,7 @@ export const sortPantry = (inv, [ field, asc ]) => {
 export const createPantryItem = props => {
 	const {
 		name = 'New item',
-		id = uuid.v4(),
+		id = camelize(name || 'New item'),
 		tags = [],
 		history = [],
 		images = [],
@@ -69,6 +69,7 @@ export const createPantryItem = props => {
 		upc = '',
 		interval = 0,
 		notes = '',
+		defaultQty = '',
 		creationDate = Date.now(),
 		modifyDate = Date.now()
 	} = props;
@@ -87,6 +88,7 @@ export const createPantryItem = props => {
 		upc,
 		interval,
 		notes,
+		defaultQty,
 		creationDate,
 		modifyDate
 	});

@@ -36,17 +36,32 @@ const inventorySlice = createSlice({
 			const [ id, props ] = action.payload;
 			if(!id || !props) return iState;
 
-			props = { ...props, modifyDate: Date.now() };
+			//props = { ...props, modifyDate: Date.now() };
 
-			let idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === id));
+			let idx = iState._Inventory.indexOf(iState._Inventory.find(item => item.id === id));
 			if(idx === -1) return iState;
 
 			return {
 				...iState,
 				_Inventory: [
-					...[ ...iState._Inventory ].splice({ ...iState._Inventory[idx], ...action.payload }, idx, 1);
+					...iState._Inventory.slice(0, idx),
+					{
+						...iState._Inventory[idx],
+						...props,
+						modifyDate: Date.now()
+					},
+					...iState._Inventory.slice(idx + 1)
+				]
+			};
+
+/*
+			return {
+				...iState,
+				_Inventory: [
+					...[ ...iState._Inventory ].splice({ ...iState._Inventory[idx], ...action.payload }, idx, 1)
 				]
 			}
+*/
 		},
 		deleteItem: (iState, action) => {
 			// For deleting an item from inventory
@@ -54,7 +69,7 @@ const inventorySlice = createSlice({
 			if(!action.payload) return iState;
 
 			return {
-				_Inventory: ...[ ...iState._Inventory ].filter(item => item.id !== action.payload),
+				_Inventory: [ ...[ ...iState._Inventory ].filter(item => item.id !== action.payload) ],
 				deleted: [ ...iState.deleted.push(action.payload) ]
 			};
 		},
@@ -77,7 +92,14 @@ const inventorySlice = createSlice({
 			return {
 				...iState,
 				_Inventory: [
-					...[ ...iState._Inventory ].splice(updatedItem, idx, 1);
+					...iState._Inventory.slice(0, idx),
+					{
+						...iState._Inventory[idx],
+						interval: Utils.calculateInterval(iState._Inventory[idx]),
+						modifyDate: Date.now()
+					},
+					...iState._Inventory.slice(idx + 1)
+					//...[ ...iState._Inventory ].splice(updatedItem, idx, 1)
 				]
 			}
 		}
