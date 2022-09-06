@@ -8,6 +8,7 @@
 - [ ] Test
 - [ ] Add persistence back in
 - [ ] Write DAV saving
+- [ ] Fix dependency loop
 
 ### Things to Implement
 

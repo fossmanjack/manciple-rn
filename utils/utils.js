@@ -8,9 +8,10 @@ export const parseDate = i => new Date(i).toISOString().split("T")[0];
 export const daysBetween = (i, j) => (j - i) / (86400000);
 export const truncateString = (str, num) => str.length >= num ? str.slice(num)+' ...' : str;
 export const nullp = val => (typeof val === 'undefined' || val === null);
-export const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
+export const _State = _Store.getState();
+export const _Dispatch = _Store.dispatch;
 
-export const getDebugLvl = _ => _Store.getState().options.debug;
+export const getDebugLvl = _ => _State.options.debug;
 
 // Writing debug message guidance: the higher the options debug level, the more
 // noisy and granular the log will be.  Each debug message instance should consider
@@ -95,6 +96,38 @@ export const createPantryItem = props => {
 }
 
 export const blankItem = (createPantryItem({ name: 'Blank item' }));
+
+export const createPantry = props => {
+	const {
+		name = 'New pantry',
+		id = uuid.v4(),
+		creationDate = Date.now(),
+		modifyDate = Date.now(),
+		inventory = { },
+		staples = [ ],
+		sync = false,
+		type = 'pantry',
+		version = '1'
+	} = props;
+
+	return ({
+		name,
+		id,
+		creationDate,
+		modifyDate,
+		inventory,
+		staples,
+		sync,
+		type,
+		version
+	});
+}
+
+export const blankPantry = (createPantry({
+	name: 'Blank pantry',
+	id: 'blank-pantry'
+}));
+
 /* debugging
 
 debug level (dlvl) is the debug value at which the message will trigger

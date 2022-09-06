@@ -41,32 +41,29 @@ const pantriesSlice = createSlice({
 			return { ...pState, currentPantry: action.payload }
 		},
 		addPantry: (pState, action) => {
-			// action.payload = pantry name
-			const newPantry = {
-				name: action.payload,
-				id: uuid.v4(),
-				creationDate: Date.now(),
-				modifyDate: Date.now(),
-				inventory: {},
-				staples: []
-			};
-			console.log('addPantry', newPantry);
-
-			return { ...pState, _Pantries: [ ...pState._Pantries, newPantry ]};
+			// action.payload = pantry object
+			// use this ONLY when creating a new pantry from scratch
+			// imports should use updatePantry
+			console.log('addPantry', action.payload);
+			if(action.payload.id && pState._Pantries.find(pnt => pnt.id === action.payload.id)) return pState;
+			return { ...pState, _Pantries: [ ...pState._Pantries, Utils.createPantry(action.payload) ]};
 		},
 		deletePantry: (pState, action) => {
-			// action.payload = pantry index
+			// action.payload = pantry ID
+			const idx = pState._Pantries.indexOf(pState._Pantries.find(ptr => ptr.id === action.payload));
+			if(idx === -1) return pState;
 			return {
 				...pState,
 				_Pantries: [
-					...pState._Pantries.slice(0, action.payload),
-					...pState._Pantries.slice(action.payload + 1)
+					...pState._Pantries.slice(0, idx),
+					...pState._Pantries.slice(idx + 1)
 				]
 			};
 			//pState._Pantries.splice(action.payload, 1);
 		},
 		updatePantry: (pState, action) => {
 			// action.payload is updated pantry object; ID won't have changed
+			// use this when importing a pantry
 			const updateID = action.payload.id;
 			action.payload.modifyDate = Date.now();
 			const updateIdx = pState._Pantries.indexOf(pState._Pantries.find(pt => pt.id === updateID));
@@ -202,26 +199,39 @@ const pantriesSlice = createSlice({
 		},
 		deleteItemFromPantry: (pState, action) => {
 			// Delete an item from pantry inventory object
-			// action payload is itemID
+			// action payload is [ itemID, pantryID ]
 			if(!action.payload) return pState;
 
-			const ret = { ...pState._Pantries[pState.currentPantry].inventory };
-			delete ret[action.payload];
+			let [ itemID, pantryID ] = action.payload;
+			if(Utils.nullp(pantryID)) pantryID = pState._Pantries[pState.currentPantry].id;
+			console.log('deleteItemFromPantry', itemID, pantryID);
 
+			const idx = pState._Pantries.indexOf(pState._Pantries.find(ptr => ptr.id === pantryID));
+
+			const ret = { ...pState._Pantries[idx].inventory };
+			delete ret[itemID];
+/*
 			const updatedPantry = {
-				...pState._Pantries[pState.currentPantry],
+				...pState._Pantries[idx],
 				modifyDate: Date.now(),
 				inventory: {
 					...ret
 				}
 			};
+*/
 
 			return {
 				...pState,
 				_Pantries: [
-					...pState._Pantries.slice(0, pState.currentPantry),
-					updatedPantry,
-					...pState._Pantries.slice(pState.currentPantry + 1)
+					...pState._Pantries.slice(0, idx),
+					{
+						...pState._Pantries[idx],
+						modifyDate: Date.now(),
+						inventory: {
+							...ret
+						}
+					},
+					...pState._Pantries.slice(idx + 1)
 				]
 			};
 		},

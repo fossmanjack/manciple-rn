@@ -47,22 +47,6 @@ export default function PantryItem({ item, exports }) {
 		setShowCalendar(!showCalendar);
 	}
 
-	const CheckBox = _ => {
-		return (
-			<Button
-				type='clear'
-				icon={_ => (
-					<Icon
-						name={item.needed ? 'square-o' : 'check-square-o'}
-						type='font-awesome'
-						size={32}
-					/>
-				)}
-				onPress={_ => handleCheckBox(item.id)}
-			/>
-		);
-	}
-
 	const IconDrawer = item => {
 		return (
 			<View style={{

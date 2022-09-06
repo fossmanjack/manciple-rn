@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+	Pressable,
 	SafeAreaView,
 	Text,
 	TextInput,
@@ -17,7 +18,7 @@ export default function Footer(props) {
 	const [ inputText, setInputText ] = useState('');
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { _Inventory } = useSelector(S => S.inventory);
-	const { handleSweepAll } = props;
+	const { handleSweepAll, dumpListData } = props;
 	const dispatch = useDispatch();
 
 /*
@@ -48,19 +49,26 @@ export default function Footer(props) {
 		console.log('handleSubmit', currentPantry, inputText);
 
 		if(inputText) { // if there's text, parse it and add an item to the pantry
-			let [ name = 'New item', qty = '1', ...preTags ] = inputText.split(',');
+			let [ name = 'New item', qty, ...preTags ] = inputText.split(',');
 			const id = Utils.sanitize(Utils.camelize(name));
-			const invItem = _Inventory.find(item => item.id === id);
+			let invItem = _Inventory.find(item => item.id === id);
 			tags = preTags.map(t => Utils.sanitize(Utils.camelize(t)));
 
-			if(Utils.nullp(invItem)) // if item doesn't exist, push it to _Inventory
-				dispatch(Inv.addItem(Utils.createPantryItem({ name, id, tags, defaultQty: qty })));
+			if(Utils.nullp(invItem)) {
+				// if item doesn't exist, push it to _Inventory
+				invItem = Utils.createPantryItem({
+					name,
+					id,
+					tags,
+					defaultQty: qty || '1'
+				});
+				dispatch(Inv.addItem(invItem));
+			}
 
 			dispatch(Pantry.addItemToPantry([ id,
 				{
 					inCart: false,
 					qty: qty || invItem.defaultQty || '1',
-					tags,
 					purchaseBy: invItem.interval && invItem.history[0]
 						? invItem.history[0] + (invItem.interval * 86400000)
 						: 0,
@@ -95,6 +103,7 @@ export default function Footer(props) {
 			console.log('handleSubmit all done');
 		}
 		console.log('handleSubmit done');
+		setInputText('');
 
 	}
 
@@ -145,14 +154,18 @@ export default function Footer(props) {
 				reverse
 				onPress={handleSweepAll}
 			/>
-			<Icon
-				style={_Styles.footerIcon}
-				name='dump-truck'
-				type='material-community'
-				color='royalblue'
-				reverse
-				onPress={dumpState}
-			/>
+			<Pressable
+				onPress={dumpListData}
+				onLongPress={dumpState}
+			>
+					<Icon
+						style={_Styles.footerIcon}
+						name='dump-truck'
+						type='material-community'
+						color='royalblue'
+						reverse
+					/>
+			</Pressable>
 		</SafeAreaView>
 	);
 }

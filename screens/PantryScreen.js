@@ -57,6 +57,11 @@ export default function PantryScreen(props) {
 			}), sortOpts);
 	}
 
+	const dumpListData = _ => {
+		console.log('Current list data:\n');
+		console.log(listData);
+	}
+
 	const handleCheckBox = itemID => {
 		// Toggle inCart, re-render should happen automatically
 		console.log('handleCheckBox called with item', itemID);
@@ -76,26 +81,26 @@ export default function PantryScreen(props) {
 		rowMap[itemID].closeRow();
 
 		if(rowMap[itemID].props.item.inCart)
-			dispatch(Inv.updateItem(
+			dispatch(Inv.updateItem([
 				itemID,
 				{
 					history: [ Date.now(), ...rowMap[itemID].props.item.history ]
 				}
-			));
+			]));
 
-		dispatch(Pantry.deleteItemFromPantry(itemID));
+		dispatch(Pantry.deleteItemFromPantry([ itemID ]));
 	}
 
 	const handleSweepAll = _ => {
 
 		listData.filter(item => item.inCart).forEach(item => {
-			dispatch(Inv.updateItem(
+			dispatch(Inv.updateItem([
 				item.id,
 				{
 					history: [ Date.now(), ...item.history ],
 				}
-			));
-			dispatch(Pantry.deleteItemFromPantry(item.id));
+			]));
+			dispatch(Pantry.deleteItemFromPantry([ item.id ]));
 		});
 	}
 
@@ -151,7 +156,6 @@ export default function PantryScreen(props) {
 		return (
 			<PantryItem
 				item={item}
-				mode='pantry'
 				exports={{
 					handleCheckBox,
 					handleDateChange
@@ -235,7 +239,10 @@ export default function PantryScreen(props) {
 				closeOnRowOpen
 				closeOnScroll
 			/>
-			<Footer handleSweepAll={handleSweepAll} />
+			<Footer
+				handleSweepAll={handleSweepAll}
+				dumpListData={dumpListData}
+			/>
 			<EditItemModal
 				dispatch={dispatch}
 				visible={showEditItemModal}

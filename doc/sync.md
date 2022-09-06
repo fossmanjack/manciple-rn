@@ -45,3 +45,10 @@
 1. Timestamp: Date.now() (or whenever sync operation is run)
 2. current: { id: modifyDate }
 3. delete: { delete queue }
+
+### Notes
+
+I've just inserted a "sync" prop into the pantries.  Thus we want to sync only based
+on pantries that actually want to sync -- items only get synced if they're listed
+in a pantry that has sync enabled.  I don't want local-only stuff (birthday gifts,
+etc) being a part of the background data.
