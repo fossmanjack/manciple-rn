@@ -35,3 +35,16 @@ scoop the manifest and update anything that's changed?  maybe
 ### Dependency loop
 
 Have utils import _Store and have consts for _Dispatch and _State.
+
+### itemID
+
+I want IDs to be immutable.  Therefore figure out how to make that work first thing.
+This might also warrant a redesign of _Inventory to an object, since mostly we're
+going to be looking things up by ID, and iterating over Object.keys isn't that hard.
+
+### History storage as its own thing
+
+historySlice -> purchase history, also save all dispatches?  I'm sure that can
+be done, maybe with middleware?
+
+A shared item DB ... is it feasible?  Is it needful?
