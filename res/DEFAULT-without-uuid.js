@@ -1,6 +1,5 @@
-export const PANTRIES = [
-	{
-		id: 'f050c373-ea40-4ba7-8aef-299f7640970e',
+export const PANTRIES = {
+	'f050c373-ea40-4ba7-8aef-299f7640970e': {
 		name: 'Groceries',
 		tags: [ 'grocery', 'household', 'cleaning' ],
 		type: 'pantry',
@@ -20,8 +19,7 @@ export const PANTRIES = [
 		],
 		sync: false
 	},
-	{
-		id: 'fb51e865-5838-496e-8d13-886a7e7c26fd',
+	'fb51e865-5838-496e-8d13-886a7e7c26fd': {
 		name: 'Hardware store',
 		tags: [ 'hardware', 'tool' ],
 		type: 'pantry',
@@ -39,7 +37,7 @@ export const PANTRIES = [
 		],
 		sync: false
 	}
-]
+}
 
 export const INVENTORY = [
 	{

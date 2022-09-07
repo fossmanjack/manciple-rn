@@ -17,7 +17,8 @@ export const PANTRIES = [
 			'd3bebaa4-d834-49cd-852e-a64f6638a2b4',
 			'3b706aa4-5f33-4aff-95ee-158c0523adea',
 			'f5218e83-fea6-4ba4-9254-2889e579cba7',
-		]
+		],
+		sync: false
 	},
 	{
 		id: 'fb51e865-5838-496e-8d13-886a7e7c26fd',
@@ -35,13 +36,13 @@ export const PANTRIES = [
 		},
 		staples: [
 
-		]
+		],
+		sync: false
 	}
 ]
 
-export const INVENTORY = [
-	{
-		id: 'd3bebaa4-d834-49cd-852e-a64f6638a2b4',
+export const INVENTORY = {
+	'd3bebaa4-d834-49cd-852e-a64f6638a2b4': {
 		name: 'Milk',
 		tags: [ 'drink', 'grocery', 'dairy' ],
 		type: 'item',
@@ -54,11 +55,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: '3b706aa4-5f33-4aff-95ee-158c0523adea',
+	'3b706aa4-5f33-4aff-95ee-158c0523adea': {
 		name: 'Bread',
 		tags: [ 'food', 'grocery', 'starch' ],
 		type: 'item',
@@ -71,11 +73,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: 'f5218e83-fea6-4ba4-9254-2889e579cba7',
+	'f5218e83-fea6-4ba4-9254-2889e579cba7': {
 		name: 'Soda',
 		tags: [ 'drink', 'soft drink', 'grocery' ],
 		type: 'item',
@@ -88,11 +91,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: '910f2d0e-be22-4957-9e16-a716649837bd',
+	'910f2d0e-be22-4957-9e16-a716649837bd': {
 		name: 'Coffee',
 		tags: [ 'drink', 'breakfast', 'grocery' ],
 		type: 'item',
@@ -105,11 +109,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: 'dc17c8aa-8cc4-4806-9cc3-032b718a9b9b',
+	'dc17c8aa-8cc4-4806-9cc3-032b718a9b9b': {
 		name: 'Lettuce',
 		tags: [ 'food', 'grocery', 'produce' ],
 		type: 'item',
@@ -122,11 +127,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: '05e4e5a9-1d69-49dc-9166-e3b13e7b9dcb',
+	'05e4e5a9-1d69-49dc-9166-e3b13e7b9dcb': {
 		name: 'Trash bags',
 		tags: [ 'household', 'maintenance' ],
 		type: 'item',
@@ -139,11 +145,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: 'b5cebc8a-1fd4-4a95-9eba-0a7dbdc97298',
+	'b5cebc8a-1fd4-4a95-9eba-0a7dbdc97298': {
 		name: 'AAA batteries',
 		tags: [ 'hardware', 'battery', 'household' ],
 		type: 'item',
@@ -156,11 +163,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: 'd345f31d-72e3-4e00-a233-cb1796060232',
+	'd345f31d-72e3-4e00-a233-cb1796060232': {
 		name: 'Borax',
 		tags: [ 'household', 'laundry', 'cleaning' ],
 		type: 'item',
@@ -173,11 +181,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: 'ec2851ac-af2c-4971-9c75-c2bb2b236eb0',
+	'ec2851ac-af2c-4971-9c75-c2bb2b236eb0': {
 		name: 'Mop',
 		tags: [ 'tool', 'household', 'cleaning' ],
 		type: 'item',
@@ -190,11 +199,12 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
-	{
-		id: '09ec4d24-5f47-48c0-9d44-5c6f297fd640',
+	'09ec4d24-5f47-48c0-9d44-5c6f297fd640': {
 		name: 'Parchment paper',
 		tags: [ 'kitchen', 'baking' ],
 		type: 'item',
@@ -207,7 +217,9 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
+		defaultQty: '',
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	}
-]
+}
