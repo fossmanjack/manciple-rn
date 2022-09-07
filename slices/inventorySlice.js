@@ -20,7 +20,7 @@ const inventorySlice = createSlice({
 			if(!action.payload) return iState;
 			if(action.payload.type !== 'item') return iState;
 
-			let idx = iState._Inventory.indexOf(iState.inventory.find(item => item.id === action.payload.id));
+			let idx = iState._Inventory.indexOf(iState._Inventory.find(item => item.id === action.payload.id));
 			if(idx !== -1) {
 				// if item with matching id is already in state, update it
 				iState._Inventory.splice({ ...iState._Inventory[idx], ...action.payload }, idx, 1);
@@ -32,6 +32,7 @@ const inventorySlice = createSlice({
 		updateItem: (iState, action) => {
 			// For updating an existing item
 			// expects an array [ id, { updated props } ]
+			console.log('Inv: updateItem,', action);
 			if(!action.payload) return iState;
 			const [ id, props ] = action.payload;
 			if(!id || !props) return iState;
@@ -70,7 +71,7 @@ const inventorySlice = createSlice({
 
 			return {
 				_Inventory: [ ...[ ...iState._Inventory ].filter(item => item.id !== action.payload) ],
-				deleted: [ ...iState.deleted.push(action.payload) ]
+				deleted: [ ...iState.deleted, action.payload ]
 			};
 		},
 		clearDeleted: (iState, action) => {

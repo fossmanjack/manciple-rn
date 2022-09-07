@@ -17,7 +17,8 @@ export const PANTRIES = [
 			'milk',
 			'bread',
 			'soda',
-		]
+		],
+		sync: false
 	},
 	{
 		id: 'fb51e865-5838-496e-8d13-886a7e7c26fd',
@@ -35,7 +36,8 @@ export const PANTRIES = [
 		},
 		staples: [
 
-		]
+		],
+		sync: false
 	}
 ]
 
@@ -55,6 +57,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -73,6 +76,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -91,6 +95,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -109,6 +114,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -127,6 +133,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -145,6 +152,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -163,6 +171,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -181,6 +190,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -199,6 +209,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
@@ -217,6 +228,7 @@ export const INVENTORY = [
 		notes: '',
 		images: [ ],
 		history: [ ],
+		parents: [ ],
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	}

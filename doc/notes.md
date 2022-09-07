@@ -31,3 +31,7 @@ has to be transferred.
 
 Can I do a useEffect and setTimeout to call a loop every five minutes or so to
 scoop the manifest and update anything that's changed?  maybe
+
+### Dependency loop
+
+Have utils import _Store and have consts for _Dispatch and _State.

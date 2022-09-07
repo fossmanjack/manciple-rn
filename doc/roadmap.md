@@ -1,13 +1,14 @@
 ### Next Steps (2022-09-03)
 
 - [x] Remove persistence until testing revised back-end is done
-- [ ] Finish InventoryScreen
+- [x] Finish InventoryScreen
 - [x] Update Footer -> handleSweep
 - [ ] Add in navigation object update?
 - [ ] Review code flow from App down to rendering items
 - [ ] Test
 - [ ] Add persistence back in
 - [ ] Write DAV saving
+- [ ] Fix dependency loop
 
 ### Things to Implement
 
