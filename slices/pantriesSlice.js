@@ -123,13 +123,15 @@ const pantriesSlice = createSlice({
 */
 		addItemToPantry: (pState, action) => {
 			// Update an item in inventory
-			// action.payload is [ itemID, { props }]
+			// action.payload is [ itemID, { props }, pantryID ]
 			// Note that if item is in inventory already it'll be overwritten
 			console.log('addItemToPantry', pState, action);
 			if(!action.payload) return pState;
-			const [ itemID, props ] = action.payload;
+			const [ itemID, props, pantryID ] = action.payload;
+			let idx = pState.currentPantry;
 			if(!itemID || !props) return pState;
-			console.log('addItemToPantry deconstruct:', itemID, props);
+			if(pantryID) idx = pState._Pantries.indexOf(pState._Pantries.find(ptr => ptr.id === pantryID));
+			console.log('addItemToPantry deconstruct:', itemID, props, pantryID);
 			console.log('addItemToPantry pantry info:\n',
 				pState._Pantries[pState.currentPantry].inventory[itemID]);
 
@@ -144,10 +146,10 @@ const pantriesSlice = createSlice({
 			console.log('addItemToPantry insert:', insert);
 
 			const updatedPantry = {
-				...pState._Pantries[pState.currentPantry],
+				...pState._Pantries[idx],
 				modifyDate: Date.now(),
 				inventory: {
-					...pState._Pantries[pState.currentPantry].inventory,
+					...pState._Pantries[idx].inventory,
 					[itemID]: insert
 				}
 			};

@@ -4,7 +4,7 @@
 // Then handleEdit sets the ref to a new one that grabs the current object to edit
 // That might work?  Otherwise we'll probably have to turn this into a React component
 // or something
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Modal,
 	Text,
@@ -16,19 +16,73 @@ import {
 	Input
 } from 'react-native-elements';
 import * as Pantry from '../slices/pantriesSlice';
+import * as Inv from '../slices/inventorySlice';
 import * as Utils from '../utils/utils';
 
 export default function EditItemModal(props) {
 	const { item, visible, setVisible, dispatch } = props;
-	const [ updatedItem, setUpdatedItem ] = useState(item);
+	// updatedItem holds the props that have been changed
+	// refItem populates the fields and is kept in sync with updatedItem
+	const [ updatedItem, setUpdatedItem ] = useState({});
+	const [ refItem, setRefItem ] = useState({ ...item });
+
+	// tracking this separately because it's handled separately
+	// staple and purchaseBy are handled elsewhere
+	const [ updatedQty, setUpdatedQty ] = useState(item.qty);
+
+	console.log('EditItemModal', refItem.id, updatedItem);
 
 	const handleCommit = _ => {
+/*
 		dispatch(Pantry.updateItem({
 			updatedItem: { ...updatedItem, id: Utils.camelize(updatedItem.name) },
 			itemID: item.id
 		}));
+*/
+		// In order to ensure the pantry data is ready to go before the PantryScreen
+		// re-render triggers, handle the pantry data first
+
+		// if the itemID changes then the pantry is going to contain a useless ref
+		// so if it's changed we have to remove all
+
+		if(item.id === refItem.id)
+			dispatch(Pantry.updateItemInPantry([ item.id, { qty: updatedQty } ]));
+		else {
+			item.parents.forEach(id => {
+				// first grab and hold the metadata
+				const tempData = _Pantries.find(ptr => ptr.id === id) ? {
+					...Pantries[_Pantries.indexOf(_Pantries.find(ptr => ptr.id === id))].inventory[item.id]
+				} : false;
+				// now we can remove the stale ref
+				dispatch(Pantry.deleteItemFromPantry([ item.id, id ]));
+				// if there was metadata to be stored, push the metadata under the
+				// new itemID
+				if(tempData)
+					dispatch(Pantry.addItemToPantry([ refItem.id, tempData, id ]));
+			});
+		}
+
+		// now that the pantry updates have been dispatched, push the item update to
+		// inventory.  The itemIDs should then match when PantryScreen registers the
+		// _Inventory update via useEffect
+		dispatch(Inv.updateItem([
+			item.id,
+			{ ...updatedItem, id: Utils.sanitize(Utils.camelize(updatedItem.name.trim())) }
+		]));
 		setVisible(!visible);
 	}
+
+	const setProp = (field, val) => {
+		console.log('setProp', field, val);
+		field === 'qty' && setUpdatedQty(val);
+		field === 'name' && setUpdatedItem({
+			...updatedItem, id: Utils.sanitize(Utils.camelize(val.trim()))
+		});
+		setUpdatedItem({ ...updatedItem, [field]: val.trim() });
+	}
+
+	// subscribe to updatedItem to keep it synced with refItem
+	useEffect(_ => setRefItem({ ...refItem, ...updatedItem }), [ updatedItem ]);
 
 	return (
 		<Modal
@@ -41,8 +95,8 @@ export default function EditItemModal(props) {
 			</Text>
 			<Input
 				placeholder='Item name'
-				value={updatedItem.name}
-				onChangeText={t => setUpdatedItem({ ...updatedItem, name: t })}
+				value={refItem.name}
+				onChangeText={t => setProp('name', t)}
 			/>
 			<View style={{
 				flexDirection: 'row'

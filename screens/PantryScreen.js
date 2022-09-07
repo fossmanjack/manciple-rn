@@ -36,6 +36,8 @@ export default function PantryScreen(props) {
 	const [ itemToEdit, setItemToEdit ] = useState(Utils.blankItem);
 	const [ listData, setListData ] = useState([]);
 
+	console.log('PantryScreen', props);
+
 	const toggleEditItemVisible = _ => {
 		console.log('toggleEditItemVisible called');
 		setShowEditItemModal(!showEditItemModal);
@@ -128,12 +130,8 @@ export default function PantryScreen(props) {
 		*/
 	};
 
-	const editItem = itemID => {
-		console.log('setItemToEdit passed item:', itemID);
-		console.log('setItemToEdit pre:', itemToEdit.id);
-		setItemToEdit({ ..._Inventory.find(i => i.id === itemID) });
-		console.log('Items equal after set?', item === itemToEdit.current ? 'yes' : 'no', item.id, ':', itemToEdit.id);
-
+	const editItem = item => {
+		setItemToEdit({ ...item });
 		setShowEditItemModal(!showEditItemModal);
 	}
 
@@ -175,7 +173,7 @@ export default function PantryScreen(props) {
 			}}>
 				<Button
 					onPress={_ => {
-							editItem(item.id);
+							editItem(item);
 						}
 					}
 					icon={
@@ -212,6 +210,8 @@ export default function PantryScreen(props) {
 	// value rather than calling the update method after dispatching a state change
 
 	useEffect(_ => setListData(generateListData()), [ _Pantries[currentPantry].inventory ]);
+
+	useEffect(_ => console.log('itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
 	return (
 		<>

@@ -26,9 +26,10 @@ export default function Footer(props) {
 
 		if(inputText) { // if there's text, parse it and add an item to the pantry
 			let [ name = 'New item', qty, ...preTags ] = inputText.split(',');
-			const id = Utils.sanitize(Utils.camelize(name));
+			const id = Utils.sanitize(Utils.camelize(name.trim()));
+			if(qty) qty = qty.trim();
 			let invItem = _Inventory.find(item => item.id === id);
-			tags = preTags.map(t => Utils.sanitize(Utils.camelize(t)));
+			tags = preTags.map(t => Utils.sanitize(Utils.camelize(t.trim())));
 
 			if(Utils.nullp(invItem)) {
 				// if item doesn't exist, push it to _Inventory
@@ -52,6 +53,7 @@ export default function Footer(props) {
 					}
 				));
 
+			console.log('handleSubmit', invItem);
 			dispatch(Pantry.addItemToPantry([ id,
 				{
 					inCart: false,

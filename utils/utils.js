@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import uuid from 'react-native-uuid';
-import { _Store } from '../res/_Store';
+//import { _Store } from '../res/_Store';
 
 export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
 export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-\[\]\{\}\\\|\`]/g, '') : false;
@@ -8,16 +8,16 @@ export const parseDate = i => new Date(i).toISOString().split("T")[0];
 export const daysBetween = (i, j) => (j - i) / (86400000);
 export const truncateString = (str, num) => str.length >= num ? str.slice(num)+' ...' : str;
 export const nullp = val => (typeof val === 'undefined' || val === null);
-export const _State = _Store.getState();
-export const _Dispatch = _Store.dispatch;
+//export const _State = _Store.getState();
+//export const _Dispatch = _Store.dispatch;
 
-export const getDebugLvl = _ => _State.options.debug;
+//export const getDebugLvl = _ => _State.options.debug;
 
 // Writing debug message guidance: the higher the options debug level, the more
 // noisy and granular the log will be.  Each debug message instance should consider
 // whether the data should always be logged (low dlvl) or rarely be logged (high
 // dlvl).  ERROR = 1, WARN = 3, INFO = 5, DEBUG = 7, VV_DEBUG = 9
-
+/*
 export const debugMsg = (fun, params=[], dlvl=9) => {
 	if(dlvl >= getDebugLvl()) {
 		console.log("****** DEBUG ******");
@@ -26,6 +26,7 @@ export const debugMsg = (fun, params=[], dlvl=9) => {
 		console.log("*******************");
 	}
 }
+*/
 
 export const calculateInterval = item => {
 	if(item.history.length < 2) return 0;
@@ -47,9 +48,17 @@ export const sortPantry = (inv, [ field, asc ]) => {
 	// Valid fields: name, price, loc, purchaseBy, none
 	// asc is a bool for "ascending"
 	if(!field || field === 'none') return inv;
-	console.log('sortPantry called');
+	console.log('sortPantry called', inv, field);
 
 	return [...inv].sort((a, b) => {
+		console.log('sortPantry sort', a, b);
+		// what seems to be happening is that the EditItemModal handleSubmit
+		// function is only pushing the updated metadata to the list but not
+		// the updated inventory item data.  Dispatch conflicts?  Should we
+		// send the item over last?  That's probably what's happening ...
+		// but I changed the dispatch order and it didn't fix it.  So this is
+		// where we start -- tracing the listData flow in PantryScreen.  To
+		// start, the useEffect triggers on ptr.inventory change, so ...
 		let x = a[field].toString().toLowerCase();
 		let y = b[field].toString().toLowerCase();
 
