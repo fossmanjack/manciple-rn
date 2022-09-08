@@ -136,7 +136,7 @@ export const getAllTags = _ => {
 
 	_Inventory.forEach(item => tagsAcc.concat(item.tags));
 
-	return [ ...new Set([ ...tagsAcc ]) ].sort((a, b) =>
+	return [ ...new Set(tagsAcc) ].sort((a, b) =>
 		a > b ? 1 : a < b ? : -1 : 0);
 }
 
