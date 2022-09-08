@@ -131,6 +131,15 @@ export const blankPantry = (createPantry({
 	name: 'Blank pantry'
 }));
 
+export const getAllTags = _ => {
+	const tagsAcc = [];
+
+	_Inventory.forEach(item => tagsAcc.concat(item.tags));
+
+	return [ ...new Set([ ...tagsAcc ]) ].sort((a, b) =>
+		a > b ? 1 : a < b ? : -1 : 0);
+}
+
 /* debugging
 
 debug level (dlvl) is the debug value at which the message will trigger
