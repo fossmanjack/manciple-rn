@@ -4,14 +4,16 @@ import { Text, View } from 'react-native';
 import Dialog from 'react-native-dialog';
 
 export default function PantryDetailDialog(props) {
-	const { pantry, visible, setVisible, handleEditPantry } = props;
+	const { _Xstate, setXstate, pantryID, setPantryID } = props;
+	const { _Pantries } = useSelector(S => S.pantries);
+	const pantry = _Pantries[pantryID];
 
 	const handleExport = _ => {
 		console.log('handleExport', pantry);
 	}
 
 	return (
-		<Dialog.Container visible={visible}>
+		<Dialog.Container visible={_Xstate.showPantryDetail}>
 			<Dialog.Title>
 				Pantry Info: {pantry.name}
 			</Dialog.Title>
@@ -38,7 +40,10 @@ export default function PantryDetailDialog(props) {
 			/>
 			<Dialog.Button
 				label='Edit'
-				onPress={handleEditPantry}
+				onPress={_ => setXstate({
+					'showPantryDetail': false,
+					'showPantryEdit': true
+				})}
 				icon={
 					<Icon
 						name='pencil'
@@ -48,7 +53,7 @@ export default function PantryDetailDialog(props) {
 			/>
 			<Dialog.Button
 				label='OK'
-				onPress={_ => setVisible(!visible)}
+				onPress={_ => setXstate({ 'showPantryDetail': false }}
 				icon={
 					<Icon
 						name='check'

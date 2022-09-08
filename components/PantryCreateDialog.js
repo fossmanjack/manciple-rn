@@ -3,24 +3,24 @@ import { useSelector, useDispatch } from 'react-redux';
 import Dialog from 'react-native-dialog';
 import * as Pantry from '../slices/pantriesSlice';
 
-export default function NewPantryDialog(props) {
-	const { visible, setVisible } = props;
+export default function PantryCreateDialog(props) {
+	const { _Xstate, setXstate } = props;
+	const { dispatch } = _Xstate;
 	const [ input, setInput ] = useState('');
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const dispatch = useDispatch();
 
-	const handleNewPantry = _ => {
+	const handleCreatePantry = _ => {
 		const pantryID = uuid.v4();
 
 		dispatch(Pantry.addPantry([ pantryID, { name: input }]));
 		dispatch(Pantry.setPantry(pantryID));
 
 		setInput('');
-		setVisible(false);
+		setXstate({ 'showPantryCreate': false });
 	}
 
 	return (
-		<Dialog.Container visible={visible}>
+		<Dialog.Container visible={_Xstate.showPantryCreate}>
 			<Dialog.Title>
 				Create New Pantry
 			</Dialog.Title>
@@ -33,10 +33,10 @@ export default function NewPantryDialog(props) {
 				label='Cancel'
 				onPress={_ => {
 					setInput('');
-					setVisible(false);
+					setXstate({ 'showPantryCreate': false });
 				}}
 			/>
-			<Dialog.Button label='Create' onPress={handleNewPantry} disabled={!input} />
+			<Dialog.Button label='Create' onPress={handleCreatePantry} disabled={!input} />
 		</Dialog.Container>
 	);
 }

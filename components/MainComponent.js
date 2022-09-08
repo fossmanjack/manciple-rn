@@ -35,7 +35,8 @@ import PantryItem from './PantryItem';
 import Screen from './ScreenComponent';
 
 // Import dialogs and modals
-import NewPantryDialog from './NewPantryDialog';
+import PantryCreateDialog from './NewPantryDialog';
+import PantryDeleteDialog from './PantryDeleteDialog';
 import PantryDetailDialog from './PantryDetailDialog';
 import PantryEditDialog from './PantryEditDialog';
 import SortOrderDialog from './SortOrderDialog';
@@ -66,6 +67,39 @@ export default function Main() {
 	const [ inputNewPantry, setInputNewPantry ] = useState('');
 
 	const drawer = useRef(null);
+
+// Transient Application State (_Xstate)
+	const _Xstate = {
+		currentPage: 'pantry',
+		dispatch: useDispatch(),
+		drawerOpen: false,
+		itemToEdit: Object.keys(_Inventory)[0],
+		pantryToEdit: Object.keys(_Pantries)[0],
+		showPantryCreate: false,
+		showPantryDelete: false,
+		showPantryDetail: false,
+		showPantryEdit: false,
+		deleteItems: false,
+		funs: {
+			drawerCtl
+		}
+	};
+/*
+	const setXstate = (prop, val) => {
+		return {
+			..._Xstate,
+			[prop]: val
+		}
+	};
+*/
+	const setXstate = props => {
+		if(typeof props !== 'object') return _Xstate;
+		return {
+			..._Xstate,
+			...props
+		}
+	}
+
 
 // drawer functions
 	const setDrawerOpen = _ => {
@@ -130,27 +164,38 @@ export default function Main() {
 			onDrawerClose={_ => setDrawerIsOpen(false)}
 			keyboardShouldPersistTaps='always'
 		>
-			<Screen exports={{ nav, setNav, drawerCtl }} />
-			<NewPantryDialog
-				visible={showNewPantryDialog}
-				setVisible={setShowNewPantryDialog}
+			<Screen
+				exports={{ nav, setNav, drawerCtl }}
+				_Xstate={_Xstate}
+				setXstate={setXstate}
+			/>
+			<PantryCreateDialog
+				_Xstate={_Xstate}
+				setXstate={setXstate}
 			/>
 			<PantryDetailDialog
-				visible={showPantryDetailDialog}
-				setVisible={setShowPantryDetailDialog}
-				pantry={pantryToEdit}
+				_Xstate={_Xstate}
+				setXstate={setXstate}
+				pantryID={pantryToEdit}
 				handleEditPantry={_ => {
 					setShowPantryDetailDialog(false);
 					setShowPantryEditDialog(true);
 				}}
-				key={`${pantryToEdit.name}-detail`}
+				key={`${pantryToEdit}-detail`}
 			/>
 			<PantryEditDialog
-				visible={showPantryEditDialog}
-				setVisible={setShowPantryEditDialog}
-				pantry={pantryToEdit}
-				setPantry={setPantryToEdit}
-				key={`${pantryToEdit.name}-edit`}
+				_Xstate={_Xstate}
+				setXstate={setXstate}
+				pantryID={pantryToEdit}
+				setPantryID={setPantryToEdit}
+				key={`${pantryToEdit}-edit`}
+			/>
+			<PantryDeleteDialog
+				_Xstate={_Xstate}
+				setXstate={setXstate}
+				pantryID={pantryToEdit}
+				setPantryID={setPantryToEdit}
+				key={`${pantryToEdit}-delete`}
 			/>
 		</DrawerLayoutAndroid>
 	);
