@@ -35,12 +35,13 @@ export default function NavDrawer(props) {
 			<UserComponent setNav={setNav} drawer={drawer} />
 			{ _Pantries.length > 0 &&
 				<FlatList
-					data={_Pantries}
-					keyExtractor={item => item.id}
-					renderItem={({ item: pantry }) => (
+					data={Object.keys(_Pantries)}
+					keyExtractor={key => key}
+					renderItem={key => (
+						const pantry = _Pantries[key];
 						<Pressable
-							onPress={_ => handlePantryChange(pantry.id)}
-							onLongPress={_ => showPantryDetail(pantry.id)}
+							onPress={_ => handlePantryChange(key)}
+							onLongPress={_ => showPantryDetail(pantry)}
 							style={{
 								borderBottomWidth: 1,
 								borderBottomColor: 'lightgray',

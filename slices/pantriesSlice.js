@@ -34,25 +34,30 @@ const pantriesSlice = createSlice({
 	reducers: {
 		// pantry management
 		setPantry: (pState, action) => {
-			// action.payload = index of selected pantry
+			// action.payload = key (pantryID) of selected pantry
 			console.log('setPantry', action.payload);
 			return { ...pState, currentPantry: action.payload }
 		},
 		addPantry: (pState, action) => {
-			// action.payload = pantry object
+			// action.payload = [ pantryID, { pantry object }]
+			// Adds pantryID: pantry to _Pantries
+			// Will not allow pantryID or pantry.name overwrite
 			// use this ONLY when creating a new pantry from scratch
 			// imports should use updatePantry
 			console.log('addPantry', action.payload);
-			if(!action.payload ||
-				Object.values(pState._Pantries)
-				.find(ob => Utils.camelize(ob.name) === Utils.camelize(action.payload.name)))
-				return pState;
+			if(!action.payload) return pState;
+			let [ pantryID, newPantry ] = action.payload;
+			if(!pantryID) pantryID = uuid.v4();
+			if(!newPantry || !newPantry.name) newPantry = Utils.createPantry({
+				...(newPantry || {}),
+				name: 'New pantry'
+			});
 
 			return {
 				...pState,
 				_Pantries: {
 					...pState._Pantries,
-					[uuid.v4()]: Utils.createPantry(action.payload)
+					[pantryID]: newPantry
 				}
 			};
 		},

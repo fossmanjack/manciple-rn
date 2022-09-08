@@ -33,7 +33,7 @@ export default function PantryScreen(props) {
 	const { sortOpts } = useSelector(S => S.options);
 	const dispatch = useDispatch();
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Utils.blankItem);
+	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_Inventory)[0]);
 	const [ listData, setListData ] = useState([]);
 
 	console.log('PantryScreen', props);
@@ -50,11 +50,13 @@ export default function PantryScreen(props) {
 		// largely-immutable stuff and Pantry has the daily changes.  The props
 		// don't share names so we can just merge them to build our item data set.
 		return Utils.sortPantry(
-			Object.keys(_Pantries[currentPantry].inventory).map(id => {
+			Object.keys(_Pantries[currentPantry].inventory).map(itemID => {
 				return {
-					..._Inventory.find(ob => ob.id === id),
-					..._Pantries[currentPantry].inventory[id],
-					staple: _Pantries[currentPantry].staples.includes(id)
+					id: itemID,
+					..._Inventory[itemID],
+					..._Images[itemID],
+					..._History[itemID],
+					..._Pantries[currentPantry].inventory[itemID]
 				}
 			}), sortOpts);
 	}
@@ -70,7 +72,7 @@ export default function PantryScreen(props) {
 		const newItem = { ..._Pantries[currentPantry].inventory[itemID] };
 		newItem.inCart = !newItem.inCart;
 
-		dispatch(Pantry.updateItemInPantry([ itemID, newItem ]));
+		dispatch(Pantry.updateItemInPantry([ itemID, newItem, currentPantry ]));
 
 		//dispatch(Pantry.toggleInCart(itemID));
 	}
@@ -83,25 +85,15 @@ export default function PantryScreen(props) {
 		rowMap[itemID].closeRow();
 
 		if(rowMap[itemID].props.item.inCart)
-			dispatch(Inv.updateItem([
-				itemID,
-				{
-					history: [ Date.now(), ...rowMap[itemID].props.item.history ]
-				}
-			]));
+			dispatch(Inv.updateHistory([ itemID, Date.now() ]));
 
 		dispatch(Pantry.deleteItemFromPantry([ itemID ]));
 	}
 
 	const handleSweepAll = _ => {
 
-		listData.filter(item => item.inCart).forEach(item => {
-			dispatch(Inv.updateItem([
-				item.id,
-				{
-					history: [ Date.now(), ...item.history ],
-				}
-			]));
+		listData.filter(item => item.inCart).forEach(item.id => {
+			dispatch(Inv.updateHistory([ item.id, Date.now() ]));
 			dispatch(Pantry.deleteItemFromPantry([ item.id ]));
 		});
 	}
@@ -121,17 +113,10 @@ export default function PantryScreen(props) {
 				..._Pantries[currentPantry],
 				staples: [ ...staples, itemID ]
 			}));
-		/*
-		const newItem = { ..._Pantries[currentPantry].inventory.find(i => i.id === itemID) };
-		newItem.staple == !newItem.staple;
-
-		dispatch(Pantry.updateItemInPantry([ itemID, newItem ]));
-		//dispatch(Pantry.updateItemInPantry(itemID, newItem));
-		*/
 	};
 
 	const editItem = item => {
-		setItemToEdit({ ...item });
+		setItemToEdit(item.id);
 		setShowEditItemModal(!showEditItemModal);
 	}
 
@@ -248,7 +233,7 @@ export default function PantryScreen(props) {
 				visible={showEditItemModal}
 				setVisible={setShowEditItemModal}
 				item={itemToEdit}
-				key={itemToEdit.id}
+				key={itemToEdit}
 			/>
 		</>
 	);

@@ -33,7 +33,7 @@ export default function InventoryScreen(props) {
 	const { sortOpts } = useSelector(S => S.options);
 	const dispatch = useDispatch();
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Utils.blankItem);
+	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_Inventory)[0]);
 	const [ showDeleteDialog, setShowDeleteDialog ] = useState(false);
 	const [ itemToDelete, setItemToDelete ] = useState('');
 	const [ listData, setListData ] = useState([]);
@@ -53,25 +53,26 @@ export default function InventoryScreen(props) {
 		// Add or remove item from current pantry
 		if(Object.keys(_Pantries[currentPantry].inventory).includes(itemID)) {
 			// if it's in the pantry, remove it
-			dispatch(Pantry.deleteItemFromPantry([ itemID, _Pantries[currentPantry].id ]));
+			dispatch(Pantry.deleteItemFromPantry([ itemID, currentPantry ]));
 		} else {
 			// if it's not in the pantry, add it
-			const itemRef = _Inventory.find(ob => ob.id === itemID);
+			const itemRef = _Inventory[itemID];
 			dispatch(Pantry.addItemToPantry([ itemID,
 				{
 					inCart: false,
-					purchaseBy: itemRef.interval && itemRef.history[0]
-						? itemRef.history[0] + (itemRef.interval * 86400000)
+					purchaseBy: itemRef.interval && _History[itemID] && _History[itemID].length
+						? _History[itemID][0] + (itemRef.interval * 86400000)
 						: 0,
 					qty: itemRef.defaultQty || '1'
-				}
+				},
+				currentPantry
 			]));
-			if(!itemRef.parents.includes(_Pantries[currentPantry].id))
+			if(!itemRef.parents.includes(currentPantry)
 				dispatch(Inv.updateItem([ itemID,
 					{
 						parents: [
 							...itemRef.parents,
-							_Pantries[currentPantry].id
+							currentPantry
 						]
 					}
 				]));
@@ -127,26 +128,21 @@ export default function InventoryScreen(props) {
 		const staples = [ ..._Pantries[currentPantry].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Pantry.updatePantry({
-				..._Pantries[currentPantry],
-				staples: staples.filter(i => i !== itemID)
-			}));
+			dispatch(Pantry.updatePantry([ currentPantry,
+				{
+					staples: staples.filter(i => i !== itemID)
+				}
+			]));
 		else // add itemID to array
-			dispatch(Pantry.updatePantry({
-				..._Pantries[currentPantry],
-				staples: [ ...staples, itemID ]
+			dispatch(Pantry.updatePantry([ currentPantry,
+				{
+					staples: [ ...staples, itemID ]
+				}
 			}));
-		/*
-		const newItem = { ..._Pantries[currentPantry].inventory.find(i => i.id === itemID) };
-		newItem.staple == !newItem.staple;
-
-		dispatch(Pantry.updateItemInPantry([ itemID, newItem ]));
-		//dispatch(Pantry.updateItemInPantry(itemID, newItem));
-		*/
 	};
 
 	const editItem = itemID => {
-		setItemToEdit({ ..._Inventory.find(ob => ob.id === itemID) });
+		setItemToEdit({ itemID });
 
 		setShowEditItemModal(!showEditItemModal);
 	}
@@ -160,7 +156,8 @@ export default function InventoryScreen(props) {
 				{
 					..._Pantries[currentPantry].inventory[item.id],
 					purchaseBy: date.getTime()
-				}
+				},
+				currentPantry
 			]
 		));
 	}
@@ -261,7 +258,7 @@ export default function InventoryScreen(props) {
 				visible={showEditItemModal}
 				setVisible={setShowEditItemModal}
 				item={itemToEdit}
-				key={itemToEdit.id}
+				key={itemToEdit}
 			/>
 		</>
 	);

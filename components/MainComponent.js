@@ -53,7 +53,7 @@ export default function Main() {
 	const dispatch = useDispatch();
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { debug, sortOpts } = useSelector(S => S.options);
-	const [ pantryToEdit, setPantryToEdit ] = useState(Utils.blankPantry);
+	const [ pantryToEdit, setPantryToEdit ] = useState(Object.keys(_Pantries)[0]);
 	const [ nav, setNav ] = useState('pantry');
 	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
 
@@ -87,22 +87,24 @@ export default function Main() {
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
 	}
 
-	const handlePantryChange = ptID => { console.log('handleListChange', ptID);
+	const handlePantryChange = pantryID => { console.log('handleListChange', pantryID);
+		dispatch(Pantry.setPantry(pantryID));
+		setNav('pantry');
+		drawerCtl(false);
 
+/*
 		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
 		setNav('pantry');
 		drawerCtl(false);
+*/
 	};
 
 // modal functions
 
-	const showPantryDetail = ptID => {
-		setPantryToEdit(_Pantries.find(pt => pt.id === ptID));
+	const showPantryDetail = pantryID => {
+		setPantryToEdit(_Pantries[pantryID]);
 		setShowPantryDetailDialog(true);
 	}
-
-
-
 
 // render component
 
@@ -141,14 +143,14 @@ export default function Main() {
 					setShowPantryDetailDialog(false);
 					setShowPantryEditDialog(true);
 				}}
-				key={`${pantryToEdit.id}-detail`}
+				key={`${pantryToEdit.name}-detail`}
 			/>
 			<PantryEditDialog
 				visible={showPantryEditDialog}
 				setVisible={setShowPantryEditDialog}
 				pantry={pantryToEdit}
 				setPantry={setPantryToEdit}
-				key={`${pantryToEdit.id}-edit`}
+				key={`${pantryToEdit.name}-edit`}
 			/>
 		</DrawerLayoutAndroid>
 	);

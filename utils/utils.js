@@ -50,15 +50,10 @@ export const sortPantry = (inv, [ field, asc ]) => {
 	if(!field || field === 'none') return inv;
 	console.log('sortPantry called', inv, field);
 
-	return [...inv].sort((a, b) => {
+	// For now let's filter out any item that doesn't have the field
+	// defined.  Which shouldn't ever happen but still.
+	return [...inv.filter(ob => ob.hasOwnProperty(field))].sort((a, b) => {
 		console.log('sortPantry sort', a, b);
-		// what seems to be happening is that the EditItemModal handleSubmit
-		// function is only pushing the updated metadata to the list but not
-		// the updated inventory item data.  Dispatch conflicts?  Should we
-		// send the item over last?  That's probably what's happening ...
-		// but I changed the dispatch order and it didn't fix it.  So this is
-		// where we start -- tracing the listData flow in PantryScreen.  To
-		// start, the useEffect triggers on ptr.inventory change, so ...
 		let x = a[field].toString().toLowerCase();
 		let y = b[field].toString().toLowerCase();
 
@@ -69,7 +64,6 @@ export const sortPantry = (inv, [ field, asc ]) => {
 export const createPantryItem = props => {
 	const {
 		name = 'New item',
-		id = camelize(name || 'New item'),
 		tags = [],
 		history = [],
 		images = [],
@@ -87,7 +81,6 @@ export const createPantryItem = props => {
 
 	return ({
 		name,
-		id,
 		type: 'item',
 		version: 1,
 		tags,
@@ -109,9 +102,10 @@ export const createPantryItem = props => {
 export const blankItem = (createPantryItem({ name: 'Blank item' }));
 
 export const createPantry = props => {
+	// takes an object, extracts pertinent props, scaffolds out the rest,
+	// returns them.
 	const {
 		name = 'New pantry',
-		id = uuid.v4(),
 		creationDate = Date.now(),
 		modifyDate = Date.now(),
 		inventory = { },
@@ -123,7 +117,6 @@ export const createPantry = props => {
 
 	return ({
 		name,
-		id,
 		creationDate,
 		modifyDate,
 		inventory,
@@ -135,8 +128,7 @@ export const createPantry = props => {
 }
 
 export const blankPantry = (createPantry({
-	name: 'Blank pantry',
-	id: 'blank-pantry'
+	name: 'Blank pantry'
 }));
 
 /* debugging

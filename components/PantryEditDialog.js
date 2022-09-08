@@ -7,18 +7,18 @@ import * as Pantry from '../slices/pantriesSlice';
 export default function PantryEditDialog(props) {
 	const { pantry, setPantry, visible, setVisible } = props;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const [ input, setInput ] = useState(pantry.name);
-	const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
+	const [ input, setInput ] = useState(_Pantries[pantry].name);
+	//const blankPantry = ({ 'name': 'Blank list', id: 'blank-list', inventory: [] });
 	const dispatch = useDispatch();
 
 	const handleEditPantry = _ => {
 		const updatedPantry = {
-			...pantry,
+			..._Pantries[pantry],
 			name: input
 		};
 
 		setVisible(!visible);
-		dispatch(Pantry.updatePantry(updatedPantry));
+		dispatch(Pantry.updatePantry([ pantry, updatedPantry ]));
 	}
 
 	const handleDeletePantry = _ => {
@@ -27,38 +27,70 @@ export default function PantryEditDialog(props) {
 
 		Alert.alert(
 			'Delete pantry?',
-			`Are you sure you wish to delete the pantry ${pantry.name}?  All of your item and purchase history will be lost!`,
+			`Are you sure you wish to delete the pantry ${_Pantries[pantry].name}?`,
 			[
 				{
 					text: 'Cancel',
-					onPress: _ => handlePantryDeleteCancel(),
 					style: 'cancel'
 				},
 				{
 					text: 'OK',
 					onPress: _ => handleDeleteConfirm(),
 				}
-			],
-			{
-				cancelable: true,
-				onDismiss: _ => handlePantryDeleteCancel()
-			}
+			]
 		);
 	}
 
+// redo the flow here to chain the alerts and then handle the cleanup rather than
+// doing it in two stages
 	const handleDeleteConfirm = _ => {
-		const idx = _Pantries.indexOf(pantry);
-
-		console.log('handlePantryDeleteConfirm', idx, currentPantry);
-		if(idx === currentPantry) {
+		if(currentPantry === pantry) {
 			console.log('trying to delete current pantry!');
-			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(currentPantry - 1));
+			const keys = Object.keys(_Pantries);
+			const idx = keys.indexOf(key => key === pantry);
+
+			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(keys[idx - 1]));
 		}
 
-		setPantry(blankPantry);
-		console.log('currentPantry:', currentPantry);
-		dispatch(Pantry.deletePantry(idx));
+		console.log('currentPantry', currentPantry);
+		dispatch(Pantry.deletePantry(pantry));
 		console.log(_Pantries);
+		Alert.alert(
+			'Clean up inventory?',
+			'Would you like to delete all items associated with this pantry from ' +
+			'your persistent item store?',
+			[
+				{
+					text: 'Yes',
+					onPress={_ => handleParentCleanup(''+pantry, true)}
+				},
+				{
+					text: 'No',
+					onPress={_ => handleParentCleanup(''+pantry, false)}
+				}
+			],
+			{
+				cancelable: true
+			},
+			{_ => handleParentCleanup(''+pantry, false)}
+		);
+		setPantry(keys[0]);
+	}
+
+	const handleParentCleanup = pantryID, clear => {
+		// get all itemIDs for items that have the deleted pantry as a parent
+		const itemsArr = Object.keys(_Inventory).filter(itemID => _Inventory[itemID].parents.includes(pantryID));
+
+		itemsArr.forEach(itemID => {
+			// remove the deleted pantry from parents
+			rents = _Inventory[itemID].parents.filter(ptID => ptID === pantryID);
+			// if clear flag is set and no parents remain, delete the item from inventory
+			if(clear && !rents.length)
+				dispatch(Inv.deleteItem(itemID));
+			// otherwise update the item with the new, potentially empty, parents array
+			else
+				dispatch(Inv.updateItem([ itemID, { parents: rents } ]));
+		};
 	}
 
 	return (

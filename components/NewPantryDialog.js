@@ -10,8 +10,11 @@ export default function NewPantryDialog(props) {
 	const dispatch = useDispatch();
 
 	const handleNewPantry = _ => {
-		dispatch(Pantry.addPantry(input)) &&
-		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.name === input)) || -1));
+		const pantryID = uuid.v4();
+
+		dispatch(Pantry.addPantry([ pantryID, { name: input }]));
+		dispatch(Pantry.setPantry(pantryID));
+
 		setInput('');
 		setVisible(false);
 	}

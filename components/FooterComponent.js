@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
+import uuid from 'react-native-uuid';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Inv from '../slices/inventorySlice';
 import * as Utils from '../utils/utils';
@@ -26,59 +27,59 @@ export default function Footer(props) {
 
 		if(inputText) { // if there's text, parse it and add an item to the pantry
 			let [ name = 'New item', qty, ...preTags ] = inputText.split(',');
-			const id = Utils.sanitize(Utils.camelize(name.trim()));
 			if(qty) qty = qty.trim();
-			let invItem = _Inventory.find(item => item.id === id);
-			tags = preTags.map(t => Utils.sanitize(Utils.camelize(t.trim())));
+			const tags = preTags.length ? preTags.map(t => Utils.camelize(Utils.sanitize(t.trim()))) : [ ];
 
-			if(Utils.nullp(invItem)) {
+			let itemID = Object.keys(_Inventory).find(key =>
+				Utils.camelize(Utils.sanitize(_Inventory[key].name)) ===
+				Utils.camelize(Utils.sanitize(name)));
+			if(!itemID) {
 				// if item doesn't exist, push it to _Inventory
 				const newItem = Utils.createPantryItem({
 					name,
-					id,
 					tags,
-					parents: [ _Pantries[currentPantry].id ],
-					defaultQty: qty || '1'
+					parents: [ currentPantry ],
+					defaultQty: qty || ''
 				});
-				dispatch(Inv.addItem(newItem));
+				dispatch(Inv.addItem([ uuid.v4(), newItem ]));
 			}
-
-			if(invItem && !invItem.parents.includes(_Pantries[currentPantry].id))
-				dispatch(Inv.updateItem(invItem.id,
-					{
+			else {
+				invItem = { ..._Inventory[itemID] };
+				if(!invItem.parents.includes(currentPantry))
+					dispatch(Inv.updateItem([ itemID, {
 						parents: [
 							...invItem.parents,
-							_Pantries[currentPantry].id
+							currentPantry
 						]
+					}));
+				dispatch(Pantry.addItemToPantry([ itemID,
+					{
+						inCart: false,
+						qty: qty || invItem.defaultQty || '1',
+						purchaseBy: invItem.interval && invItem.history[0]
+							? invItem.history[0] + (invItem.interval * 86400000)
+							: 0,
 					}
-				));
+				]));
 
-			console.log('handleSubmit', invItem);
-			dispatch(Pantry.addItemToPantry([ id,
-				{
-					inCart: false,
-					qty: qty || invItem.defaultQty || '1',
-					purchaseBy: invItem.interval && invItem.history[0]
-						? invItem.history[0] + (invItem.interval * 86400000)
-						: 0,
-				}
-			]));
 		} else { // if no text, add all staples
 			console.log('handleSubmit all:', _Pantries[currentPantry].staples);
-			_Pantries[currentPantry].staples.forEach(id => {
-				console.log('processing staple', id);
-				if(Object.keys(_Pantries[currentPantry].inventory).includes(id)) return;
-				const invItem = _Inventory.find(i => i.id === id);
+			_Pantries[currentPantry].staples.forEach(itemID => {
+				console.log('processing staple', itemID);
+				// If the item is already listed, continue
+				if(Object.keys(_Pantries[currentPantry].inventory).includes(itemID)) return;
+				const invItem = _Inventory[itemID];
 
 				if(Utils.nullp(invItem)) { // if the ID isn't in inventory, toss it
 					console.log('found bad id', id);
-					dispatch(Pantry.updatePantry({
-						..._Pantries[currentPantry],
-						staples: _Pantries[currentPantry].staples.filter(i => i.id === id)
-					}));
+					dispatch(Pantry.updatePantry([ currentPantry,
+						{
+							staples: _Pantries[currentPantry].staples.filter(i => i.id === id)
+						}
+					]));
 				} else { // otherwise add it to the list
-					console.log('adding item', id);
-					dispatch(Pantry.addItemToPantry([ id,
+					console.log('adding item', itemID);
+					dispatch(Pantry.addItemToPantry([ itemID,
 						{
 							inCart: false,
 							qty: invItem.defaultQty || '1',
