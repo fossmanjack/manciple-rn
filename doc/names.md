@@ -1,7 +1,0 @@
-- Andrew (Andrew Martin, Bicentennial Man)
-- Bernard
-- Doubtfire (Mrs Doubtfire)
-- Jarvis (meh)
-- Mervyn (Sandman, also Mervyn Bunter)
-- Seneschal (majordomo and steward)
-- Manciple (officer responsible for purchase and storage of food)
