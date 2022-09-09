@@ -15,8 +15,8 @@ import {
 	Button,
 	Input
 } from 'react-native-elements';
-import * as Pantry from '../slices/pantriesSlice';
-import * as Inv from '../slices/inventorySlice';
+import * as Pantry from '../slices/listsSlice';
+import * as Inv from '../slices/itemStoreSlice';
 import * as Utils from '../utils/utils';
 
 export default function EditItemModal(props) {
@@ -50,8 +50,8 @@ export default function EditItemModal(props) {
 		else {
 			item.parents.forEach(id => {
 				// first grab and hold the metadata
-				const tempData = _Pantries.find(ptr => ptr.id === id) ? {
-					...Pantries[_Pantries.indexOf(_Pantries.find(ptr => ptr.id === id))].inventory[item.id]
+				const tempData = _Lists.find(ptr => ptr.id === id) ? {
+					...Pantries[_Lists.indexOf(_Lists.find(ptr => ptr.id === id))].inventory[item.id]
 				} : false;
 				// now we can remove the stale ref
 				dispatch(Pantry.deleteItemFromPantry([ item.id, id ]));
@@ -64,7 +64,7 @@ export default function EditItemModal(props) {
 
 		// now that the pantry updates have been dispatched, push the item update to
 		// inventory.  The itemIDs should then match when PantryScreen registers the
-		// _Inventory update via useEffect
+		// _ItemStore update via useEffect
 		dispatch(Inv.updateItem([
 			item.id,
 			{ ...updatedItem, id: Utils.sanitize(Utils.camelize(updatedItem.name.trim())) }

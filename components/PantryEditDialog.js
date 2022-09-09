@@ -2,28 +2,28 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import Dialog from 'react-native-dialog';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Pantry from '../slices/listsSlice';
 
 export default function PantryEditDialog(props) {
-	const { _Xstate, setXstate, pantryID, setPantryID } = props;
+	const { _Xstate, setXstate, listID, setPantryID } = props;
 	const { dispatch } = _Xstate;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const [ input, setInput ] = useState(_Pantries[pantryID].name);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const [ input, setInput ] = useState(_Lists[listID].name);
 
 	const handleEditPantry = _ => {
 		const updatedPantry = {
-			..._Pantries[pantryID],
+			..._Lists[listID],
 			name: input
 		};
 
 		setXstate({ 'showPantryEdit', false });
-		dispatch(Pantry.updatePantry([ pantryID, updatedPantry ]));
+		dispatch(Pantry.updatePantry([ listID, updatedPantry ]));
 	}
 
 	const handleDeletePantry = _ => {
 		// Offloading pantry deletion to its own component to use the Dialog
 		// options
-		console.log('handleDeletePantry:', pantryID);
+		console.log('handleDeletePantry:', listID);
 		setXstate({
 			'showPantryEdit': false,
 			'showPantryDelete': true

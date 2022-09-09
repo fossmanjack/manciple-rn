@@ -10,7 +10,7 @@ import {
 	REGISTER
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { pantriesReducer } from '../slices/pantriesSlice';
+import { listsReducer } from '../slices/listsSlice';
 import { optionsReducer } from '../slices/optionsSlice';
 import { globalReducer } from '../slices/globalSlice';
 import { userReducer } from '../slices/userSlice';
@@ -27,7 +27,7 @@ export const _Store = configureStore({
 	reducer: persistCombineReducers(config, {
 		global: globalReducer,
 		options: optionsReducer,
-		pantries: pantriesReducer,
+		lists: listsReducer,
 		user: userReducer,
 	}),
 	middleware: (getDefaultMiddleware) =>

@@ -17,7 +17,7 @@ export default function ModalDialogComponent(props) {
 			<PantryDetailDialog
 				_Xstate={_Xstate}
 				setXstate={setXstate}
-				pantryID={pantryToEdit}
+				listID={pantryToEdit}
 				handleEditPantry={_ => {
 					setShowPantryDetailDialog(false);
 					setShowPantryEditDialog(true);
@@ -27,14 +27,14 @@ export default function ModalDialogComponent(props) {
 			<PantryEditDialog
 				_Xstate={_Xstate}
 				setXstate={setXstate}
-				pantryID={pantryToEdit}
+				listID={pantryToEdit}
 				setPantryID={setPantryToEdit}
 				key={`${pantryToEdit}-edit`}
 			/>
 			<PantryDeleteDialog
 				_Xstate={_Xstate}
 				setXstate={setXstate}
-				pantryID={pantryToEdit}
+				listID={pantryToEdit}
 				setPantryID={setPantryToEdit}
 				key={`${pantryToEdit}-delete`}
 			/>

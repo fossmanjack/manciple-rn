@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { inventoryReducer } from '../slices/inventorySlice';
-import { pantriesReducer } from '../slices/pantriesSlice';
+import { itemStoreReducer } from '../slices/itemStoreSlice';
+import { listsReducer } from '../slices/listsSlice';
 import { optionsReducer } from '../slices/optionsSlice';
 import { globalReducer } from '../slices/globalSlice';
 import { userReducer } from '../slices/userSlice';
@@ -9,9 +9,9 @@ export const _Store = configureStore({
 	reducer: {
 		global: globalReducer,
 		options: optionsReducer,
-		pantries: pantriesReducer,
+		lists: listsReducer,
 		user: userReducer,
-		inventory: inventoryReducer
+		itemStore: itemStoreReducer
 	}
 });
 

@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Dialog from 'react-native-dialog';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Pantry from '../slices/listsSlice';
 
 export default function PantryCreateDialog(props) {
 	const { _Xstate, setXstate } = props;
 	const { dispatch } = _Xstate;
 	const [ input, setInput ] = useState('');
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleCreatePantry = _ => {
-		const pantryID = uuid.v4();
+		const listID = uuid.v4();
 
-		dispatch(Pantry.addPantry([ pantryID, { name: input }]));
-		dispatch(Pantry.setPantry(pantryID));
+		dispatch(Pantry.addPantry([ listID, { name: input }]));
+		dispatch(Pantry.setPantry(listID));
 
 		setInput('');
 		setXstate({ 'showPantryCreate': false });

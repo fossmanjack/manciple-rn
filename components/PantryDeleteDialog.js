@@ -8,41 +8,41 @@ import { useSelector } from 'react-redux';
 import Dialog from 'react-native-dialog';
 
 // slice imports
-import * as Inv from '../slices/inventorySlice';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Inv from '../slices/itemStoreSlice';
+import * as Pantry from '../slices/listsSlice';
 
 // utils
 import * as Utils from '../utils/utils';
 
 export default function PantryDeleteDialog(props) {
-	const { _Xstate, setXstate, pantryID, setPantryID } = props;
+	const { _Xstate, setXstate, listID, setPantryID } = props;
 	const { dispatch } = _Xstate;
-	const { _Inventory } = useSelector(S => S.inventory);
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { _ItemStore } = useSelector(S => S.inventory);
+	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleCancel = _ => {
 		setXstate({ 'showPantryDelete': false });
 	}
 
 	const handleConfirm = _ => {
-		if(currentPantry === pantryID) {
+		if(currentList === listID) {
 			console.log('trying to delete current pantry!');
-			const keys = Object.keys(_Pantries);
-			const idx = keys.indexOf(key => key === pantryID);
+			const keys = Object.keys(_Lists);
+			const idx = keys.indexOf(key => key === listID);
 
-			if(_Pantries.length <= idx + 1) dispatch(Pantry.setPantry(keys[idx - 1]));
+			if(_Lists.length <= idx + 1) dispatch(Pantry.setPantry(keys[idx - 1]));
 		}
 
-		console.log('currentPantry', currentPantry);
-		dispatch(Pantry.deletePantry(pantryID));
-		console.log(_Pantries);
+		console.log('currentList', currentList);
+		dispatch(Pantry.deletePantry(listID));
+		console.log(_Lists);
 
-		// Now remove all references to the deleted pantryID from item store
-		const itemsArr = Object.keys(_Inventory).filter(itemID => _Inventory[itemID].parents.includes(pantryID));
+		// Now remove all references to the deleted listID from item store
+		const itemsArr = Object.keys(_ItemStore).filter(itemID => _ItemStore[itemID].parents.includes(listID));
 
 		itemsArr.forEach(itemID => {
 			// remove the deleted pantry from parents
-			rents = _Inventory[itemID].parents.filter(ptID => ptID === pantryID);
+			rents = _ItemStore[itemID].parents.filter(ptID => ptID === listID);
 			// if clear flag is set and no parents remain, delete the item from inventory
 			if(_Xstate.deleteItems && !rents.length)
 				dispatch(Inv.deleteItem(itemID));

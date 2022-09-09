@@ -1,9 +1,9 @@
-export const PANTRIES = [
+export const LISTS = [
 	{
 		id: 'f050c373-ea40-4ba7-8aef-299f7640970e',
 		name: 'Groceries',
 		tags: [ 'grocery', 'household', 'cleaning' ],
-		type: 'pantry',
+		type: 'shoppingList',
 		version: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now(),
@@ -24,7 +24,7 @@ export const PANTRIES = [
 		id: 'fb51e865-5838-496e-8d13-886a7e7c26fd',
 		name: 'Hardware store',
 		tags: [ 'hardware', 'tool' ],
-		type: 'pantry',
+		type: 'shoppingList',
 		version: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now(),
@@ -41,7 +41,7 @@ export const PANTRIES = [
 	}
 ]
 
-export const INVENTORY = {
+export const ITEMSTORE = {
 	'd3bebaa4-d834-49cd-852e-a64f6638a2b4': {
 		name: 'Milk',
 		tags: [ 'drink', 'grocery', 'dairy' ],

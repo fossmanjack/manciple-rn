@@ -1,6 +1,6 @@
 // PantryScreen.js
 // Handles the bulk of the application logic, displays items stored in
-// _Pantries[currentPantry].inventory in a third-party SwipeListView, handles
+// _Lists[currentList].inventory in a third-party SwipeListView, handles
 // selection buttons, etc
 
 // react, RN, community imports
@@ -18,8 +18,8 @@ import Footer from '../components/FooterComponent';
 import InventoryItem from '../components/InventoryItem';
 
 // slice imports
-import * as Pantry from '../slices/pantriesSlice';
-import * as Inv from '../slices/inventorySlice';
+import * as Pantry from '../slices/listsSlice';
+import * as Inv from '../slices/itemStoreSlice';
 
 // utility imports
 import { _Styles } from '../res/_Styles';
@@ -35,13 +35,13 @@ export default function ItemStoreScreen(props) {
 	} = _Xstate;
 
 
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { _Inventory } = useSelector(S => S.inventory);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.inventory);
 	const { sortOpts } = useSelector(S => S.options);
 
 /*
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_Inventory)[0]);
+	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_ItemStore)[0]);
 	const [ showDeleteDialog, setShowDeleteDialog ] = useState(false);
 	const [ itemToDelete, setItemToDelete ] = useState('');
 	const [ listData, setListData ] = useState([]);
@@ -55,17 +55,17 @@ export default function ItemStoreScreen(props) {
 	const generateListData = _ => {
 		console.log('Inv: generateListData');
 
-		return Utils.sortPantry(_Inventory, sortOpts);
+		return Utils.sortPantry(_ItemStore, sortOpts);
 	}
 
 	const handleCheckBox = itemID => {
 		// Add or remove item from current pantry
-		if(Object.keys(_Pantries[currentPantry].inventory).includes(itemID)) {
+		if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
 			// if it's in the pantry, remove it
-			dispatch(Pantry.deleteItemFromPantry([ itemID, currentPantry ]));
+			dispatch(Pantry.deleteItemFromPantry([ itemID, currentList ]));
 		} else {
 			// if it's not in the pantry, add it
-			const itemRef = _Inventory[itemID];
+			const itemRef = _ItemStore[itemID];
 			dispatch(Pantry.addItemToPantry([ itemID,
 				{
 					inCart: false,
@@ -74,14 +74,14 @@ export default function ItemStoreScreen(props) {
 						: 0,
 					qty: itemRef.defaultQty || '1'
 				},
-				currentPantry
+				currentList
 			]));
-			if(!itemRef.parents.includes(currentPantry)
+			if(!itemRef.parents.includes(currentList)
 				dispatch(Inv.updateItem([ itemID,
 					{
 						parents: [
 							...itemRef.parents,
-							currentPantry
+							currentList
 						]
 					}
 				]));
@@ -112,7 +112,7 @@ export default function ItemStoreScreen(props) {
 	const deleteItem = itemID => {
 		dispatch(Inv.deleteItem(itemID));
 
-		_Pantries.forEach(pnt => {
+		_Lists.forEach(pnt => {
 			if(Object.keys(pnt.inventory).includes(itemID))
 				dispatch(Pantry.deleteItemFromPantry([ itemID, pnt.id ]));
 		});
@@ -134,16 +134,16 @@ export default function ItemStoreScreen(props) {
 	const handleToggleStaple = itemID => {
 		console.log('handleToggleStaple called with item', itemID);
 
-		const staples = [ ..._Pantries[currentPantry].staples ];
+		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Pantry.updatePantry([ currentPantry,
+			dispatch(Pantry.updatePantry([ currentList,
 				{
 					staples: staples.filter(i => i !== itemID)
 				}
 			]));
 		else // add itemID to array
-			dispatch(Pantry.updatePantry([ currentPantry,
+			dispatch(Pantry.updatePantry([ currentList,
 				{
 					staples: [ ...staples, itemID ]
 				}
@@ -163,10 +163,10 @@ export default function ItemStoreScreen(props) {
 			[
 				item.id,
 				{
-					..._Pantries[currentPantry].inventory[item.id],
+					..._Lists[currentList].inventory[item.id],
 					purchaseBy: date.getTime()
 				},
-				currentPantry
+				currentList
 			]
 		));
 	}
@@ -215,7 +215,7 @@ export default function ItemStoreScreen(props) {
 					onPress={_ => handleToggleStaple(item.id)}
 					icon={
 						<Icon
-							name={_Pantries[currentPantry].staples.includes(item.id) ? 'toggle-on' : 'toggle-off'}
+							name={_Lists[currentList].staples.includes(item.id) ? 'toggle-on' : 'toggle-off'}
 							type='font-awesome'
 							color='black'
 							style={{ marginRight: 5 }}
@@ -233,8 +233,8 @@ export default function ItemStoreScreen(props) {
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
 
-	//useEffect(_ => setListData(generateListData()), [ _Inventory ]);
-	useEffect(_ => setXstate({ 'listData': generateListData() }), [ _Inventory ]);
+	//useEffect(_ => setListData(generateListData()), [ _ItemStore ]);
+	useEffect(_ => setXstate({ 'listData': generateListData() }), [ _ItemStore ]);
 
 	return (
 		<>

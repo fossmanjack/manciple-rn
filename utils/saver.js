@@ -89,10 +89,10 @@ export function logout(_Store) {
 export async function saveState(_Store) {
 	const state = _Store.getState();
 	const local = generateManifest();
-	const queue = [ ...state.pantries._Pantries ];
+	const queue = [ ...state.lists._Lists ];
 	const syncClient = Dav.davClient(state);
 
-	// for now let's just put all pantries into the remote store
+	// for now let's just put all lists into the remote store
 
 	try {
 		let res = syncClient.put('manifest.json', JSON.stringify(local), { format: 'text' });
@@ -134,10 +134,10 @@ export function generateManifest(state) {
 	const ret = {
 		timestamp: state.global.lastUse,
 		clientID: state.global.clientID,
-		pantries: { }
+		lists: { }
 	}
 
-	state.pantries._Pantries.forEach(ptr => ret.pantries[ptr.id] = ptr.modifyDate);
+	state.lists._Lists.forEach(ptr => ret.lists[ptr.id] = ptr.modifyDate);
 
 	return ret;
 }
@@ -197,9 +197,9 @@ export async function getRemoteState(dispatch) {
 	//     timestamp: ...,
 	//     clientID: ...,
 	//     data: {
-	//         pantries: {
-	//             _Pantries: { ... },
-	//             currentPantry: int
+	//         lists: {
+	//             _Lists: { ... },
+	//             currentList: int
 	//         }
 	//     }
 	// }
@@ -220,8 +220,8 @@ export async function getRemoteState(dispatch) {
 	const remoteManifest = JSON.parse(syncClient.get('manifest.json'));
 
 	if(localManifest.timestamp > remoteManifest.timestamp) {
-		state.pantries._Pantries.forEach(ptr => {
-			if(ptr.modifyDate > remoteManifest.pantries[ptr.id])
+		state.lists._Lists.forEach(ptr => {
+			if(ptr.modifyDate > remoteManifest.lists[ptr.id])
 				queue.push(ptr.id);
 		})
 	};

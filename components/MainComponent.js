@@ -17,7 +17,7 @@ import Screen from '../components/ScreenComponent';
 import ModalDialogComponent from '../components/ModalDialogComponent';
 
 // slice imports
-import * as Pantry from '../slices/pantriesSlice';
+import * as Lists from '../slices/listsSlice';
 import * as Global from '../slices/globalSlice';
 
 // utility imports
@@ -25,30 +25,27 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function Main() {
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
 	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
-
-	// Input field variables
-	const [ inputNewPantry, setInputNewPantry ] = useState('');
-
 	const drawer = useRef(null);
 
 // Transient Application State (_Xstate)
 	const _Xstate = {
-		currentPage: 'pantry',
+		currentPage: 'currentList',
 		drawerOpen: false,
-		itemToEdit: Object.keys(_Inventory)[0],
+		itemToEdit: Object.keys(_ItemStore)[0],
 		listData: [],
-		pantryToEdit: Object.keys(_Pantries)[0],
-		showPantryCreate: false,
-		showPantryDelete: false,
-		showPantryDetail: false,
-		showPantryEdit: false,
+		listToEdit: Object.keys(_Lists)[0],
+		showListCreate: false,
+		showListDelete: false,
+		showListDetail: false,
+		showListEdit: false,
 		showItemEdit: false,
 		showSortOrder: false,
 		deleteItems: false,
-		headerTitle: 'Manciple',
+		headerTitle: `${_Lists[currentList].name}: List view`,
 		headerControls: false,
 		funs: {
 			drawerCtl,
@@ -56,14 +53,7 @@ export default function Main() {
 			handlePantryChange
 		}
 	};
-/*
-	const setXstate = (prop, val) => {
-		return {
-			..._Xstate,
-			[prop]: val
-		}
-	};
-*/
+
 	const setXstate = props => {
 		if(typeof props !== 'object') return _Xstate;
 		return {
@@ -71,7 +61,6 @@ export default function Main() {
 			...props
 		}
 	}
-
 
 // drawer functions
 	const setDrawerOpen = _ => {
@@ -93,28 +82,17 @@ export default function Main() {
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
 	}
 
-	const handlePantryChange = pantryID => {
-		console.log('handleListChange', pantryID);
-		dispatch(Pantry.setPantry(pantryID));
+	const handleListChange = listID => {
+		console.log('handleListChange', listID);
+		dispatch(Lists.setList(listID));
 		setXstate({
-			'currentPage': 'pantry',
-			'headerTitle': `${_Pantries[pantryID].name}: List view`,
+			'currentPage': 'currentList',
+			'headerTitle': `${_Lists[listID].name}: List view`,
 			'headerControls': true
 		});
 		drawerCtl(false);
 
-/*
-		dispatch(Pantry.setPantry(_Pantries.indexOf(_Pantries.find(pt => pt.id === ptID))));
-		setNav('pantry');
-		drawerCtl(false);
-*/
 	};
-
-//
-	const showPantryDetail = pantryID => {
-		setPantryToEdit(_Pantries[pantryID]);
-		setShowPantryDetailDialog(true);
-	}
 
 // render component
 

@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as MediaLibrary from 'expo-media-library';
 import Dialog from 'react-native-dialog';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Pantry from '../slices/listsSlice';
 import * as Utils from '../utils/utils';
 import { _DefaultImage } from '../res/_DefaultImage';
 

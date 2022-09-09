@@ -44,16 +44,16 @@ export const calculateInterval = item => {
 	return acc / (item.history.length - 1);
 }
 
-export const sortPantry = (inv, [ field, asc ]) => {
+export const sortList = (inv, [ field, asc ]) => {
 	// Valid fields: name, price, loc, purchaseBy, none
 	// asc is a bool for "ascending"
 	if(!field || field === 'none') return inv;
-	console.log('sortPantry called', inv, field);
+	console.log('sortList called', inv, field);
 
 	// For now let's filter out any item that doesn't have the field
 	// defined.  Which shouldn't ever happen but still.
 	return [...inv.filter(ob => ob.hasOwnProperty(field))].sort((a, b) => {
-		console.log('sortPantry sort', a, b);
+		console.log('sortList sort', a, b);
 		let x = a[field].toString().toLowerCase();
 		let y = b[field].toString().toLowerCase();
 
@@ -61,7 +61,7 @@ export const sortPantry = (inv, [ field, asc ]) => {
 	});
 }
 
-export const createPantryItem = props => {
+export const createListItem = props => {
 	const {
 		name = 'New item',
 		tags = [],
@@ -99,19 +99,19 @@ export const createPantryItem = props => {
 	});
 }
 
-export const blankItem = (createPantryItem({ name: 'Blank item' }));
+export const blankItem = (createListItem({ name: 'Blank item' }));
 
-export const createPantry = props => {
+export const createShoppingList = props => {
 	// takes an object, extracts pertinent props, scaffolds out the rest,
 	// returns them.
 	const {
-		name = 'New pantry',
+		name = 'New list',
 		creationDate = Date.now(),
 		modifyDate = Date.now(),
 		inventory = { },
 		staples = [ ],
 		sync = false,
-		type = 'pantry',
+		type = 'shoppingList',
 		version = '1'
 	} = props;
 
@@ -127,14 +127,14 @@ export const createPantry = props => {
 	});
 }
 
-export const blankPantry = (createPantry({
-	name: 'Blank pantry'
+export const blankShoppingList = (createShoppingList({
+	name: 'Blank list'
 }));
 
 export const getAllTags = _ => {
 	const tagsAcc = [];
 
-	_Inventory.forEach(item => tagsAcc.concat(item.tags));
+	_ItemStore.forEach(item => tagsAcc.concat(item.tags));
 
 	return [ ...new Set(tagsAcc) ].sort((a, b) =>
 		a > b ? 1 : a < b ? : -1 : 0);

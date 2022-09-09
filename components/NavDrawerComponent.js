@@ -24,17 +24,17 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 		showPantryCreate,
 		funs: { handlePantryChange }
 	} = _Xstate;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	return (
 		<>
 			<UserComponent drawer={drawer} _Xstate={_Xstate} setXstate={setXstate} />
-			{ Object.keys(_Pantries).length &&
+			{ Object.keys(_Lists).length &&
 				<FlatList
-					data={Object.keys(_Pantries)}
+					data={Object.keys(_Lists)}
 					keyExtractor={key => key}
 					renderItem={key => (
-						const pantry = _Pantries[key];
+						const pantry = _Lists[key];
 						<Pressable
 							onPress={_ => handlePantryChange(key)}
 							onLongPress={_ => {
@@ -83,7 +83,7 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 					drawer.closeDrawer();
 					setXstate({
 						'currentPage': 'pantry',
-						'headerTitle': `${_Pantries[currentPantry].name}: List view`,
+						'headerTitle': `${_Lists[currentList].name}: List view`,
 						'headerControls': true,
 						'showPantryCreate': true
 					});

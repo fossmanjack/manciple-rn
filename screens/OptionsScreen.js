@@ -14,7 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as SecureStore from 'expo-secure-store';
 import Header from '../components/HeaderComponent';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Pantry from '../slices/listsSlice';
 import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
 //import * as Dav from '../utils/davModule';

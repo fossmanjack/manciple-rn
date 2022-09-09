@@ -39,8 +39,8 @@ It's also easy enough to add "type" and "version" strings to all the objects.
 
 So, what all do we need to update?
 
-- pantriesSlice -> pantrySlice (only handles pantries)
-- inventorySlice -> handles all changes to _Inventory
+- listsSlice -> pantrySlice (only handles lists)
+- itemStoreSlice -> handles all changes to _ItemStore
 - PantryItem or PantryScreen or both
 
 

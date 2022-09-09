@@ -48,7 +48,7 @@
 
 ### Notes
 
-I've just inserted a "sync" prop into the pantries.  Thus we want to sync only based
-on pantries that actually want to sync -- items only get synced if they're listed
+I've just inserted a "sync" prop into the lists.  Thus we want to sync only based
+on lists that actually want to sync -- items only get synced if they're listed
 in a pantry that has sync enabled.  I don't want local-only stuff (birthday gifts,
 etc) being a part of the background data.

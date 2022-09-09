@@ -4,9 +4,9 @@ import { Text, View } from 'react-native';
 import Dialog from 'react-native-dialog';
 
 export default function PantryDetailDialog(props) {
-	const { _Xstate, setXstate, pantryID, setPantryID } = props;
-	const { _Pantries } = useSelector(S => S.pantries);
-	const pantry = _Pantries[pantryID];
+	const { _Xstate, setXstate, listID, setPantryID } = props;
+	const { _Lists } = useSelector(S => S.lists);
+	const pantry = _Lists[listID];
 
 	const handleExport = _ => {
 		console.log('handleExport', pantry);

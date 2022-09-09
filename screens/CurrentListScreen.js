@@ -1,6 +1,6 @@
 // PantryScreen.js
 // Handles the bulk of the application logic, displays items stored in
-// _Pantries[currentPantry].inventory in a third-party SwipeListView, handles
+// _Lists[currentList].inventory in a third-party SwipeListView, handles
 // selection buttons, etc
 
 // react, RN, community imports
@@ -19,21 +19,21 @@ import Footer from '../components/FooterComponent';
 import PantryItem from '../components/PantryItem';
 
 // slice imports
-import * as Pantry from '../slices/pantriesSlice';
-import * as Inv from '../slices/inventorySlice';
+import * as Pantry from '../slices/listsSlice';
+import * as Inv from '../slices/itemStoreSlice';
 
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function PantryScreen(props) {
+export default function CurrentListScreen({ _Xstate, setXstate }) {
 	const { drawerCtl, nav, setNav } = props;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { _Inventory } = useSelector(S => S.inventory);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
 	const dispatch = useDispatch();
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_Inventory)[0]);
+	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_ItemStore)[0]);
 	const [ listData, setListData ] = useState([]);
 
 	console.log('PantryScreen', props);
@@ -50,13 +50,13 @@ export default function PantryScreen(props) {
 		// largely-immutable stuff and Pantry has the daily changes.  The props
 		// don't share names so we can just merge them to build our item data set.
 		return Utils.sortPantry(
-			Object.keys(_Pantries[currentPantry].inventory).map(itemID => {
+			Object.keys(_Lists[currentList].inventory).map(itemID => {
 				return {
 					id: itemID,
-					..._Inventory[itemID],
+					..._ItemStore[itemID],
 					..._Images[itemID],
 					..._History[itemID],
-					..._Pantries[currentPantry].inventory[itemID]
+					..._Lists[currentList].inventory[itemID]
 				}
 			}), sortOpts);
 	}
@@ -69,10 +69,10 @@ export default function PantryScreen(props) {
 	const handleCheckBox = itemID => {
 		// Toggle inCart, re-render should happen automatically
 		console.log('handleCheckBox called with item', itemID);
-		const newItem = { ..._Pantries[currentPantry].inventory[itemID] };
+		const newItem = { ..._Lists[currentList].inventory[itemID] };
 		newItem.inCart = !newItem.inCart;
 
-		dispatch(Pantry.updateItemInPantry([ itemID, newItem, currentPantry ]));
+		dispatch(Pantry.updateItemInPantry([ itemID, newItem, currentList ]));
 
 		//dispatch(Pantry.toggleInCart(itemID));
 	}
@@ -101,16 +101,16 @@ export default function PantryScreen(props) {
 	const handleToggleStaple = itemID => {
 		console.log('handleToggleStaple called with item', itemID);
 
-		const staples = [ ..._Pantries[currentPantry].staples ];
+		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
 			dispatch(Pantry.updatePantry({
-				..._Pantries[currentPantry],
+				..._Lists[currentList],
 				staples: staples.filter(i => i !== itemID)
 			}));
 		else // add itemID to array
 			dispatch(Pantry.updatePantry({
-				..._Pantries[currentPantry],
+				..._Lists[currentList],
 				staples: [ ...staples, itemID ]
 			}));
 	};
@@ -127,7 +127,7 @@ export default function PantryScreen(props) {
 			[
 				item.id,
 				{
-					..._Pantries[currentPantry].inventory[item.id],
+					..._Lists[currentList].inventory[item.id],
 					purchaseBy: date.getTime()
 				}
 			]
@@ -176,7 +176,7 @@ export default function PantryScreen(props) {
 					onPress={_ => handleToggleStaple(item.id)}
 					icon={
 						<Icon
-							name={_Pantries[currentPantry].staples.includes(item.id) ? 'toggle-on' : 'toggle-off'}
+							name={_Lists[currentList].staples.includes(item.id) ? 'toggle-on' : 'toggle-off'}
 							type='font-awesome'
 							color='black'
 							style={{ marginRight: 5 }}
@@ -194,7 +194,7 @@ export default function PantryScreen(props) {
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
 
-	useEffect(_ => setListData(generateListData()), [ _Pantries[currentPantry].inventory ]);
+	useEffect(_ => setListData(generateListData()), [ _Lists[currentList].inventory ]);
 
 	useEffect(_ => console.log('itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
@@ -205,8 +205,8 @@ export default function PantryScreen(props) {
 				controls
 				nav={nav}
 				setNav={setNav}
-				title={currentPantry === -1 ? 'No pantry loaded!' :
-					`${_Pantries[currentPantry].name}: Pantry view`
+				title={currentList === -1 ? 'No pantry loaded!' :
+					`${_Lists[currentList].name}: Pantry view`
 				}
 			/>
 			<SwipeListView

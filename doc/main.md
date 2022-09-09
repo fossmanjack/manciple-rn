@@ -23,7 +23,7 @@ RN-navigation
 const [ nav, setNav ] = useState('...');
 const [ navHist, setNavHist ] = useState([]);
 
-const updateNavigation = screen/pantryID => {
+const updateNavigation = screen/listID => {
 	setNav(screen); // can either be "options" or just a pantry ID
 	setNavHist([ screen, ...navHist ]);
 }
@@ -34,13 +34,13 @@ navHist?
 
 ---
 
-I think I need to just save the _Pantries array to storage every time it's updated --
+I think I need to just save the _Lists array to storage every time it's updated --
 
 1. check to see if it's been updated since last push
 2. if ... and here we introduce the possibility of collision
 
 No, I think what I really need to do is save the history chain to the remote server
-in order to prevent collisions.  Each time a pantriesSlice action is dispatched, it
+in order to prevent collisions.  Each time a listsSlice action is dispatched, it
 should push that action onto the remote stack, and then the remote stack should unshift ...
 
 Remote stack is array of action objects:
@@ -58,5 +58,5 @@ history queue and dump it all to ... yeah, no go.
 Honestly I'm not sure this is feasible to do without a database of some kind, because
 at least that way it would be pretty straightforward to simply log the dispatches
 and play them back when a client connected, but I'm gonna soldier on.  I think the
-"save the _Pantries after every dispatch" is workable, it's just a question of
+"save the _Lists after every dispatch" is workable, it's just a question of
 keeping the file in sync with the remote.  Maybe compare hashes every so often?

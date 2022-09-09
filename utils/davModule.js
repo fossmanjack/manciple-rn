@@ -51,7 +51,7 @@ export default function davClient(state) {
 
 /*
 export async function saveStateToDAV() {
-	const { pantries, options: { dav }, global: { clientID }} = _Store.getState();
+	const { lists, options: { dav }, global: { clientID }} = _Store.getState();
 
 	const { username, password } = await JSON.parse(SecureStore.getItemAsync('userinfo'));
 	console.log(dav);
@@ -76,7 +76,7 @@ export async function saveStateToDAV() {
 	const mancipleData = {
 		timestamp: Date.now(),
 		clientID,
-		pantries
+		lists
 	}
 
 

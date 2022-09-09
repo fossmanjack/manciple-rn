@@ -11,7 +11,7 @@ import SortOrderDialog from '../components/SortOrderDialog';
 
 // import slices
 import * as Global from '../slices/globalSlice';
-import * as Pantry from '../slices/pantriesSlice';
+import * as Pantry from '../slices/listsSlice';
 
 // function def
 export default function Header({ _Xstate, setXstate }) {
@@ -22,20 +22,20 @@ export default function Header({ _Xstate, setXstate }) {
 		showSortDialog
 		funs: { drawerCtl }
 	} = _Xstate;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
+	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleToggleMode = _ => {
-		console.log('handleToggleMode', currentPantry, ':', _Pantries[currentPantry].name);
+		console.log('handleToggleMode', currentList, ':', _Lists[currentList].name);
 		console.log('*******************');
 
 		setXstate(currentPage === 'pantry'
 			? {
 				'currentPage': 'itemStore',
-				'headerTitle': `Item Store (${_Pantries[currentPantry].name})`,
+				'headerTitle': `Item Store (${_Lists[currentList].name})`,
 				'headerControls': true
 			} : {
 				'currentPage': 'pantry',
-				'headerTitle': `${_Pantries[pantryID].name}: List view`,
+				'headerTitle': `${_Lists[listID].name}: List view`,
 				'headerControls': true
 			});
 	}

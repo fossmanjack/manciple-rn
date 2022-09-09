@@ -38,8 +38,8 @@ export default function InventoryItem({ item, exports }) {
 		handleCheckBox,
 		handleDateChange
 	} = exports;
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { _Inventory } = useSelector(S => S.inventory);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.inventory);
 
 	const onCalendarChange = (event, selectedDate) => {
 		console.log('called onCalendarChange with event', event, 'selectedDate', selectedDate);
@@ -49,7 +49,7 @@ export default function InventoryItem({ item, exports }) {
 	}
 
 	const CheckBox = _ => {
-		const listed = Object.keys(_Pantries[currentPantry].inventory).includes(item.id);
+		const listed = Object.keys(_Lists[currentList].inventory).includes(item.id);
 
 		return (
 			<Button

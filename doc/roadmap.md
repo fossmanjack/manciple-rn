@@ -56,7 +56,7 @@ cancel and ok buttons), so next I should probably implement pantry mode.
 - [ ] finish item edit dialog
 - [ ] fix calendar bug
 - [ ] auto-calculate intervals
-- [ ] import/export pantries
+- [ ] import/export lists
 - [x] move item status icons to IconTray component
 - [ ] add chips for tag management to item and pantry detail
 - [ ] convert item and pantry dates to human-readable format

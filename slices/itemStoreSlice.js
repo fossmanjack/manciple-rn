@@ -1,20 +1,20 @@
-// inventorySlice.js
+// itemStoreSlice.js
 // Handles actions for adding, updating, or deleting items
-// 76149.1: updated to standardize inputs and treat _Inventory as an object
+// 76149.1: updated to standardize inputs and treat _ItemStore as an object
 
 import { createSlice } from '@reduxjs/toolkit';
 import { INVENTORY } from '../res/DEFAULT';
 import * as Utils from '../utils/utils';
 
 const initialState = {
-	_Inventory: INVENTORY,
+	_ItemStore: ITEMSTORE,
 	_History: { },
 	_Images: { },
 	deleted: [ ]
 }
 
-const inventorySlice = createSlice({
-	name: 'inventory',
+const itemStoreSlice = createSlice({
+	name: 'itemStore',
 	initialState,
 	reducers: {
 		// all reducers should take itemID or [ itemID, { props }] as payload
@@ -26,20 +26,20 @@ const inventorySlice = createSlice({
 			if(!itemID || !props || props.type !== 'item') return iState;
 
 			// does the item already exist?  If so, treat as an update
-			if(Object.keys(iState._Inventory).includes(itemID)) {
+			if(Object.keys(iState._ItemStore).includes(itemID)) {
 				props = {
-					...iState._Inventory[itemID],
+					...iState._ItemStore[itemID],
 					...props
 				};
 			}
 
 			// does the item share a camelized name with an existing item?  If so,
 			// use those values instead
-			if(Object.values(iState._Inventory).find(ob => Utils.camelize(ob.name) === Utils.camelize(props.name))) {
-				itemID = Object.keys(iState._Inventory).find(key =>
-					Utils.camelize(iState._Inventory[key].name) === Utils.camelize(props.name));
+			if(Object.values(iState._ItemStore).find(ob => Utils.camelize(ob.name) === Utils.camelize(props.name))) {
+				itemID = Object.keys(iState._ItemStore).find(key =>
+					Utils.camelize(iState._ItemStore[key].name) === Utils.camelize(props.name));
 				props = {
-					...iState._Inventory[itemID],
+					...iState._ItemStore[itemID],
 					...props
 				};
 			}
@@ -47,8 +47,8 @@ const inventorySlice = createSlice({
 			// replace or insert the object associated with the itemID
 			return {
 				...iState,
-				_Inventory: {
-					...iState._Inventory,
+				_ItemStore: {
+					...iState._ItemStore,
 					[itemID]: props
 				}
 			}
@@ -64,10 +64,10 @@ const inventorySlice = createSlice({
 			//props = { ...props, modifyDate: Date.now() };
 			return {
 				...iState,
-				_Inventory: {
-					...iState._Inventory,
+				_ItemStore: {
+					...iState._ItemStore,
 					[itemID]: {
-						...iState._Inventory[itemID],
+						...iState._ItemStore[itemID],
 						...props
 					}
 				}
@@ -77,7 +77,7 @@ const inventorySlice = createSlice({
 			// For deleting an item from inventory
 			// expects an item ID
 			if(!action.payload) return iState;
-			const newInv = { ...iState._Inventory };
+			const newInv = { ...iState._ItemStore };
 			const newHist = { ...iState._History };
 			const newImg = { ...iState._Images };
 
@@ -87,7 +87,7 @@ const inventorySlice = createSlice({
 
 			return {
 				...iState,
-				_Inventory: newInv,
+				_ItemStore: newInv,
 				_History: newHist,
 				_Images: newImg,
 				deleted: [ ...iState.deleted, action.payload ]
@@ -192,15 +192,15 @@ const inventorySlice = createSlice({
 			// update the purchase interval of an item
 			// expects itemID as payload
 			if(!action.payload) return iState;
-			const updatedItem = { ...iState._Inventory[action.payload] };
+			const updatedItem = { ...iState._ItemStore[action.payload] };
 			if(Utils.nullp(updatedItem)) return iState;
 
 			updatedItem.interval = Utils.calculateInterval(updatedItem);
 
 			return {
 				...iState,
-				_Inventory: {
-					...iState._Inventory,
+				_ItemStore: {
+					...iState._ItemStore,
 					[itemID]: updatedItem
 				}
 			}
@@ -208,7 +208,7 @@ const inventorySlice = createSlice({
 	}
 });
 
-export const inventoryReducer = inventorySlice.reducer;
+export const itemStoreReducer = itemStoreSlice.reducer;
 
 export const {
 	addItem,
@@ -221,5 +221,5 @@ export const {
 	addImage,
 	deleteImage,
 	updateInterval
-} = inventorySlice.actions;
+} = itemStoreSlice.actions;
 

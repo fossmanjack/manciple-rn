@@ -9,50 +9,50 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
 import uuid from 'react-native-uuid';
-import * as Pantry from '../slices/pantriesSlice';
-import * as Inv from '../slices/inventorySlice';
+import * as Lists from '../slices/listsSlice';
+import * as Ist from '../slices/itemStoreSlice';
 import * as Utils from '../utils/utils';
 import { _Styles } from '../res/_Styles';
 import { _Store } from '../res/_Store';
 
 export default function Footer(props) {
 	const [ inputText, setInputText ] = useState('');
-	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const { _Inventory } = useSelector(S => S.inventory);
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { handleSweepAll, dumpListData } = props;
 	const dispatch = useDispatch();
 
 	const handleSubmit = _ => {
-		console.log('handleSubmit', currentPantry, inputText);
+		console.log('handleSubmit', currentList, inputText);
 
 		if(inputText) { // if there's text, parse it and add an item to the pantry
 			let [ name = 'New item', qty, ...preTags ] = inputText.split(',');
 			if(qty) qty = qty.trim();
 			const tags = preTags.length ? preTags.map(t => Utils.camelize(Utils.sanitize(t.trim()))) : [ ];
 
-			let itemID = Object.keys(_Inventory).find(key =>
-				Utils.camelize(Utils.sanitize(_Inventory[key].name)) ===
+			let itemID = Object.keys(_ItemStore).find(key =>
+				Utils.camelize(Utils.sanitize(_ItemStore[key].name)) ===
 				Utils.camelize(Utils.sanitize(name)));
 			if(!itemID) {
-				// if item doesn't exist, push it to _Inventory
-				const newItem = Utils.createPantryItem({
+				// if item doesn't exist, push it to _ItemStore
+				const newItem = Utils.createListItem({
 					name,
 					tags,
-					parents: [ currentPantry ],
+					parents: [ currentList ],
 					defaultQty: qty || ''
 				});
-				dispatch(Inv.addItem([ uuid.v4(), newItem ]));
+				dispatch(Ist.addItem([ uuid.v4(), newItem ]));
 			}
 			else {
-				invItem = { ..._Inventory[itemID] };
-				if(!invItem.parents.includes(currentPantry))
-					dispatch(Inv.updateItem([ itemID, {
+				invItem = { ..._ItemStore[itemID] };
+				if(!invItem.parents.includes(currentList))
+					dispatch(Ist.updateItem([ itemID, {
 						parents: [
 							...invItem.parents,
-							currentPantry
+							currentList
 						]
 					}));
-				dispatch(Pantry.addItemToPantry([ itemID,
+				dispatch(Lists.addItemToList([ itemID,
 					{
 						inCart: false,
 						qty: qty || invItem.defaultQty || '1',
@@ -63,23 +63,23 @@ export default function Footer(props) {
 				]));
 
 		} else { // if no text, add all staples
-			console.log('handleSubmit all:', _Pantries[currentPantry].staples);
-			_Pantries[currentPantry].staples.forEach(itemID => {
+			console.log('handleSubmit all:', _Lists[currentList].staples);
+			_Lists[currentList].staples.forEach(itemID => {
 				console.log('processing staple', itemID);
 				// If the item is already listed, continue
-				if(Object.keys(_Pantries[currentPantry].inventory).includes(itemID)) return;
-				const invItem = _Inventory[itemID];
+				if(Object.keys(_Lists[currentList].inventory).includes(itemID)) return;
+				const invItem = _ItemStore[itemID];
 
 				if(Utils.nullp(invItem)) { // if the ID isn't in inventory, toss it
 					console.log('found bad id', id);
-					dispatch(Pantry.updatePantry([ currentPantry,
+					dispatch(Lists.updateList([ currentList,
 						{
-							staples: _Pantries[currentPantry].staples.filter(i => i.id === id)
+							staples: _Lists[currentList].staples.filter(i => i.id === id)
 						}
 					]));
 				} else { // otherwise add it to the list
 					console.log('adding item', itemID);
-					dispatch(Pantry.addItemToPantry([ itemID,
+					dispatch(Lists.addItemToList([ itemID,
 						{
 							inCart: false,
 							qty: invItem.defaultQty || '1',
@@ -118,7 +118,7 @@ export default function Footer(props) {
 				color='royalblue'
 				reverse
 				onPress={handleSubmit}
-				disabled={currentPantry === -1}
+				disabled={currentList === -1}
 			/>
 			<Icon
 				style={_Styles.footerIcon}
