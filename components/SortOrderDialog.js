@@ -10,8 +10,11 @@ import { Button, Icon } from 'react-native-elements';
 import Dialog from 'react-native-dialog';
 import * as Options from '../slices/optionsSlice';
 
-export default function SortOrderDialog(props) {
-	const { dispatch, visible, setVisible } = props;
+export default function SortOrderDialog({ _Xstate, setXstate }) {
+	const {
+		showSortOrder,
+		funs: { dispatch }
+	} = _Xstate;
 	const [ sortField, sortAsc ] = useSelector(S => S.options.sortOpts);
 	const [ ascending, setAscending ] = useState(sortAsc);
 	const [ field, setField ] = useState(sortField);
@@ -25,7 +28,7 @@ export default function SortOrderDialog(props) {
 
 	const handleClose = _ => {
 		dispatch(Options.setSortOpts([ field, ascending ]));
-		setVisible(!visible);
+		setXstate({ 'showSortOrder': false });
 	}
 
 	const RadioButton = props => {
@@ -60,7 +63,7 @@ export default function SortOrderDialog(props) {
 
 	return (
 		<Dialog.Container
-			visible={visible}
+			visible={showSortOrder}
 			onBackdropPress={handleClose}
 			onRequestClose={handleClose}
 		>

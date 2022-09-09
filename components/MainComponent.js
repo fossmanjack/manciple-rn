@@ -3,46 +3,20 @@
 
 // Import React, RN, Redux native and community components
 import {
-	useEffect,
 	useState,
 	useRef
 } from 'react';
 import {
-	Alert,
-	DrawerLayoutAndroid,
-	FlatList,
-	Modal,
-	Pressable,
-	Text,
-	TouchableOpacity,
-	View
+	DrawerLayoutAndroid
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	Button,
-	Card,
-	Icon,
-	Input
-} from 'react-native-elements';
-
-// import third-party components
-import { SwipeListView } from 'react-native-swipe-list-view';
-import Dialog from 'react-native-dialog';
 
 // Import local components
-import NavDrawer from './NavDrawerComponent';
-import PantryItem from './PantryItem';
-import Screen from './ScreenComponent';
-
-// Import dialogs and modals
-import PantryCreateDialog from './NewPantryDialog';
-import PantryDeleteDialog from './PantryDeleteDialog';
-import PantryDetailDialog from './PantryDetailDialog';
-import PantryEditDialog from './PantryEditDialog';
-import SortOrderDialog from './SortOrderDialog';
+import NavDrawer from '../components/NavDrawerComponent';
+import Screen from '../components/ScreenComponent';
+import ModalDialogComponent from '../components/ModalDialogComponent';
 
 // slice imports
-//import createPantryItem from '../slices/pantryItemSlice';
 import * as Pantry from '../slices/pantriesSlice';
 import * as Global from '../slices/globalSlice';
 
@@ -51,17 +25,9 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function Main() {
-	const dispatch = useDispatch();
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { debug, sortOpts } = useSelector(S => S.options);
-	const [ pantryToEdit, setPantryToEdit ] = useState(Object.keys(_Pantries)[0]);
-	const [ nav, setNav ] = useState('pantry');
 	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
-
-	// Modal and Dialog toggles
-	const [ showNewPantryDialog, setShowNewPantryDialog ] = useState(false);
-	const [ showPantryDetailDialog, setShowPantryDetailDialog ] = useState(false);
-	const [ showPantryEditDialog, setShowPantryEditDialog ] = useState(false);
 
 	// Input field variables
 	const [ inputNewPantry, setInputNewPantry ] = useState('');
@@ -71,17 +37,23 @@ export default function Main() {
 // Transient Application State (_Xstate)
 	const _Xstate = {
 		currentPage: 'pantry',
-		dispatch: useDispatch(),
 		drawerOpen: false,
 		itemToEdit: Object.keys(_Inventory)[0],
+		listData: [],
 		pantryToEdit: Object.keys(_Pantries)[0],
 		showPantryCreate: false,
 		showPantryDelete: false,
 		showPantryDetail: false,
 		showPantryEdit: false,
+		showItemEdit: false,
+		showSortOrder: false,
 		deleteItems: false,
+		headerTitle: 'Manciple',
+		headerControls: false,
 		funs: {
-			drawerCtl
+			drawerCtl,
+			dispatch: useDispatch(),
+			handlePantryChange
 		}
 	};
 /*
@@ -121,9 +93,14 @@ export default function Main() {
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
 	}
 
-	const handlePantryChange = pantryID => { console.log('handleListChange', pantryID);
+	const handlePantryChange = pantryID => {
+		console.log('handleListChange', pantryID);
 		dispatch(Pantry.setPantry(pantryID));
-		setNav('pantry');
+		setXstate({
+			'currentPage': 'pantry',
+			'headerTitle': `${_Pantries[pantryID].name}: List view`,
+			'headerControls': true
+		});
 		drawerCtl(false);
 
 /*
@@ -133,8 +110,7 @@ export default function Main() {
 */
 	};
 
-// modal functions
-
+//
 	const showPantryDetail = pantryID => {
 		setPantryToEdit(_Pantries[pantryID]);
 		setShowPantryDetailDialog(true);
@@ -149,53 +125,26 @@ export default function Main() {
 			drawerPosition='left'
 			renderNavigationView={_ =>
 				<NavDrawer
-					exports={{
-						drawer: drawer.current,
-						handlePantryChange,
-						setShowNewPantryDialog,
-						setNav,
-						showNewPantryDialog,
-						showPantryDetail
-					}}
+					drawer={drawer.current}
+					_Xstate={_Xstate}
+					setXstate={setXstate}
 				/>
 			}
-			key={nav}
+			key={_Xstate.currentPage}
 			onDrawerOpen={_ => setDrawerIsOpen(true)}
 			onDrawerClose={_ => setDrawerIsOpen(false)}
-			keyboardShouldPersistTaps='always'
 		>
+			<Header
+				_Xstate={_Xstate}
+				setXstate={setXstate}
+			/>
 			<Screen
-				exports={{ nav, setNav, drawerCtl }}
 				_Xstate={_Xstate}
 				setXstate={setXstate}
 			/>
-			<PantryCreateDialog
+			<ModalDialogComponent
 				_Xstate={_Xstate}
 				setXstate={setXstate}
-			/>
-			<PantryDetailDialog
-				_Xstate={_Xstate}
-				setXstate={setXstate}
-				pantryID={pantryToEdit}
-				handleEditPantry={_ => {
-					setShowPantryDetailDialog(false);
-					setShowPantryEditDialog(true);
-				}}
-				key={`${pantryToEdit}-detail`}
-			/>
-			<PantryEditDialog
-				_Xstate={_Xstate}
-				setXstate={setXstate}
-				pantryID={pantryToEdit}
-				setPantryID={setPantryToEdit}
-				key={`${pantryToEdit}-edit`}
-			/>
-			<PantryDeleteDialog
-				_Xstate={_Xstate}
-				setXstate={setXstate}
-				pantryID={pantryToEdit}
-				setPantryID={setPantryToEdit}
-				key={`${pantryToEdit}-delete`}
 			/>
 		</DrawerLayoutAndroid>
 	);

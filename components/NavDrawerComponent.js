@@ -4,7 +4,7 @@
 // Might be replaced with react-native-navigation
 
 // react, RN, community imports
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
 	FlatList,
 	Pressable,
@@ -16,24 +16,20 @@ import {
 } from 'react-native-elements';
 
 // component imports
-import UserComponent from './UserComponent';
+import UserComponent from '../components/UserComponent';
 
-export default function NavDrawer(props) {
+export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 	const {
-		drawer,
-		handlePantryChange,
-		setShowNewPantryDialog,
-		setNav,
-		showNewPantryDialog,
-		showPantryDetail
-	} = props.exports;
+		showPantryDetail,
+		showPantryCreate,
+		funs: { handlePantryChange }
+	} = _Xstate;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const dispatch = useDispatch();
 
 	return (
 		<>
-			<UserComponent setNav={setNav} drawer={drawer} />
-			{ _Pantries.length > 0 &&
+			<UserComponent drawer={drawer} _Xstate={_Xstate} setXstate={setXstate} />
+			{ Object.keys(_Pantries).length &&
 				<FlatList
 					data={Object.keys(_Pantries)}
 					keyExtractor={key => key}
@@ -41,7 +37,13 @@ export default function NavDrawer(props) {
 						const pantry = _Pantries[key];
 						<Pressable
 							onPress={_ => handlePantryChange(key)}
-							onLongPress={_ => showPantryDetail(pantry)}
+							onLongPress={_ => {
+								setXstate({
+									'showPantryDetail': true,
+									'pantryToEdit': key
+								});
+								drawer.closeDrawer();
+							}}
 							style={{
 								borderBottomWidth: 1,
 								borderBottomColor: 'lightgray',
@@ -79,8 +81,12 @@ export default function NavDrawer(props) {
 				onPress={_ => {
 					console.log('New pantry pressed');
 					drawer.closeDrawer();
-					setNav('pantry');
-					setShowNewPantryDialog(!showNewPantryDialog);
+					setXstate({
+						'currentPage': 'pantry',
+						'headerTitle': `${_Pantries[currentPantry].name}: List view`,
+						'headerControls': true,
+						'showPantryCreate': true
+					});
 				}}
 				style={{
 					borderBottomWidth: 1,
@@ -119,7 +125,11 @@ export default function NavDrawer(props) {
 					paddingVertical: 10,
 				}}
 				onPress={_ => {
-					setNav('options');
+					setXstate({
+						'currentPage': 'options',
+						'headerTitle': 'Manciple Options',
+						'headerControls': false
+					});
 					drawer.closeDrawer();
 				}}
 			>
@@ -154,7 +164,11 @@ export default function NavDrawer(props) {
 					paddingVertical: 10,
 				}}
 				onPress={_ => {
-					setNav('help');
+					setXstate({
+						'currentPage': 'help',
+						'headerTitle': 'Manciple Help',
+						'headerControls': false
+					});
 					drawer.closeDrawer();
 				}}
 			>

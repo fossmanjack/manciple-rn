@@ -5,7 +5,6 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
-import { useDispatch, useSelector } from 'react-redux';
 
 // import custom components
 import SortOrderDialog from '../components/SortOrderDialog';
@@ -15,25 +14,30 @@ import * as Global from '../slices/globalSlice';
 import * as Pantry from '../slices/pantriesSlice';
 
 // function def
-export default function Header(props) {
+export default function Header({ _Xstate, setXstate }) {
 	const {
-		drawerCtl,
-		title,
-		controls=false,
-		nav,
-		setNav,
-	} = props;
+		currentPage,
+		headerTitle,
+		headerControls,
+		showSortDialog
+		funs: { drawerCtl }
+	} = _Xstate;
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
-	const dispatch = useDispatch();
-	const [ showSortDialog, setShowSortDialog ] = useState(false);
 
 	const handleToggleMode = _ => {
-		console.log('handleToggleMode', _Pantries[currentPantry].id, ':', _Pantries[currentPantry].name);
-		//_Pantries[currentPantry].inventory.forEach(item => console.log(`Item ${item.id}: needed: ${item.needed}, listed: ${item.listed}`));
+		console.log('handleToggleMode', currentPantry, ':', _Pantries[currentPantry].name);
 		console.log('*******************');
 
-		const target = nav === 'pantry' ? 'inventory' : 'pantry';
-		setNav(target);
+		setXstate(currentPage === 'pantry'
+			? {
+				'currentPage': 'itemStore',
+				'headerTitle': `Item Store (${_Pantries[currentPantry].name})`,
+				'headerControls': true
+			} : {
+				'currentPage': 'pantry',
+				'headerTitle': `${_Pantries[pantryID].name}: List view`,
+				'headerControls': true
+			});
 	}
 
 	return (
@@ -55,12 +59,12 @@ export default function Header(props) {
 						{title}
 					</Text>
 				</View>
-				{ controls &&
+				{ headerControls &&
 					(
 						<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
 							<Button
 								onPress={handleToggleMode}
-								icon={nav === 'pantry'
+								icon={currentPage === 'pantry'
 									? <Icon
 										name='list-status'
 										type='material-community'
@@ -77,7 +81,7 @@ export default function Header(props) {
 							<Icon
 								name='sort'
 								type='material'
-								onPress={_ => setShowSortDialog(!showSortDialog)}
+								onPress={_ => setXstate({ 'showSortOrder': true })}
 								reverse
 								color='royalblue'
 							/>
@@ -85,11 +89,6 @@ export default function Header(props) {
 					)
 				}
 			</View>
-			<SortOrderDialog
-				dispatch={dispatch}
-				visible={showSortDialog}
-				setVisible={setShowSortDialog}
-			/>
 		</>
 	);
 }

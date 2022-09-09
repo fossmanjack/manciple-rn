@@ -13,7 +13,6 @@ import { Button, Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // custom component imports
-import EditItemModal from '../components/EditItemModal';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/FooterComponent';
 import InventoryItem from '../components/InventoryItem';
@@ -26,21 +25,31 @@ import * as Inv from '../slices/inventorySlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function InventoryScreen(props) {
-	const { drawerCtl, nav, setNav } = props;
+export default function ItemStoreScreen(props) {
+	const { _Xstate, setXstate } = props;
+	const {
+		listData,
+		itemToEdit,
+		showItemEdit,
+		funs: { drawerCtl, dispatch }
+	} = _Xstate;
+
+
 	const { _Pantries, currentPantry } = useSelector(S => S.pantries);
 	const { _Inventory } = useSelector(S => S.inventory);
 	const { sortOpts } = useSelector(S => S.options);
-	const dispatch = useDispatch();
+
+/*
 	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
 	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_Inventory)[0]);
 	const [ showDeleteDialog, setShowDeleteDialog ] = useState(false);
 	const [ itemToDelete, setItemToDelete ] = useState('');
 	const [ listData, setListData ] = useState([]);
+*/
 
-	const toggleEditItemVisible = _ => {
-		console.log('toggleEditItemVisible called');
-		setShowEditItemModal(!showEditItemModal);
+	const toggleItemEditModal = _ => {
+		console.log('toggleItemEditModal called');
+		setXstate({ 'showItemEdit': !_Xstate.showItemEdit });
 	}
 
 	const generateListData = _ => {
@@ -86,7 +95,7 @@ export default function InventoryScreen(props) {
 		Alert.alert(
 			'Delete item?',
 			`Are you sure you want to delete ${item.name} from ` +
-			`your global pantry?  This will erase all detail and purchase history!`,
+			`the item store?  This will erase all detail and purchase history!`,
 			[
 				{
 					text: 'Cancel',
@@ -224,19 +233,11 @@ export default function InventoryScreen(props) {
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
 
-	useEffect(_ => setListData(generateListData()), [ _Inventory ]);
+	//useEffect(_ => setListData(generateListData()), [ _Inventory ]);
+	useEffect(_ => setXstate({ 'listData': generateListData() }), [ _Inventory ]);
 
 	return (
 		<>
-			<Header
-				drawerCtl={drawerCtl}
-				controls
-				nav={nav}
-				setNav={setNav}
-				title={currentPantry === -1 ? 'No pantry loaded!' :
-					`${_Pantries[currentPantry].name}: Inventory view`
-				}
-			/>
 			<SwipeListView
 				data={listData}
 				renderItem={renderItem}
@@ -253,13 +254,6 @@ export default function InventoryScreen(props) {
 				closeOnScroll
 			/>
 			<Footer handleSweepAll={handleSweepAll} />
-			<EditItemModal
-				dispatch={dispatch}
-				visible={showEditItemModal}
-				setVisible={setShowEditItemModal}
-				item={itemToEdit}
-				key={itemToEdit}
-			/>
 		</>
 	);
 }

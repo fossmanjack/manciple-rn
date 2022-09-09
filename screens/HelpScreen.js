@@ -5,15 +5,16 @@ import {
 import Header from '../components/HeaderComponent';
 
 export default function HelpScreen(props) {
-	const { setNav, drawer } = props;
+	const { _Xstate, setXstate } = props;
 
 	return (
 		<View>
 			<Header
-				drawerCtl={drawerCtl}
+				_Xstate={_Xstate}
+				setXstate={setXstate}
 				title='Manciple Help'
 			/>
-			<Pressable onPress={_ => setNav('pantry')}>
+			<Pressable onPress={_ => setXstate({ 'currentPage': 'pantry' })}>
 				<Text>Back to Pantry</Text>
 			</Pressable>
 		</View>

@@ -8,7 +8,32 @@ import UserScreen from '../screens/UserScreen';
 import InventoryScreen from '../screens/InventoryScreen';
 
 export default function Screen(props) {
-	const { exports: { nav, setNav, drawerCtl }} = props;
+	const { _Xstate, setXstate } = props;
+
+	return (
+		{_ => {
+			switch(_Xstate.currentPage) {
+				case 'help':
+					return (<HelpScreen _Xstate={_Xstate} setXstate={setXstate} />);
+					break;
+				case 'itemStore':
+					return (<ItemStoreScreen _Xstate={_Xstate} setXstate={setXstate} />);
+					break;
+				case 'options':
+					return (<OptionsScreen _Xstate={_Xstate} setXstate={setXstate} />);
+					break;
+				case 'pantry':
+					return (<PantryScreen _Xstate={_Xstate} setXstate={setXstate} />);
+					break;
+				case 'user':
+					return (<UserScreen _Xstate={_Xstate} setXstate={setXstate} />);
+					break;
+				default:
+					return (<View><Text>Oops!</Text></View>);
+			}
+		}
+	);
+}
 
 /*
 	switch(nav) {
@@ -25,32 +50,32 @@ export default function Screen(props) {
 			return (<View></View>);
 	}
 */
-	return nav === 'help'
+/*
+	return _Xstate.currentPage === 'help'
 		? <HelpScreen
-			drawerCtl={drawerCtl}
-			setNav={setNav}
+		    _Xstate={_Xstate}
+			setXstate={setXstate}
 		/>
 		: nav === 'options'
 			? <OptionsScreen
-				drawerCtl={drawerCtl}
-				setNav={setNav}
+		    	_Xstate={_Xstate}
+				setXstate={setXstate}
 			/>
 			: nav === 'pantry'
 				? <PantryScreen
-					drawerCtl={drawerCtl}
-					nav={nav}
-					setNav={setNav}
+		    		_Xstate={_Xstate}
+					setXstate={setXstate}
 				/>
 				: nav === 'user'
 					? <UserScreen
-						drawerCtl={drawerCtl}
-						setNav={setNav}
+		    			_Xstate={_Xstate}
+						setXstate={setXstate}
 					/>
 					: nav === 'inventory'
 						? <InventoryScreen
-							drawerCtl={drawerCtl}
-							nav={nav}
-							setNav={setNav}
+		    				_Xstate={_Xstate}
+							setXstate={setXstate}
 						/>
 						: (<View><Text>Oops!</Text></View>);
 }
+*/
