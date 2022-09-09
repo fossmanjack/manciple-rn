@@ -1,9 +1,8 @@
-// Takes in an inventory object and returns edited inventory object
-// What if this is created as a ref in parent object
-// editItemModal = useRef(...)
-// Then handleEdit sets the ref to a new one that grabs the current object to edit
-// That might work?  Otherwise we'll probably have to turn this into a React component
-// or something
+// ItemEditModal.js
+// Exposes an item's props for editing, then dispatches the changes to the
+// appropriate stores
+
+// React, RN, RNE imports
 import { useState, useEffect } from 'react';
 import {
 	Modal,
@@ -15,30 +14,71 @@ import {
 	Button,
 	Input
 } from 'react-native-elements';
-import * as Pantry from '../slices/listsSlice';
-import * as Inv from '../slices/itemStoreSlice';
-import * as Utils from '../utils/utils';
 
-export default function EditItemModal(props) {
-	const { item, visible, setVisible, dispatch } = props;
+// slices
+import * as Lists from '../slices/listsSlice';
+import * as Ist from '../slices/itemStoreSlice';
+
+export default function EditItemModal({ _Xstate }) {
+	const { itemToEdit, showItemEdit, funs: {
+		dispatch,
+		setXstate,
+		parseName,
+		nullp
+	}} = _Xstate;
+	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	// updatedItem holds the props that have been changed
 	// refItem populates the fields and is kept in sync with updatedItem
 	const [ updatedItem, setUpdatedItem ] = useState({});
-	const [ refItem, setRefItem ] = useState({ ...item });
+	const [ refItem, setRefItem ] = useState(
+		{
+			..._ItemStore[itemToEdit],
+			..._Lists[currentList].inventory[itemToEdit],
+			history: [ ..._History[itemToEdit] ],
+			images: [ ..._Images[itemToEdit] ]
+		}
+	);
 
 	// tracking this separately because it's handled separately
 	// staple and purchaseBy are handled elsewhere
-	const [ updatedQty, setUpdatedQty ] = useState(item.qty);
 
-	console.log('EditItemModal', refItem.id, updatedItem);
+	console.log('EditItemModal', itemToEdit, updatedItem);
 
 	const handleCommit = _ => {
+		if(Object.keys(updatedItem).length) { // only do stuff if there are changes
+			const newItem = { ...refItem, ...updatedItem };
+			const toList = {
+				qty: newItem.qty,
+				inCart: newItem.inCart,
+				purchaseBy: newItem.purchaseBy
+			};
+			const toItemStore = {
+				modifyDate: Date.now(),
+				name: Object.keys(_ItemStore).find(key =>
+					parseName(_ItemStore[key].name) === parseName(newItem.name))
+						&& newItem.name
+						: refItem.name,
+				...
+			};
+			const toHistory = updatedItem.history && updatedItem.history.length
+				? [ ...newItem.history ]
+				: null;
+			const toImages = updatedItem.images && updatedItem.images.length
+				? [ ...newItem.images ]
+				: null;
+
+			dispatch(Ist.updateItem([ itemToEdit, toItemStore ]));
+			!nullp(toHistory) && dispatch(Ist.updateHistory([ itemToEdit, toHistory ]));
+			!nullp(toImages) && dispatch(Ist.updateImages([ itemToEdit, toImages ]));
+
+			// since Listview update is keyed to Lists, send this one last
+			dispatch(Lists.updateItemInList([ itemToEdit, toList ]));
+		}
 /*
 		dispatch(Pantry.updateItem({
 			updatedItem: { ...updatedItem, id: Utils.camelize(updatedItem.name) },
 			itemID: item.id
 		}));
-*/
 		// In order to ensure the pantry data is ready to go before the PantryScreen
 		// re-render triggers, handle the pantry data first
 
@@ -70,9 +110,14 @@ export default function EditItemModal(props) {
 			{ ...updatedItem, id: Utils.sanitize(Utils.camelize(updatedItem.name.trim())) }
 		]));
 		setVisible(!visible);
+*/
 	}
 
-	const setProp = (field, val) => {
+	const handleClose = _ => setXstate({ showItemEdit: false });
+
+	const setProp = (field, val) => setUpdatedItem({ ...updatedItem, [field]: val.trim() });
+/*
+		setUpdatedItem({ ...updatedIte
 		console.log('setProp', field, val);
 		field === 'qty' && setUpdatedQty(val);
 		field === 'name' && setUpdatedItem({
@@ -80,6 +125,7 @@ export default function EditItemModal(props) {
 		});
 		setUpdatedItem({ ...updatedItem, [field]: val.trim() });
 	}
+*/
 
 	// subscribe to updatedItem to keep it synced with refItem
 	useEffect(_ => setRefItem({ ...refItem, ...updatedItem }), [ updatedItem ]);
@@ -87,8 +133,8 @@ export default function EditItemModal(props) {
 	return (
 		<Modal
 			transparent={false}
-			visible={visible}
-			onRequestClose={_ => setVisible(!visible)}
+			visible={showItemEdit}
+			onRequestClose={handleClose}
 		>
 			<Text>
 				Name
@@ -103,11 +149,11 @@ export default function EditItemModal(props) {
 			}}>
 				<Button
 					title='Commit'
-					onPress={_ => handleCommit(updatedItem)}
+					onPress={handleCommit}
 				/>
 				<Button
 					title='Cancel'
-					onPress={_ => setVisible(!visible)}
+					onPress={handleClose}
 				/>
 			</View>
 		</Modal>

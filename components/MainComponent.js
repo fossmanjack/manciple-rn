@@ -50,7 +50,11 @@ export default function Main() {
 		funs: {
 			drawerCtl,
 			dispatch: useDispatch(),
-			handlePantryChange
+			handlePantryChange,
+			sanitize: Utils.sanitize,
+			camelize: Utils.camelize,
+			nullp: Utils.nullp,
+			parseName: name => Utils.camelize(Utils.sanitize(name))
 		}
 	};
 
