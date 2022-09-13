@@ -10,19 +10,19 @@ import {
 	Button,
 	Input
 } from 'react-native-elements';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as SecureStore from 'expo-secure-store';
 import Header from '../components/HeaderComponent';
-import * as Pantry from '../slices/listsSlice';
+import * as Lists from '../slices/listsSlice';
 import * as Options from '../slices/optionsSlice';
 import * as Global from '../slices/globalSlice';
 //import * as Dav from '../utils/davModule';
 import * as Saver from '../utils/saver';
 import { _Persist } from '../res/_Store';
 
-export default function OptionsScreen(props) {
-	const { setNav, drawerCtl } = props;
+export default function OptionsScreen({ _Xstate }) {
+	const { dispatch, drawerCtl, navigate } = _Xstate.funs;
 	const _Opts = useSelector(S => S.options);
 //	const [ username, setUsername ] = useState('');
 //	const [ password, setPassword ] = useState('');
@@ -35,10 +35,9 @@ export default function OptionsScreen(props) {
 		{ label: 'None', value: 'none' },
 		{ label: 'NextCloud', value: 'nc' },
 		{ label: 'WebDAV', value: 'dav' },
-		{ label: 'Manciple', value: 'node' }
+		{ label: 'Seneschal', value: 'seneschal' }
 	]);
 
-	const dispatch = useDispatch();
 
 /*
 	useEffect(_ => SecureStore.getItemAsync('userinfo')
@@ -85,7 +84,7 @@ export default function OptionsScreen(props) {
 		console.log('Attempting to restore defaults!');
 		Alert.alert(
 			'Reset Application State',
-			'Are you sure you want to reset the application state?  This will delete all pantry content and purchase history!',
+			'Are you sure you want to reset the application state?  This will delete all list content and purchase history!',
 			[
 				{
 					text: 'Cancel',
@@ -112,13 +111,8 @@ export default function OptionsScreen(props) {
 
 	return (
 		<View
-			keyboardShouldPersistTaps='always'
 			style={styles.mainContainer}
 		>
-			<Header
-				drawerCtl={drawerCtl}
-				title='Options'
-			/>
 			<Text>
 				TBI:
 					- Light/dark mode
@@ -144,8 +138,8 @@ export default function OptionsScreen(props) {
 			</View>
 			<View>
 				<Button
-					onPress={_ => setNav('pantry')}
-					title='Back to Pantry'
+					onPress={_ => navigate('currentList')}
+					title='Back to List View'
 				/>
 			</View>
 			<View>

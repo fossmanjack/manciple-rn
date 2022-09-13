@@ -48,12 +48,12 @@ export const sortList = (inv, [ field, asc ]) => {
 	// Valid fields: name, price, loc, purchaseBy, none
 	// asc is a bool for "ascending"
 	if(!field || field === 'none') return inv;
-	console.log('sortList called', inv, field);
+	//console.log('sortList called', inv, field);
 
 	// For now let's filter out any item that doesn't have the field
 	// defined.  Which shouldn't ever happen but still.
 	return [...inv.filter(ob => ob.hasOwnProperty(field))].sort((a, b) => {
-		console.log('sortList sort', a, b);
+		//console.log('sortList sort', a, b);
 		let x = a[field].toString().toLowerCase();
 		let y = b[field].toString().toLowerCase();
 
@@ -137,7 +137,7 @@ export const getAllTags = _ => {
 	_ItemStore.forEach(item => tagsAcc.concat(item.tags));
 
 	return [ ...new Set(tagsAcc) ].sort((a, b) =>
-		a > b ? 1 : a < b ? : -1 : 0);
+		a > b ? 1 : a < b ? -1 : 0);
 }
 
 /* debugging

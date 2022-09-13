@@ -1,31 +1,39 @@
+// ListCreateDialog.js
+// Dialog for what it says
+
+// React, RN, RNE, redux
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Dialog from 'react-native-dialog';
-import * as Pantry from '../slices/listsSlice';
 
-export default function PantryCreateDialog(props) {
-	const { _Xstate, setXstate } = props;
-	const { dispatch } = _Xstate;
+// Community
+import Dialog from 'react-native-dialog';
+
+// Slices
+import * as Lists from '../slices/listsSlice';
+
+export default function ListCreateDialog({ _Xstate }) {
+	const { dispatch, setXstate, sanitize } = _Xstate.funs;
+
 	const [ input, setInput ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
-	const handleCreatePantry = _ => {
+	const handleCreateList = _ => {
 		const listID = uuid.v4();
 
-		dispatch(Pantry.addPantry([ listID, { name: input }]));
-		dispatch(Pantry.setPantry(listID));
+		dispatch(Lists.addList([ listID, { name: sanitize(input.trim()) }]));
+		dispatch(Lists.setList(listID));
 
 		setInput('');
-		setXstate({ 'showPantryCreate': false });
+		setXstate({ 'showListCreate': false });
 	}
 
 	return (
-		<Dialog.Container visible={_Xstate.showPantryCreate}>
+		<Dialog.Container visible={_Xstate.showListCreate}>
 			<Dialog.Title>
-				Create New Pantry
+				Create New List
 			</Dialog.Title>
 			<Dialog.Input
-				placeholder='New pantry name...'
+				placeholder='New list name...'
 				value={input}
 				onChangeText={t => setInput(t)}
 			/>
@@ -33,10 +41,10 @@ export default function PantryCreateDialog(props) {
 				label='Cancel'
 				onPress={_ => {
 					setInput('');
-					setXstate({ 'showPantryCreate': false });
+					setXstate({ 'showListCreate': false });
 				}}
 			/>
-			<Dialog.Button label='Create' onPress={handleCreatePantry} disabled={!input} />
+			<Dialog.Button label='Create' onPress={handleCreateList} disabled={!input} />
 		</Dialog.Container>
 	);
 }

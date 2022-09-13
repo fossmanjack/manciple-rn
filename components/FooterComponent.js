@@ -1,3 +1,7 @@
+// FooterComponent.js
+// Provides item add and control buttons
+
+// React, RN, RNE, Redux
 import { useState } from 'react';
 import {
 	Pressable,
@@ -6,21 +10,25 @@ import {
 	TextInput,
 	View
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
+
+// Community
 import uuid from 'react-native-uuid';
+
+// Slices
 import * as Lists from '../slices/listsSlice';
-import * as Ist from '../slices/itemStoreSlice';
+import * as Istore from '../slices/itemStoreSlice';
+
+// Utils
 import * as Utils from '../utils/utils';
 import { _Styles } from '../res/_Styles';
-import { _Store } from '../res/_Store';
 
-export default function Footer(props) {
+export default function Footer({ _Xstate }) {
+	const { listData, funs: { dispatch, parseName } } = _Xstate;
 	const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
-	const { handleSweepAll, dumpListData } = props;
-	const dispatch = useDispatch();
 
 	const handleSubmit = _ => {
 		console.log('handleSubmit', currentList, inputText);
@@ -28,11 +36,10 @@ export default function Footer(props) {
 		if(inputText) { // if there's text, parse it and add an item to the pantry
 			let [ name = 'New item', qty, ...preTags ] = inputText.split(',');
 			if(qty) qty = qty.trim();
-			const tags = preTags.length ? preTags.map(t => Utils.camelize(Utils.sanitize(t.trim()))) : [ ];
+			const tags = preTags.length ? preTags.map(t => parseName(t)) : [ ];
 
 			let itemID = Object.keys(_ItemStore).find(key =>
-				Utils.camelize(Utils.sanitize(_ItemStore[key].name)) ===
-				Utils.camelize(Utils.sanitize(name)));
+				parseName(_ItemStore[key].name) === parseName(name));
 			if(!itemID) {
 				// if item doesn't exist, push it to _ItemStore
 				const newItem = Utils.createListItem({
@@ -41,17 +48,17 @@ export default function Footer(props) {
 					parents: [ currentList ],
 					defaultQty: qty || ''
 				});
-				dispatch(Ist.addItem([ uuid.v4(), newItem ]));
+				dispatch(Istore.addItem([ uuid.v4(), newItem ]));
 			}
 			else {
 				invItem = { ..._ItemStore[itemID] };
 				if(!invItem.parents.includes(currentList))
-					dispatch(Ist.updateItem([ itemID, {
+					dispatch(Istore.updateItem([ itemID, {
 						parents: [
 							...invItem.parents,
 							currentList
 						]
-					}));
+					}]));
 				dispatch(Lists.addItemToList([ itemID,
 					{
 						inCart: false,
@@ -61,6 +68,7 @@ export default function Footer(props) {
 							: 0,
 					}
 				]));
+			}
 
 		} else { // if no text, add all staples
 			console.log('handleSubmit all:', _Lists[currentList].staples);
@@ -68,13 +76,12 @@ export default function Footer(props) {
 				console.log('processing staple', itemID);
 				// If the item is already listed, continue
 				if(Object.keys(_Lists[currentList].inventory).includes(itemID)) return;
-				const invItem = _ItemStore[itemID];
 
-				if(Utils.nullp(invItem)) { // if the ID isn't in inventory, toss it
-					console.log('found bad id', id);
+				if(!Object.keys(_ItemStore).includes(itemID)) { // if the ID isn't in inventory, toss it
+					console.log('found bad id', itemID);
 					dispatch(Lists.updateList([ currentList,
 						{
-							staples: _Lists[currentList].staples.filter(i => i.id === id)
+							staples: _Lists[currentList].staples.filter(i => i.id === itemID)
 						}
 					]));
 				} else { // otherwise add it to the list
@@ -83,8 +90,8 @@ export default function Footer(props) {
 						{
 							inCart: false,
 							qty: invItem.defaultQty || '1',
-							purchaseBy: invItem.interval && invItem.history[0]
-								? invItem.history[0] + (invItem.interval * 86400000)
+							purchaseBy: invItem.interval && _History[itemID][0]
+								? _History[itemID][0] + (invItem.interval * 86400000)
 								: 0,
 						}
 					]));
@@ -97,10 +104,23 @@ export default function Footer(props) {
 
 	}
 
+	const handleSweepAll = _ => {
+
+		listData.filter(item => item.inCart).forEach(item => {
+			dispatch(Istore.updateHistory([ item.id, Date.now() ]));
+			dispatch(Lists.deleteItemFromList([ item.id ]));
+		});
+	}
+
 	const dumpState = _ => {
-		const state = _Store.getState();
+		const state = useSelector(S => S);
 
 		console.log(state);
+	}
+
+	const dumpListData = _ => {
+		console.log('Current list data:\n');
+		console.log(listData);
 	}
 
 	return (

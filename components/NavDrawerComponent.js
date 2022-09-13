@@ -18,29 +18,33 @@ import {
 // component imports
 import UserComponent from '../components/UserComponent';
 
-export default function NavDrawer({ drawer, _Xstate, setXstate }) {
+export default function NavDrawer({ drawer, _Xstate }) {
 	const {
-		showPantryDetail,
-		showPantryCreate,
-		funs: { handlePantryChange }
+		showListDetail,
+		showListCreate,
+		funs: { handleListChange, setXstate, navigate }
 	} = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	return (
 		<>
-			<UserComponent drawer={drawer} _Xstate={_Xstate} setXstate={setXstate} />
+			<UserComponent drawer={drawer} _Xstate={_Xstate} />
 			{ Object.keys(_Lists).length &&
 				<FlatList
 					data={Object.keys(_Lists)}
-					keyExtractor={key => key}
-					renderItem={key => (
-						const pantry = _Lists[key];
+					keyExtractor={data => {
+						console.log('keyExtractor:', data);
+						return data;
+					}}
+					renderItem={data => {
+						const list = _Lists[data.item];
+						console.log('NavComponent renderItem:', data, list, list.name);
 						<Pressable
-							onPress={_ => handlePantryChange(key)}
+							onPress={_ => handleListChange(key)}
 							onLongPress={_ => {
 								setXstate({
-									'showPantryDetail': true,
-									'pantryToEdit': key
+									'showListDetail': true,
+									'listToEdit': key
 								});
 								drawer.closeDrawer();
 							}}
@@ -70,23 +74,23 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 										fontSize: 18
 									}}
 								>
-									{pantry.name}
+									{list.name}
 								</Text>
 							</View>
 						</Pressable>
-					)}
+					}}
 				/>
 			}
 			<Pressable
 				onPress={_ => {
-					console.log('New pantry pressed');
+					console.log('New list pressed');
 					drawer.closeDrawer();
 					setXstate({
-						'currentPage': 'pantry',
 						'headerTitle': `${_Lists[currentList].name}: List view`,
 						'headerControls': true,
-						'showPantryCreate': true
+						'showListCreate': true
 					});
+					navigate('currentList');
 				}}
 				style={{
 					borderBottomWidth: 1,
@@ -114,7 +118,7 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 							fontSize: 18
 						}}
 					>
-						New Pantry...
+						New List...
 					</Text>
 				</View>
 			</Pressable>
@@ -126,11 +130,11 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 				}}
 				onPress={_ => {
 					setXstate({
-						'currentPage': 'options',
 						'headerTitle': 'Manciple Options',
 						'headerControls': false
 					});
 					drawer.closeDrawer();
+					navigate('options');
 				}}
 			>
 				<View
@@ -165,11 +169,11 @@ export default function NavDrawer({ drawer, _Xstate, setXstate }) {
 				}}
 				onPress={_ => {
 					setXstate({
-						'currentPage': 'help',
 						'headerTitle': 'Manciple Help',
 						'headerControls': false
 					});
 					drawer.closeDrawer();
+					navigate('help');
 				}}
 			>
 				<View

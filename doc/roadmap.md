@@ -1,3 +1,11 @@
+### Next Steps (2022-09-12)
+
+- [ ] Complete refactor per refactor.md
+- [ ] Test app is in working state
+- [ ] Re-implement persistence
+- [ ] Communicate with Expo server
+- [ ] JWTs
+
 ### Next Steps (2022-09-03)
 
 - [x] Remove persistence until testing revised back-end is done

@@ -2,19 +2,15 @@
 // Handles modals, dialogs, navdrawer, header, loading from back-end
 
 // Import React, RN, Redux native and community components
-import {
-	useState,
-	useRef
-} from 'react';
-import {
-	DrawerLayoutAndroid
-} from 'react-native';
+import { useRef } from 'react';
+import { DrawerLayoutAndroid } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Import local components
 import NavDrawer from '../components/NavDrawerComponent';
 import Screen from '../components/ScreenComponent';
 import ModalDialogComponent from '../components/ModalDialogComponent';
+import Header from '../components/HeaderComponent';
 
 // slice imports
 import * as Lists from '../slices/listsSlice';
@@ -28,16 +24,61 @@ export default function Main() {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
-	const [ drawerIsOpen, setDrawerIsOpen ] = useState(false);
 	const drawer = useRef(null);
 
-// Transient Application State (_Xstate)
-	const _Xstate = {
-		currentPage: 'currentList',
+// Transient Application State (_Xstate) -- functions first
+
+	const navigate = destScreen => {
+		if(destScreen) {
+			setXstate({
+				'screenHist': [ _Xstate.currentScreen, ..._Xstate.screenHist ],
+				'currentScreen': destScreen
+			});
+		} else {
+			newHist = [ ..._Xstate.screenHist ];
+			destScreen = newHist.unshift();
+
+			setXstate({
+				'screenHist': newHist,
+				'currentScreen': destScreen
+			});
+		}
+	}
+
+	const setXstate = props => {
+		console.log('setXstate', props);
+		_Xstate = { ..._Xstate, ...props };
+		console.log('new Xstate:', _Xstate);
+	}
+
+	const drawerCtl = newState => {
+		// if newState is undefined, toggle the drawer
+		// Otherwise, if "true" open the drawer, if "false" close the drawer
+		console.log('drawerCtl: drawerIsOpen?', _Xstate.drawerOpen, newState);
+
+		if(typeof newState === 'undefined') _Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
+	}
+
+	const handleListChange = listID => {
+		console.log('handleListChange', listID);
+		dispatch(Lists.setList(listID));
+		setXstate({
+			'headerTitle': `${_Lists[listID].name}: List view`,
+			'headerControls': true
+		});
+		navigate('currentList');
+		drawerCtl(false);
+
+	};
+
+	var _Xstate = {
+		currentScreen: 'currentList',
+		screenHist: [],
 		drawerOpen: false,
-		itemToEdit: Object.keys(_ItemStore)[0],
+		itemToEdit: Object.keys(_ItemStore)[0] || '',
 		listData: [],
-		listToEdit: Object.keys(_Lists)[0],
+		listToEdit: Object.keys(_Lists)[0] || '',
 		showListCreate: false,
 		showListDelete: false,
 		showListDetail: false,
@@ -45,19 +86,28 @@ export default function Main() {
 		showItemEdit: false,
 		showSortOrder: false,
 		deleteItems: false,
-		headerTitle: `${_Lists[currentList].name}: List view`,
+		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
 		headerControls: false,
 		funs: {
 			drawerCtl,
+			handleListChange,
+			setXstate,
+			navigate,
 			dispatch: useDispatch(),
-			handlePantryChange,
 			sanitize: Utils.sanitize,
 			camelize: Utils.camelize,
 			nullp: Utils.nullp,
-			parseName: name => Utils.camelize(Utils.sanitize(name))
+			parseName: name => Utils.camelize(Utils.sanitize(name.trim())),
 		}
 	};
 
+
+	const handleDateChange = (item, date) => {
+		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
+
+	}
+
+/*
 	const setXstate = props => {
 		if(typeof props !== 'object') return _Xstate;
 		return {
@@ -65,6 +115,7 @@ export default function Main() {
 			...props
 		}
 	}
+*/
 
 // drawer functions
 	const setDrawerOpen = _ => {
@@ -77,26 +128,6 @@ export default function Main() {
 
 	//const drawerCtl = _ => drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
 
-	const drawerCtl = newState => {
-		// if newState is undefined, toggle the drawer
-		// Otherwise, if "true" open the drawer, if "false" close the drawer
-		console.log('drawerCtl: drawerIsOpen?', drawerIsOpen, newState);
-
-		if(typeof newState === 'undefined') drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
-		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
-	}
-
-	const handleListChange = listID => {
-		console.log('handleListChange', listID);
-		dispatch(Lists.setList(listID));
-		setXstate({
-			'currentPage': 'currentList',
-			'headerTitle': `${_Lists[listID].name}: List view`,
-			'headerControls': true
-		});
-		drawerCtl(false);
-
-	};
 
 // render component
 
@@ -109,24 +140,20 @@ export default function Main() {
 				<NavDrawer
 					drawer={drawer.current}
 					_Xstate={_Xstate}
-					setXstate={setXstate}
 				/>
 			}
-			key={_Xstate.currentPage}
-			onDrawerOpen={_ => setDrawerIsOpen(true)}
-			onDrawerClose={_ => setDrawerIsOpen(false)}
+			key={_Xstate.currentScreen}
+			onDrawerOpen={_ => setXstate({ drawerOpen: true })}
+			onDrawerClose={_ => setXstate({ drawerOpen: false })}
 		>
 			<Header
 				_Xstate={_Xstate}
-				setXstate={setXstate}
 			/>
 			<Screen
 				_Xstate={_Xstate}
-				setXstate={setXstate}
 			/>
 			<ModalDialogComponent
 				_Xstate={_Xstate}
-				setXstate={setXstate}
 			/>
 		</DrawerLayoutAndroid>
 	);

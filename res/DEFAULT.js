@@ -1,6 +1,7 @@
-export const LISTS = [
-	{
-		id: 'f050c373-ea40-4ba7-8aef-299f7640970e',
+import uuid from 'react-native-uuid';
+
+export const LISTS = {
+	[uuid.v4()]: {
 		name: 'Groceries',
 		tags: [ 'grocery', 'household', 'cleaning' ],
 		type: 'shoppingList',
@@ -12,7 +13,7 @@ export const LISTS = [
 			'3b706aa4-5f33-4aff-95ee-158c0523adea': { qty: '1', purchaseBy: 0, inCart: false },
 			'910f2d0e-be22-4957-9e16-a716649837bd': { qty: '1', purchaseBy: 0, inCart: true },
 			'09ec4d24-5f47-48c0-9d44-5c6f297fd640': { qty: '2', purchaseBy: 0, inCart: false }
-		}
+		},
 		staples: [
 			'd3bebaa4-d834-49cd-852e-a64f6638a2b4',
 			'3b706aa4-5f33-4aff-95ee-158c0523adea',
@@ -20,8 +21,7 @@ export const LISTS = [
 		],
 		sync: false
 	},
-	{
-		id: 'fb51e865-5838-496e-8d13-886a7e7c26fd',
+	[uuid.v4()]: {
 		name: 'Hardware store',
 		tags: [ 'hardware', 'tool' ],
 		type: 'shoppingList',
@@ -39,7 +39,7 @@ export const LISTS = [
 		],
 		sync: false
 	}
-]
+}
 
 export const ITEMSTORE = {
 	'd3bebaa4-d834-49cd-852e-a64f6638a2b4': {

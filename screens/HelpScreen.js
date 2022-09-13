@@ -4,17 +4,16 @@ import {
 } from 'react-native';
 import Header from '../components/HeaderComponent';
 
-export default function HelpScreen(props) {
-	const { _Xstate, setXstate } = props;
+export default function HelpScreen({ _Xstate }) {
+	const { navigate } = _Xstate.funs;
 
 	return (
 		<View>
 			<Header
 				_Xstate={_Xstate}
-				setXstate={setXstate}
 				title='Manciple Help'
 			/>
-			<Pressable onPress={_ => setXstate({ 'currentPage': 'pantry' })}>
+			<Pressable onPress={_ => navigate('currentList')}>
 				<Text>Back to Pantry</Text>
 			</Pressable>
 		</View>

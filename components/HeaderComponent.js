@@ -5,22 +5,23 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
+import { useSelector } from 'react-redux';
 
 // import custom components
-import SortOrderDialog from '../components/SortOrderDialog';
+import SortOrderDialog from '../dialogs/SortOrderDialog';
 
 // import slices
 import * as Global from '../slices/globalSlice';
-import * as Pantry from '../slices/listsSlice';
+import * as Lists from '../slices/listsSlice';
 
 // function def
-export default function Header({ _Xstate, setXstate }) {
+export default function Header({ _Xstate }) {
 	const {
-		currentPage,
+		currentScreen,
 		headerTitle,
 		headerControls,
-		showSortDialog
-		funs: { drawerCtl }
+		showSortDialog,
+		funs: { drawerCtl, setXstate, navigate }
 	} = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
@@ -28,16 +29,19 @@ export default function Header({ _Xstate, setXstate }) {
 		console.log('handleToggleMode', currentList, ':', _Lists[currentList].name);
 		console.log('*******************');
 
-		setXstate(currentPage === 'pantry'
-			? {
-				'currentPage': 'itemStore',
+		if(currentScreen === 'currentList') {
+			setXstate({
 				'headerTitle': `Item Store (${_Lists[currentList].name})`,
 				'headerControls': true
-			} : {
-				'currentPage': 'pantry',
-				'headerTitle': `${_Lists[listID].name}: List view`,
+			});
+			navigate('itemStore');
+		} else {
+			setXstate({
+				'headerTitle': `${_Lists[currentList].name}: List view`,
 				'headerControls': true
 			});
+			navigate('currentList');
+		}
 	}
 
 	return (
@@ -56,7 +60,7 @@ export default function Header({ _Xstate, setXstate }) {
 				/>
 				<View style={{ flex: 10 }}>
 					<Text style={{ color: 'white', fontSize: 20 }}>
-						{title}
+						{headerTitle}
 					</Text>
 				</View>
 				{ headerControls &&
@@ -64,7 +68,7 @@ export default function Header({ _Xstate, setXstate }) {
 						<View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
 							<Button
 								onPress={handleToggleMode}
-								icon={currentPage === 'pantry'
+								icon={currentScreen === 'currentList'
 									? <Icon
 										name='list-status'
 										type='material-community'

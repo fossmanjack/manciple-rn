@@ -10,10 +10,10 @@ import { Button, Icon } from 'react-native-elements';
 import Dialog from 'react-native-dialog';
 import * as Options from '../slices/optionsSlice';
 
-export default function SortOrderDialog({ _Xstate, setXstate }) {
+export default function SortOrderDialog({ _Xstate }) {
 	const {
 		showSortOrder,
-		funs: { dispatch }
+		funs: { dispatch, setXstate }
 	} = _Xstate;
 	const [ sortField, sortAsc ] = useSelector(S => S.options.sortOpts);
 	const [ ascending, setAscending ] = useState(sortAsc);

@@ -1,7 +1,6 @@
-// PantryScreen.js
-// Handles the bulk of the application logic, displays items stored in
-// _Lists[currentList].inventory in a third-party SwipeListView, handles
-// selection buttons, etc
+// ItemStoreScreen.js
+// For managing the item store directly.  Displays items stored in
+// _ItemStore with SwipeListView.
 
 // react, RN, community imports
 import { useState, useEffect } from 'react';
@@ -15,28 +14,27 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 // custom component imports
 import Header from '../components/HeaderComponent';
 import Footer from '../components/FooterComponent';
-import InventoryItem from '../components/InventoryItem';
+import ItemDisplay from '../components/ItemDisplayComponent';
 
 // slice imports
-import * as Pantry from '../slices/listsSlice';
-import * as Inv from '../slices/itemStoreSlice';
+import * as Lists from '../slices/listsSlice';
+import * as Istore from '../slices/itemStoreSlice';
 
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function ItemStoreScreen(props) {
-	const { _Xstate, setXstate } = props;
+export default function ItemStoreScreen({ _Xstate }) {
 	const {
 		listData,
 		itemToEdit,
 		showItemEdit,
-		funs: { drawerCtl, dispatch }
+		funs: { drawerCtl, dispatch, setXstate }
 	} = _Xstate;
 
 
 	const { _Lists, currentList } = useSelector(S => S.lists);
-	const { _ItemStore } = useSelector(S => S.inventory);
+	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
 
 /*
@@ -53,20 +51,26 @@ export default function ItemStoreScreen(props) {
 	}
 
 	const generateListData = _ => {
-		console.log('Inv: generateListData');
-
-		return Utils.sortPantry(_ItemStore, sortOpts);
+		console.log('Istore: generateListData');
+		return Utils.sortList(Object.keys(_ItemStore).map(itemID => {
+			return {
+				id: itemID,
+				..._ItemStore[itemID],
+				history: [ ..._History[itemID] ],
+				images: [ ..._Images[itemID] ]
+			}
+		}), sortOpts);
 	}
 
 	const handleCheckBox = itemID => {
-		// Add or remove item from current pantry
+		// Add or remove item from current list
 		if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
-			// if it's in the pantry, remove it
-			dispatch(Pantry.deleteItemFromPantry([ itemID, currentList ]));
+			// if it's in the list, remove it
+			dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
 		} else {
-			// if it's not in the pantry, add it
+			// if it's not in the list, add it
 			const itemRef = _ItemStore[itemID];
-			dispatch(Pantry.addItemToPantry([ itemID,
+			dispatch(Lists.addItemToList([ itemID,
 				{
 					inCart: false,
 					purchaseBy: itemRef.interval && _History[itemID] && _History[itemID].length
@@ -76,8 +80,8 @@ export default function ItemStoreScreen(props) {
 				},
 				currentList
 			]));
-			if(!itemRef.parents.includes(currentList)
-				dispatch(Inv.updateItem([ itemID,
+			if(!itemRef.parents.includes(currentList))
+				dispatch(Istore.updateItem([ itemID,
 					{
 						parents: [
 							...itemRef.parents,
@@ -110,24 +114,24 @@ export default function ItemStoreScreen(props) {
 	}
 
 	const deleteItem = itemID => {
-		dispatch(Inv.deleteItem(itemID));
+		dispatch(Istore.deleteItem(itemID));
 
-		_Lists.forEach(pnt => {
-			if(Object.keys(pnt.inventory).includes(itemID))
-				dispatch(Pantry.deleteItemFromPantry([ itemID, pnt.id ]));
+		Object.keys(_Lists).forEach(listID => {
+			if(Object.keys(_Lists[listID].inventory).includes(itemID))
+				dispatch(Lists.deleteItemFromList([ itemID, listID ]));
 		});
 	}
 
 	const handleSweepAll = _ => {
-		// this does the same thing as PantryScreen
+		// this does the same thing as CurrentListScreen
 		listData.filter(item => item.inCart).forEach(item => {
-			dispatch(Inv.updateItem(
+			dispatch(Istore.updateItem(
 				item.id,
 				{
 					history: [ Date.now(), ...item.history ],
 				}
 			));
-			dispatch(Pantry.deleteItemFromPantry(item.id));
+			dispatch(Lists.deleteItemFromList(item.id));
 		});
 	}
 
@@ -137,17 +141,17 @@ export default function ItemStoreScreen(props) {
 		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Pantry.updatePantry([ currentList,
+			dispatch(Lists.updateList([ currentList,
 				{
 					staples: staples.filter(i => i !== itemID)
 				}
 			]));
 		else // add itemID to array
-			dispatch(Pantry.updatePantry([ currentList,
+			dispatch(Lists.updateList([ currentList,
 				{
 					staples: [ ...staples, itemID ]
 				}
-			}));
+			]));
 	};
 
 	const editItem = itemID => {
@@ -159,7 +163,7 @@ export default function ItemStoreScreen(props) {
 	const handleDateChange = (item, date) => {
 		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
 
-		dispatch(Pantry.updateItemInPantry(
+		dispatch(Lists.updateItemInList(
 			[
 				item.id,
 				{
@@ -172,11 +176,12 @@ export default function ItemStoreScreen(props) {
 	}
 
 	const renderItem = (data, rowMap) => {
-		// this needs to be redone since it isn't going to have the pantry
+		// this needs to be redone since it isn't going to have the list
 		// data with it
 		const { item } = data;
 		return (
-			<InventoryItem
+			<ItemDisplay
+				_Xstate={_Xstate}
 				item={item}
 				exports={{
 					handleCheckBox,
@@ -253,7 +258,9 @@ export default function ItemStoreScreen(props) {
 				closeOnRowOpen
 				closeOnScroll
 			/>
-			<Footer handleSweepAll={handleSweepAll} />
+			<Footer
+				_Xstate={_Xstate}
+			/>
 		</>
 	);
 }

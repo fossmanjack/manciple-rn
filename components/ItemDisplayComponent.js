@@ -1,7 +1,9 @@
-// Builds the accordion entry for each pantry item
-// Called from ListView and PantryView
-// Calls ListViewHiddenButtons and PantryViewHiddenButtons
-// Expects the pantry item object and dispatch functions as props
+// ItemDisplayComponent.js
+// Builds the accordion entry for each list item
+// Called from ItemStoreScreen and CurrentListScreen
+
+// React, RN, RNE
+import { useState, useRef } from 'react';
 import {
 	Image,
 	Text,
@@ -14,23 +16,22 @@ import {
 	ListItem,
 	Button
 } from 'react-native-elements';
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
+
+// Community
 import {
 	Collapse,
 	CollapseHeader,
 	CollapseBody
 } from 'accordion-collapse-react-native';
-import { useSelector } from 'react-redux';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Carousel from './Carousel';
+
+// Local
+import Carousel from '../components/CarouselComponent';
 import { _Styles } from '../res/_Styles';
-import { _DefaultImage } from '../res/_DefaultImage';
 import * as Utils from '../utils/utils';
 
-// { Picker } for implementing date selection
-
-
-export default function InventoryItem({ item, exports }) {
+export default function ItemDisplay({ item, _Xstate }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
@@ -38,35 +39,8 @@ export default function InventoryItem({ item, exports }) {
 		handleCheckBox,
 		handleDateChange
 	} = exports;
-	const { _Lists, currentList } = useSelector(S => S.lists);
-	const { _ItemStore } = useSelector(S => S.inventory);
+	const global = _Xstate.currentScreen === 'itemStore' ? true : false;
 
-	const onCalendarChange = (event, selectedDate) => {
-		console.log('called onCalendarChange with event', event, 'selectedDate', selectedDate);
-		setPickDate(selectedDate);
-		handleDateChange(item, selectedDate);
-		setShowCalendar(!showCalendar);
-	}
-
-	const CheckBox = _ => {
-		const listed = Object.keys(_Lists[currentList].inventory).includes(item.id);
-
-		return (
-			<Button
-				type='clear'
-				icon={_ => (
-					<Icon
-						name={listed ? 'minus' : 'plus'}
-						color={listed ? 'red' : 'green'}
-						type='font-awesome'
-						size={32}
-					/>
-				)}
-				onPress={_ => handleCheckBox(item.id)}
-			/>
-		);
-	}
-/*
 	const IconDrawer = item => {
 		return (
 			<View style={{
@@ -112,10 +86,17 @@ export default function InventoryItem({ item, exports }) {
 			</View>
 		);
 	}
+
+/* Differences between ItemStore and List view:
+
+- Checkbox completely different, different functions
+- No qty, purchaseBy, or inCart with global view
+
+Solutions:
+- render different checkboxes
+- only show Qty and purchaseBy lines if in List view
+
 */
-
-
-// Doing it with listview
 
 	return (
 		<Collapse style={{
@@ -125,30 +106,60 @@ export default function InventoryItem({ item, exports }) {
 		}}>
 			<CollapseHeader>
 				<ListItem>
-					<CheckBox />
+					{ global
+						? <Button
+							type='clear'
+							icon={_ => (
+								<Icon
+									name={listed ? 'minus' : 'plus'}
+									color={listed ? 'red' : 'green'}
+									type='font-awesome'
+									size={32}
+								/>
+							)}
+							onPress={_ => handleCheckBox(item.id)}
+						/>
+						: <Button
+							type='clear'
+							icon={_ => (
+								<Icon
+									name={item.inCart ? 'check-square-o' : 'square-o'}
+									type='font-awesome'
+									size={32}
+								/>
+							)}
+							onPress={_ => handleCheckBox(item.id)}
+						/>
+					}
 					<ListItem.Content>
 						<ListItem.Title
-							style={_Styles.textItemName}
+							style={item.inCart
+								? _Styles.textItemNameChecked
+								: _Styles.textItemName
+							}
 						>
 							{item.name}
 						</ListItem.Title>
-						<ListItem.Subtitle style={{
-							flexDirection: 'row',
-							width: '100%',
-						}}>
-							<View style={{
-								flex: 8,
+						{ !global &&
+							<ListItem.Subtitle style={{
 								flexDirection: 'row',
-								alignSelf: 'stretch'
+								width: '100%',
 							}}>
-								<Text style={_Styles.textItemQtyLabel}>
-									Default Qty:
-								</Text>
-								<Text style={_Styles.textItemQty}>
-									{item.defaultQty}
-								</Text>
-							</View>
-						</ListItem.Subtitle>
+								<View style={{
+									flex: 8,
+									flexDirection: 'row',
+									alignSelf: 'stretch'
+								}}>
+									<Text style={_Styles.textItemQtyLabel}>
+										Qty:
+									</Text>
+									<Text style={_Styles.textItemQty}>
+										{item.qty}
+									</Text>
+								</View>
+								<IconDrawer item={item} />
+							</ListItem.Subtitle>
+						}
 					</ListItem.Content>
 				</ListItem>
 			</CollapseHeader>
@@ -156,6 +167,7 @@ export default function InventoryItem({ item, exports }) {
 				padding: 20
 			}}>
 				<Carousel
+					_Xstate={_Xstate}
 					item={item}
 					width={200}
 					height={200}
@@ -189,14 +201,41 @@ export default function InventoryItem({ item, exports }) {
 							{item.history[0] ? Utils.parseDate(item.history[0]) : '-'}
 						</Text>
 					</View>
-					<View style={{ flex: 3 }}>
-						<Text style={_Styles.textItemDetailLabel}>
-							Interval:
-						</Text>
-						<Text style={_Styles.textItemDetailText}>
-							{item.interval || '-'}
-						</Text>
-					</View>
+					{ !global &&
+						<View style={{ flex: 3 }}>
+							<Text style={_Styles.textItemDetailLabel}>
+								Purchase by:
+							</Text>
+							<Button
+								onPress={_ => setShowCalendar(!showCalendar)}
+								title={item.purchaseBy
+									? Utils.parseDate(item.purchaseBy)
+									: '-'
+								}
+							/>
+							{ showCalendar && !global (
+								<DateTimePicker
+									value={pickDate}
+									mode='date'
+									display='calendar'
+									onChange={(e, newDate) => {
+										setXstate({ 'showCalendar': false });
+										if(e.type !== 'neutralButtonPressed')
+										{
+											setPickDate(newDate);
+											dispatch(Lists.updateItemInList([
+												item.id,
+												{
+													purchaseBy: newDate.getTime()
+												}
+											]));
+										}
+									}}
+									minimumDate={Date.now()}
+								/>
+							)}
+						</View>
+					}
 				</View>
 				<View>
 					<Text style={_Styles.textItemDetailLabel}>
@@ -227,6 +266,4 @@ export default function InventoryItem({ item, exports }) {
 			</CollapseBody>
 		</Collapse>
 	);
-
-
 }

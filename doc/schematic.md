@@ -7,15 +7,16 @@ App
 		Screen(Component)
 			HelpScreen
 			ItemStoreScreen
-				ListItem
-					Carousel
+				ItemDisplay(Component)
+					Carousel(Component)
 				Footer(Component)
 			ListScreen
-				ListItem
-					Carousel
+				ItemDisplay(Component)
+					Carousel(Component)
 				Footer(Component)
 			OptionsScreen
 			UserScreen
+			---
 		ModalDialogComponent
 			ItemEditModal
 			ListCreateDialog

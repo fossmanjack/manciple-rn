@@ -1,3 +1,8 @@
+// CarouselComponent.js
+// Provides <Carousel>
+// Couldn't find one I liked so made this from scratch
+
+// React, RN, RNE, Redux
 import { useState } from 'react';
 import {
 	Image,
@@ -6,21 +11,27 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
+
+// Expo
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as MediaLibrary from 'expo-media-library';
+
+// Community
 import Dialog from 'react-native-dialog';
-import * as Pantry from '../slices/listsSlice';
+
+// Local
+import * as Lists from '../slices/listsSlice';
+import * as Istore from '../slices/itemStoreSlice';
 import * as Utils from '../utils/utils';
-import { _DefaultImage } from '../res/_DefaultImage';
 
 export default function Carousel(props) {
-	const { item, height, width } = props;
+	const { item, height, width, _Xstate } = props;
+	const { dispatch } = _Xstate.funs;
 	const { id: itemID, images: pics } = item;
-	const { mode } = useSelector(S => S.global);
+
 	const [ currentImgIndex, setCurrentImgIndex ] = useState(0);
 	const [ visible, setVisible ] = useState(false);
-	const dispatch = useDispatch();
 
 // these can be set as callback functions directly in the buttons
 // so do that when you refactor
@@ -56,13 +67,7 @@ export default function Carousel(props) {
 	}
 */
 	const handleDelete = _ => {
-		dispatch(Pantry.updateItem({
-			itemID,
-			updatedItem: {
-				...item,
-				images: pics.filter(img => img !== pics[currentImgIndex])
-			}
-		}))
+		dispatch(Istore.deleteImage([ itemID, currentImgIndex ]));
 	}
 
 	const getImageFromGallery = async _ => {
@@ -106,16 +111,7 @@ export default function Carousel(props) {
 
 		const imgData = 'data:image/png;base64,' + processedImage.base64;
 		const savedImage = await MediaLibrary.saveToLibraryAsync(processedImage.uri);
-		dispatch(Pantry.updateItem({
-			itemID,
-			updatedItem: {
-				...item,
-				images: [
-					...pics,
-					imgData
-				]
-			}
-		}));
+		dispatch(Istore.addImage([ itemID, imgData ]));
 		setVisible(false);
 	}
 

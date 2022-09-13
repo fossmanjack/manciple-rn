@@ -25,7 +25,7 @@ import * as Utils from '../utils/utils';
 
 const initialState = {
 	_Lists: LISTS,
-	currentList: '' // holds pantry id
+	currentList: Object.keys(LISTS)[0] // holds pantry id
 };
 
 const listsSlice = createSlice({
@@ -90,7 +90,7 @@ const listsSlice = createSlice({
 					[listID]: {
 						...(lState._Lists[listID] || {}),
 						...props,
-						modifyDate: Date.now();
+						modifyDate: Date.now()
 					}
 				}
 			};
@@ -202,7 +202,7 @@ const listsSlice = createSlice({
 							...lState._Lists[idx].inventory,
 							[itemID]: insert
 						}
-					}
+					},
 					...lState._Lists.slice(idx + 1)
 				]
 			};

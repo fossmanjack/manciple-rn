@@ -1,31 +1,37 @@
+// ListDetalDialog.js
+// Displays list meta-information and exposes list functions
+
+// React, RN, RNE, Redux
+import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
-import { Text, View } from 'react-native';
+
+// Community
 import Dialog from 'react-native-dialog';
 
-export default function PantryDetailDialog(props) {
-	const { _Xstate, setXstate, listID, setPantryID } = props;
+export default function ListDetailDialog({ _Xstate }) {
+	const { listToEdit: listID, funs: { setXstate } } = _Xstate;
 	const { _Lists } = useSelector(S => S.lists);
-	const pantry = _Lists[listID];
+	const refList = _Lists[listID];
 
 	const handleExport = _ => {
 		console.log('handleExport', pantry);
 	}
 
 	return (
-		<Dialog.Container visible={_Xstate.showPantryDetail}>
+		<Dialog.Container visible={_Xstate.showListDetail}>
 			<Dialog.Title>
-				Pantry Info: {pantry.name}
+				List Info: {refList.name}
 			</Dialog.Title>
 			<View>
 				<Text>
-					Created on: {pantry.creationDate}
+					Created on: {refList.creationDate}
 				</Text>
 				<Text>
-					Last modified: {pantry.modifyDate}
+					Last modified: {refList.modifyDate}
 				</Text>
 				<Text>
-					Pantry size: {pantry.inventory.length}
+					List size: {refList.inventory.length}
 				</Text>
 			</View>
 			<Dialog.Button
@@ -41,8 +47,8 @@ export default function PantryDetailDialog(props) {
 			<Dialog.Button
 				label='Edit'
 				onPress={_ => setXstate({
-					'showPantryDetail': false,
-					'showPantryEdit': true
+					'showListDetail': false,
+					'showListEdit': true
 				})}
 				icon={
 					<Icon
@@ -53,7 +59,7 @@ export default function PantryDetailDialog(props) {
 			/>
 			<Dialog.Button
 				label='OK'
-				onPress={_ => setXstate({ 'showPantryDetail': false }}
+				onPress={_ => setXstate({ 'showListDetail': false })}
 				icon={
 					<Icon
 						name='check'

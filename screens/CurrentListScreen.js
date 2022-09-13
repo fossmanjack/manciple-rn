@@ -1,4 +1,4 @@
-// PantryScreen.js
+// CurrentListScreen.js
 // Handles the bulk of the application logic, displays items stored in
 // _Lists[currentList].inventory in a third-party SwipeListView, handles
 // selection buttons, etc
@@ -13,58 +13,53 @@ import { Button, Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // custom component imports
-import EditItemModal from '../components/EditItemModal';
+import ItemEditModal from '../dialogs/ItemEditModal';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/FooterComponent';
-import PantryItem from '../components/PantryItem';
+import ItemDisplay from '../components/ItemDisplayComponent';
 
 // slice imports
-import * as Pantry from '../slices/listsSlice';
-import * as Inv from '../slices/itemStoreSlice';
+import * as Lists from '../slices/listsSlice';
+import * as Istore from '../slices/itemStoreSlice';
 
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function CurrentListScreen({ _Xstate, setXstate }) {
-	const { drawerCtl, nav, setNav } = props;
+export default function CurrentListScreen({ _Xstate }) {
+	const { itemToEdit, listData, showItemEdit, funs: { drawerCtl, dispatch, setXstate } } = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
-	const { _ItemStore } = useSelector(S => S.itemStore);
+	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
-	const dispatch = useDispatch();
-	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_ItemStore)[0]);
-	const [ listData, setListData ] = useState([]);
 
-	console.log('PantryScreen', props);
-
-	const toggleEditItemVisible = _ => {
-		console.log('toggleEditItemVisible called');
-		setShowEditItemModal(!showEditItemModal);
-	}
+	console.log('CurrentListScreen', _Xstate);
 
 	const generateListData = _ => {
-		console.log('refreshListData');
+		const refList = _Lists[currentList] || Utils.blankList;
+		console.log('refreshListData:', refList);
 
 		// Data for each listed item is stored in two places: Inventory has the
-		// largely-immutable stuff and Pantry has the daily changes.  The props
+		// largely-immutable stuff and Lists has the daily changes.  The props
 		// don't share names so we can just merge them to build our item data set.
-		return Utils.sortPantry(
-			Object.keys(_Lists[currentList].inventory).map(itemID => {
+		return Utils.sortList(
+			Object.keys(refList.inventory).map(itemID => {
+				console.log('Mapping refList.inventory:', itemID);
 				return {
 					id: itemID,
 					..._ItemStore[itemID],
 					..._Images[itemID],
 					..._History[itemID],
-					..._Lists[currentList].inventory[itemID]
+					...refList.inventory[itemID]
 				}
 			}), sortOpts);
 	}
 
+/*
 	const dumpListData = _ => {
 		console.log('Current list data:\n');
 		console.log(listData);
 	}
+*/
 
 	const handleCheckBox = itemID => {
 		// Toggle inCart, re-render should happen automatically
@@ -72,31 +67,32 @@ export default function CurrentListScreen({ _Xstate, setXstate }) {
 		const newItem = { ..._Lists[currentList].inventory[itemID] };
 		newItem.inCart = !newItem.inCart;
 
-		dispatch(Pantry.updateItemInPantry([ itemID, newItem, currentList ]));
+		dispatch(Lists.updateItemInList([ itemID, newItem, currentList ]));
 
 		//dispatch(Pantry.toggleInCart(itemID));
 	}
 
 	const handleSweep = (itemID, rowMap) => {
-		// remove item from pantry, conditionally update item history,
+		// remove item from list, conditionally update item history,
 		// close row, regenerating list data should happen automatically
-		// Pantry.deleteItemFromPantry(itemID)
+		// Lists.deleteItemFromList(itemID)
 		// Inv.updateItem(itemID, { updated props })
 		rowMap[itemID].closeRow();
 
 		if(rowMap[itemID].props.item.inCart)
-			dispatch(Inv.updateHistory([ itemID, Date.now() ]));
+			dispatch(Istore.updateHistory([ itemID, Date.now() ]));
 
-		dispatch(Pantry.deleteItemFromPantry([ itemID ]));
+		dispatch(Lists.deleteItemFromList([ itemID ]));
 	}
-
+/*
 	const handleSweepAll = _ => {
 
-		listData.filter(item => item.inCart).forEach(item.id => {
-			dispatch(Inv.updateHistory([ item.id, Date.now() ]));
-			dispatch(Pantry.deleteItemFromPantry([ item.id ]));
+		listData.filter(item => item.inCart).forEach(item => {
+			dispatch(Istore.updateHistory([ item.id, Date.now() ]));
+			dispatch(Lists.deleteItemFromList([ item.id ]));
 		});
 	}
+*/
 
 	const handleToggleStaple = itemID => {
 		console.log('handleToggleStaple called with item', itemID);
@@ -104,41 +100,31 @@ export default function CurrentListScreen({ _Xstate, setXstate }) {
 		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Pantry.updatePantry({
+			dispatch(Lists.updateList({
 				..._Lists[currentList],
 				staples: staples.filter(i => i !== itemID)
 			}));
 		else // add itemID to array
-			dispatch(Pantry.updatePantry({
+			dispatch(Lists.updateList({
 				..._Lists[currentList],
 				staples: [ ...staples, itemID ]
 			}));
 	};
 
 	const editItem = item => {
-		setItemToEdit(item.id);
-		setShowEditItemModal(!showEditItemModal);
-	}
-
-	const handleDateChange = (item, date) => {
-		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
-
-		dispatch(Pantry.updateItemInPantry(
-			[
-				item.id,
-				{
-					..._Lists[currentList].inventory[item.id],
-					purchaseBy: date.getTime()
-				}
-			]
-		));
+		setXstate({
+			'itemToEdit': item.id,
+			'showItemEdit': true
+		});
 	}
 
 	const renderItem = (data, rowMap) => {
 		const { item } = data;
+		console.log('renderItem:', item);
 		return (
-			<PantryItem
+			<ItemDisplay
 				item={item}
+				_Xstate={_Xstate}
 				exports={{
 					handleCheckBox,
 					handleDateChange
@@ -194,26 +180,27 @@ export default function CurrentListScreen({ _Xstate, setXstate }) {
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
 
-	useEffect(_ => setListData(generateListData()), [ _Lists[currentList].inventory ]);
+	useEffect(_ => {
+		console.log('Subbing to listData:', currentList);
+		const newData = generateListData();
+		console.log('newData:', newData);
+		setXstate({ "listData": newData });
+		console.log('listData:', listData);
+	}, [ _Lists[currentList].inventory ]);
 
 	useEffect(_ => console.log('itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
 	return (
 		<>
-			<Header
-				drawerCtl={drawerCtl}
-				controls
-				nav={nav}
-				setNav={setNav}
-				title={currentList === -1 ? 'No pantry loaded!' :
-					`${_Lists[currentList].name}: Pantry view`
-				}
-			/>
 			<SwipeListView
 				data={listData}
+				key={listData}
 				renderItem={renderItem}
 				renderHiddenItem={renderHiddenItem}
-				keyExtractor={item => item.id}
+				keyExtractor={item => {
+					console.log('SwipeListView key:', item);
+					return item.id;
+				}}
 				rightOpenValue={-100}
 				leftActivationValue={75}
 				leftActionValue={500}
@@ -225,15 +212,7 @@ export default function CurrentListScreen({ _Xstate, setXstate }) {
 				closeOnScroll
 			/>
 			<Footer
-				handleSweepAll={handleSweepAll}
-				dumpListData={dumpListData}
-			/>
-			<EditItemModal
-				dispatch={dispatch}
-				visible={showEditItemModal}
-				setVisible={setShowEditItemModal}
-				item={itemToEdit}
-				key={itemToEdit}
+				_Xstate={_Xstate}
 			/>
 		</>
 	);

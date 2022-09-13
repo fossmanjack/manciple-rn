@@ -14,65 +14,77 @@ import {
 	Button,
 	Input
 } from 'react-native-elements';
+import { useSelector } from 'react-redux';
 
 // slices
 import * as Lists from '../slices/listsSlice';
-import * as Ist from '../slices/itemStoreSlice';
+import * as Istore from '../slices/itemStoreSlice';
 
-export default function EditItemModal({ _Xstate }) {
-	const { itemToEdit, showItemEdit, funs: {
+export default function ItemEditModal({ _Xstate }) {
+	const { itemToEdit: itemID, showItemEdit, funs: {
 		dispatch,
 		setXstate,
 		parseName,
 		nullp
 	}} = _Xstate;
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
+	const { _Lists, currentList } = useSelector(S => S.lists);
 	// updatedItem holds the props that have been changed
 	// refItem populates the fields and is kept in sync with updatedItem
 	const [ updatedItem, setUpdatedItem ] = useState({});
 	const [ refItem, setRefItem ] = useState(
 		{
-			..._ItemStore[itemToEdit],
-			..._Lists[currentList].inventory[itemToEdit],
-			history: [ ..._History[itemToEdit] ],
-			images: [ ..._Images[itemToEdit] ]
+			..._ItemStore[itemID],
+			..._Lists[currentList].inventory[itemID],
+			history: _History[itemID] ? [ ..._History[itemID] ] : [],
+			images: _Images[itemID] ? [ ..._Images[itemID] ] : []
 		}
 	);
 
 	// tracking this separately because it's handled separately
 	// staple and purchaseBy are handled elsewhere
 
-	console.log('EditItemModal', itemToEdit, updatedItem);
+	console.log('EditItemModal', itemID, updatedItem);
 
 	const handleCommit = _ => {
 		if(Object.keys(updatedItem).length) { // only do stuff if there are changes
-			const newItem = { ...refItem, ...updatedItem };
-			const toList = {
-				qty: newItem.qty,
-				inCart: newItem.inCart,
-				purchaseBy: newItem.purchaseBy
-			};
-			const toItemStore = {
-				modifyDate: Date.now(),
-				name: Object.keys(_ItemStore).find(key =>
-					parseName(_ItemStore[key].name) === parseName(newItem.name))
-						&& newItem.name
-						: refItem.name,
-				...
-			};
-			const toHistory = updatedItem.history && updatedItem.history.length
-				? [ ...newItem.history ]
-				: null;
-			const toImages = updatedItem.images && updatedItem.images.length
-				? [ ...newItem.images ]
-				: null;
+			const newItem = { ...updatedItem };
 
-			dispatch(Ist.updateItem([ itemToEdit, toItemStore ]));
-			!nullp(toHistory) && dispatch(Ist.updateHistory([ itemToEdit, toHistory ]));
-			!nullp(toImages) && dispatch(Ist.updateImages([ itemToEdit, toImages ]));
+			const toList = {};
 
-			// since Listview update is keyed to Lists, send this one last
-			dispatch(Lists.updateItemInList([ itemToEdit, toList ]));
+			if(newItem.qty) {
+				toList.qty = newItem.qty;
+				delete newItem.qty;
+			}
+			if(newItem.inCart) {
+				toList.inCart = newItem.inCart;
+				delete newItem.inCart;
+			}
+			if(newItem.purchaseBy) {
+				toList.purchaseBy = newItem.purchaseBy;
+				delete newItem.purchaseBy;
+			}
+
+			if(newItem.history && newItem.history.length) {
+				dispatch(Istore.updateHistory([ itemID, newItem.history ]));
+				delete newItem.history;
+			}
+
+			if(newItem.images && newItem.images.length) {
+				dispatch(Istore.updateImages([ itemID, newItem.images ]));
+				delete newItem.images;
+			}
+
+			// Everything left should belong to _ItemStore
+
+			if(Object.keys(newItem).length)
+				dispatch(Istore.updateItem([ itemID, newItem ]));
+
+			// Since CurrentListView is subscribed to the List inventory,
+			// update that last
+
+			if(Object.keys(toList).length)
+				dispatch(Lists.updateItemInList([ itemID, toList, currentList ]));
 		}
 /*
 		dispatch(Pantry.updateItem({

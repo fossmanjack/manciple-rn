@@ -3,7 +3,7 @@
 // 76149.1: updated to standardize inputs and treat _ItemStore as an object
 
 import { createSlice } from '@reduxjs/toolkit';
-import { INVENTORY } from '../res/DEFAULT';
+import { ITEMSTORE } from '../res/DEFAULT';
 import * as Utils from '../utils/utils';
 
 const initialState = {
@@ -111,7 +111,7 @@ const itemStoreSlice = createSlice({
 				...iState,
 				_History: {
 					...iState._History,
-					[itemID]: newHist;
+					[itemID]: newHist
 				}
 			};
 		},
