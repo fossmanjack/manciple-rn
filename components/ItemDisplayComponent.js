@@ -28,18 +28,58 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Local
 import Carousel from '../components/CarouselComponent';
+import * as Lists from '../slices/listsSlice';
+import * as Istore from '../slices/itemStoreSlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function ItemDisplay({ item, _Xstate }) {
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore, _History } = useSelector(S => S.itemStore);
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
+/*
 	const {
 		handleCheckBox,
 		handleDateChange
 	} = exports;
+*/
 	const global = _Xstate.currentScreen === 'itemStore' ? true : false;
+
+	const handleCheckBox = itemID => {
+		console.log('handleCheckBox called with item', itemID);
+		if(global) {
+			// add item to currentList if not in it, or remove it if it is
+			const { inventory } = _Lists[currentList];
+			const refItem = _ItemStore[itemID];
+			if(Object.keys(inventory).includes(itemID)) {
+				if(inventory[itemID].inCart) {
+					_Xstate.funs.dispatch(Istore.updateHistory([
+						itemID, Date.now()
+					]));
+				}
+				_Xstate.funs.dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
+
+			} else {
+				_Xstate.funs.dispatch(Lists.addItemToList([ itemID, currentList ]));
+				if(!refItem.parents.includes(currentList))
+					_Xstate.funs.dispatch(Istore.updateItem([
+						itemID,
+						{
+							...refItem,
+							parents: [ ...refItem.parents, currentList ]
+						}
+					]));
+			}
+		} else {
+			// Toggle inCart, re-render should happen automatically
+			const newItem = { ..._Lists[currentList].inventory[itemID] };
+			newItem.inCart = !newItem.inCart;
+
+			_Xstate.funs.dispatch(Lists.updateItemInList([ itemID, newItem, currentList ]));
+		}
+	}
 
 	const IconDrawer = item => {
 		return (

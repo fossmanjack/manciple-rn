@@ -105,7 +105,7 @@ const itemStoreSlice = createSlice({
 			const [ itemID, newDate ] = action.payload;
 			if(!itemID || !newDate) return iState;
 
-			const newHist = [ newDate, ...iState._History[action.payload] || [] ];
+			const newHist = [ newDate, ...iState._History[itemID] || [] ];
 
 			return {
 				...iState,
@@ -124,8 +124,8 @@ const itemStoreSlice = createSlice({
 			if(!itemID || !histIdx) return iState;
 
 			const newHist = [
-				...iState._History[action.payload].slice(0, histIdx),
-				...iState._History[action.payload].slice(histIdx + 1)
+				...iState._History[itemID].slice(0, histIdx),
+				...iState._History[itemID].slice(histIdx + 1)
 			];
 
 			return {

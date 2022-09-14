@@ -2,7 +2,7 @@
 // Handles modals, dialogs, navdrawer, header, loading from back-end
 
 // Import React, RN, Redux native and community components
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DrawerLayoutAndroid } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,9 +24,35 @@ export default function Main() {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
+	//const [ _Xstate, updateXstate ] = useState({ });
 	const drawer = useRef(null);
 
 // Transient Application State (_Xstate) -- functions first
+/* useState version
+	const setXstate = payload => {
+		console.log('setXstate', _Xstate, props);
+		updateXstate({ ..._Xstate, ...payload });
+	}
+*/
+
+	// I guess for the references (listData, etc) to work correctly we need to
+	// mutate the state object instead of replacing it immutably.  This is disappointing
+	// and I may revisit when I have more time.
+	//const setXstate = payload => Object.keys(payload).forEach(key => _Xstate[key] = payload[key]);
+	const setXstate = payload => {
+		console.log('setXstate payload:', payload);
+		Object.keys(payload).forEach(key => {
+			console.log(`${key}: ${payload[key]}`);
+			_Xstate[key] = payload[key];
+		});
+		console.log('Updated Xstate:', _Xstate);
+	}
+/*
+		console.log('setXstate', props);
+		_Xstate = { ..._Xstate, ...props };
+		console.log('new Xstate:', _Xstate);
+	}
+*/
 
 	const navigate = destScreen => {
 		if(destScreen) {
@@ -45,11 +71,6 @@ export default function Main() {
 		}
 	}
 
-	const setXstate = props => {
-		console.log('setXstate', props);
-		_Xstate = { ..._Xstate, ...props };
-		console.log('new Xstate:', _Xstate);
-	}
 
 	const drawerCtl = newState => {
 		// if newState is undefined, toggle the drawer
@@ -72,6 +93,12 @@ export default function Main() {
 
 	};
 
+	// init Xstate
+
+/*
+	useEffect(_ => {
+		setXstate({
+*/
 	var _Xstate = {
 		currentScreen: 'currentList',
 		screenHist: [],
@@ -99,7 +126,11 @@ export default function Main() {
 			nullp: Utils.nullp,
 			parseName: name => Utils.camelize(Utils.sanitize(name.trim())),
 		}
-	};
+	}
+/*
+		});
+	}, []);
+*/
 
 
 	const handleDateChange = (item, date) => {

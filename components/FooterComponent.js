@@ -21,11 +21,12 @@ import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 
 // Utils
+import { _Store } from '../res/_Store';
 import * as Utils from '../utils/utils';
 import { _Styles } from '../res/_Styles';
 
 export default function Footer({ _Xstate }) {
-	const { listData, funs: { dispatch, parseName } } = _Xstate;
+	const { funs: { dispatch, parseName } } = _Xstate;
 	const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
@@ -106,21 +107,21 @@ export default function Footer({ _Xstate }) {
 
 	const handleSweepAll = _ => {
 
-		listData.filter(item => item.inCart).forEach(item => {
+		_Xstate.listData.filter(item => item.inCart).forEach(item => {
 			dispatch(Istore.updateHistory([ item.id, Date.now() ]));
 			dispatch(Lists.deleteItemFromList([ item.id ]));
 		});
 	}
 
 	const dumpState = _ => {
-		const state = useSelector(S => S);
+		const state = _Store.getState();
 
 		console.log(state);
 	}
 
 	const dumpListData = _ => {
 		console.log('Current list data:\n');
-		console.log(listData);
+		console.log(_Xstate.listData);
 	}
 
 	return (

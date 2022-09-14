@@ -27,7 +27,7 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function CurrentListScreen({ _Xstate }) {
-	const { itemToEdit, listData, showItemEdit, funs: { drawerCtl, dispatch, setXstate } } = _Xstate;
+	const { itemToEdit, showItemEdit, funs: { drawerCtl, dispatch, setXstate } } = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
@@ -61,16 +61,6 @@ export default function CurrentListScreen({ _Xstate }) {
 	}
 */
 
-	const handleCheckBox = itemID => {
-		// Toggle inCart, re-render should happen automatically
-		console.log('handleCheckBox called with item', itemID);
-		const newItem = { ..._Lists[currentList].inventory[itemID] };
-		newItem.inCart = !newItem.inCart;
-
-		dispatch(Lists.updateItemInList([ itemID, newItem, currentList ]));
-
-		//dispatch(Pantry.toggleInCart(itemID));
-	}
 
 	const handleSweep = (itemID, rowMap) => {
 		// remove item from list, conditionally update item history,
@@ -120,15 +110,11 @@ export default function CurrentListScreen({ _Xstate }) {
 
 	const renderItem = (data, rowMap) => {
 		const { item } = data;
-		console.log('renderItem:', item);
+		console.log('*********> renderItem:', item.name);
 		return (
 			<ItemDisplay
 				item={item}
 				_Xstate={_Xstate}
-				exports={{
-					handleCheckBox,
-					handleDateChange
-				}}
 			/>
 		)
 	}
@@ -185,7 +171,7 @@ export default function CurrentListScreen({ _Xstate }) {
 		const newData = generateListData();
 		console.log('newData:', newData);
 		setXstate({ "listData": newData });
-		console.log('listData:', listData);
+		console.log('listData:', _Xstate.listData);
 	}, [ _Lists[currentList].inventory ]);
 
 	useEffect(_ => console.log('itemToEdit changed!', itemToEdit), [ itemToEdit ]);
@@ -193,8 +179,8 @@ export default function CurrentListScreen({ _Xstate }) {
 	return (
 		<>
 			<SwipeListView
-				data={listData}
-				key={listData}
+				data={_Xstate.listData}
+				key={_Xstate.listData}
 				renderItem={renderItem}
 				renderHiddenItem={renderHiddenItem}
 				keyExtractor={item => {
