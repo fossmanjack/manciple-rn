@@ -93,6 +93,7 @@ export default function Main() {
 
 	};
 
+
 	// init Xstate
 
 /*
@@ -125,6 +126,7 @@ export default function Main() {
 			camelize: Utils.camelize,
 			nullp: Utils.nullp,
 			parseName: name => Utils.camelize(Utils.sanitize(name.trim())),
+			timestamp: Utils.timestamp,
 		}
 	}
 /*
