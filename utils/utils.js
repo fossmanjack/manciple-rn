@@ -2,16 +2,42 @@ import { useSelector } from 'react-redux';
 import uuid from 'react-native-uuid';
 //import { _Store } from '../res/_Store';
 
-export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
-export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-\[\]\{\}\\\|\`]/g, '') : false;
-export const parseDate = i => new Date(i).toISOString().split("T")[0];
-export const daysBetween = (i, j) => (j - i) / (86400000);
-export const truncateString = (str, num) => str.length >= num ? str.slice(num)+' ...' : str;
-export const nullp = val => (typeof val === 'undefined' || val === null);
-//export const _State = _Store.getState();
-//export const _Dispatch = _Store.dispatch;
+// global constants
 
-//export const getDebugLvl = _ => _State.options.debug;
+export const DAY = 86400000;
+export const ERROR = 9; // highest priority
+export const WARN = 7;
+export const INFO = 5;
+export const DEBUG = 3;
+export const VERBOSE = 1;
+
+// debugging
+// debug is the global threshold, only debug messages with a higher priority than
+// this value will be logged.
+
+export const debug = VERBOSE; // hardcoded until I figure out how to expose it to users
+export const debugMsg = (msg, dlvl = VERBOSE) => dlvl >= debug && console.log(timestamp(), msg);
+
+// datetime management utilities
+export const parseDate = i => new Date(i).toISOString().split("T")[0];
+export const daysBetween = (i, j) => (j - i) / (DAY);
+export const timestamp = _ => {
+	const [ d, tData ] = new Date().toISOString().split('T');
+	const [ h, m, sData ] = tData.split(':');
+	const s = sData.slice(0, 6);
+
+	return `[${d} ${h}${m}.${s}]`;
+}
+
+// String manipulation and comparing functions
+export const truncateString = (str, num) => str.length >= num ? str.slice(0, num)+' ...' : str;
+export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-\[\]\{\}\\\|\`]/g, '') : false;
+export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
+export const parseName = val => camelize(sanitize(val.trim()));
+export const collisonCheck = (a, b) => parseName(a) === parseName(b);
+
+// Check for null or undefined objects or props
+export const nullp = val => (typeof val === 'undefined' || val === null);
 
 // Writing debug message guidance: the higher the options debug level, the more
 // noisy and granular the log will be.  Each debug message instance should consider
@@ -27,6 +53,16 @@ export const debugMsg = (fun, params=[], dlvl=9) => {
 	}
 }
 */
+// de
+
+	// dlvl is message severity, higher value requires higher debug value set
+	// default to 9
+
+
+export const getuuid = len => {
+	if(len) return Math.random().toString(16).slice(2, len > 13 ? 15 : 2 + len);
+	else return uuid.v4();
+}
 
 export const calculateInterval = item => {
 	if(item.history.length < 2) return 0;

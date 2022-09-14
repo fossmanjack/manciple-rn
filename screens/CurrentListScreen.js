@@ -27,23 +27,24 @@ import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
 export default function CurrentListScreen({ _Xstate }) {
-	const { itemToEdit, showItemEdit, funs: { drawerCtl, dispatch, setXstate } } = _Xstate;
+	const { itemToEdit, showItemEdit, funs: { drawerCtl, dispatch, setXstate, timestamp } } = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
+	const [ listData, setListData ] = useState(_Xstate.listData || []);
 
-	console.log('CurrentListScreen', _Xstate);
+	console.log(timestamp(), 'CurrentListScreen', _Xstate);
 
 	const generateListData = _ => {
 		const refList = _Lists[currentList] || Utils.blankList;
-		console.log('refreshListData:', refList);
+		Utils.debugMsg('refreshListData: '+refList.name, Utils.VERBOSE);
 
 		// Data for each listed item is stored in two places: Inventory has the
 		// largely-immutable stuff and Lists has the daily changes.  The props
 		// don't share names so we can just merge them to build our item data set.
 		return Utils.sortList(
 			Object.keys(refList.inventory).map(itemID => {
-				console.log('Mapping refList.inventory:', itemID);
+				Utils.debugMsg('Mapping refList.inventory: '+itemID, Utils.VERBOSE);
 				return {
 					id: itemID,
 					..._ItemStore[itemID],
@@ -85,7 +86,7 @@ export default function CurrentListScreen({ _Xstate }) {
 */
 
 	const handleToggleStaple = itemID => {
-		console.log('handleToggleStaple called with item', itemID);
+		Utils.debugMsg('handleToggleStaple: '+itemID, Utils.VERBOSE);
 
 		const staples = [ ..._Lists[currentList].staples ];
 
@@ -110,7 +111,7 @@ export default function CurrentListScreen({ _Xstate }) {
 
 	const renderItem = (data, rowMap) => {
 		const { item } = data;
-		console.log('*********> renderItem:', item.name);
+		Utils.debugMsg('renderItem: '+item.name, Utils.VERBOSE);
 		return (
 			<ItemDisplay
 				item={item}
@@ -167,24 +168,24 @@ export default function CurrentListScreen({ _Xstate }) {
 	// value rather than calling the update method after dispatching a state change
 
 	useEffect(_ => {
-		console.log('Subbing to listData:', currentList);
+		Utils.debugMsg('Subbing to listData: '+currentList, Utils.VERBOSE);
 		const newData = generateListData();
-		console.log('newData:', newData);
+		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
+		setListData(newData);
 		setXstate({ "listData": newData });
-		console.log('listData:', _Xstate.listData);
 	}, [ _Lists[currentList].inventory ]);
 
-	useEffect(_ => console.log('itemToEdit changed!', itemToEdit), [ itemToEdit ]);
+	useEffect(_ => console.log(timestamp(), 'itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
 	return (
 		<>
 			<SwipeListView
-				data={_Xstate.listData}
-				key={_Xstate.listData}
+				data={listData}
+				key={listData}
 				renderItem={renderItem}
 				renderHiddenItem={renderHiddenItem}
 				keyExtractor={item => {
-					console.log('SwipeListView key:', item);
+					Utils.debugMsg('SwipeListView key extracted: '+item.id, Utils.VERBOSE);
 					return item.id;
 				}}
 				rightOpenValue={-100}

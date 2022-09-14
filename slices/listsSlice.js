@@ -19,8 +19,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { purgeStoredState } from 'redux-persist';
 import { LISTS } from '../res/DEFAULT';
-//import createPantryItem from './pantryItemSlice';
-import uuid from 'react-native-uuid';
 import * as Utils from '../utils/utils';
 
 const initialState = {
@@ -35,29 +33,39 @@ const listsSlice = createSlice({
 		// pantry management
 		setList: (lState, action) => {
 			// action.payload = key (listID) of selected pantry
-			console.log('setPantry', action.payload);
-			return { ...lState, currentList: action.payload }
+			if(!Object.keys(lState._Lists).includes(action.payload)) {
+				Utils.debugMsg('setList: invalid listID! '+action.payload, Utils.VERBOSE);
+				return lState;
+			} else {
+				Utils.debugMsg('setList: '+action.payload, Utils.VERBOSE);
+				return { ...lState, currentList: action.payload }
+			}
 		},
 		addList: (lState, action) => {
-			// action.payload = [ listID, { pantry object }]
+			// action.payload = [ listID, { list object }]
 			// Adds listID: pantry to _Lists
 			// Will not allow listID or pantry.name overwrite
 			// use this ONLY when creating a new pantry from scratch
 			// imports should use updatePantry
-			console.log('addPantry', action.payload);
+			Utils.debugMsg('addList: '+action.payload, Utils.VERBOSE);
 			if(!action.payload) return lState;
-			let [ listID, newPantry ] = action.payload;
-			if(!listID) listID = uuid.v4();
-			if(!newPantry || !newPantry.name) newPantry = Utils.createPantry({
-				...(newPantry || {}),
-				name: 'New pantry'
-			});
+			const [
+				listID = Utils.genuuid(),
+				newList = Utils.createPantry()
+			] = action.payload;
+
+			// Don't allow overwrites using this function
+			if(Object.keys(lState._Lists).includes(listID)) return lState;
+
+			// Don't allow name collisions
+			if(Object.keys(lState._Lists).find(key => collisionCheck(lState._Lists[key].name, newList.name)))
+				return lState;
 
 			return {
 				...lState,
 				_Lists: {
 					...lState._Lists,
-					[listID]: newPantry
+					[listID]: newList
 				}
 			};
 		},
@@ -74,14 +82,21 @@ const listsSlice = createSlice({
 			};
 		},
 		updateList: (lState, action) => {
-			// update an existing pantry
+			// update an existing list
 			// action.payload is [ listID, { ...props } ]
-			// use this when importing a pantry
+			// use this when importing a list
 
 			if(!action.payload) return lState;
 
 			const [ listID, props ] = action.payload;
 			if(!listID || !props) return lState;
+
+			// Name collisions are still not ok
+			const incomingName = Object.keys(lState._Lists).includes(listID)
+				? lState._Lists[listID].name
+				: props.name || 'New list '+Utils.genuuid(6);
+			if(Object.keys(lState._Lists).find(key => Utils.collisonCheck(lState._Lists[key].name, incomingName)))
+				props.name = ''+props.name+' '+Utils.genuuid(6);
 
 			return {
 				...lState,
@@ -100,44 +115,23 @@ const listsSlice = createSlice({
 			// Update an item in inventory
 			// action.payload is [ itemID, { props }, listID ]
 			// Note that if item is in inventory already it'll be overwritten
-			console.log('addItemToPantry', lState, action);
+			Utils.debugMsg('addItemToList '+lState+' '+action, Utils.VERBOSE);
 			if(!action.payload) return lState;
-			const [ itemID, props, listID ] = action.payload;
-			let idx = lState.currentList;
+			const [ itemID, props, listID = lState.currentList ] = action.payload;
 			if(!itemID || !props) return lState;
-			if(listID) idx = lState._Lists.indexOf(lState._Lists.find(list => list.id === listID));
-			console.log('addItemToPantry deconstruct:', itemID, props, listID);
-			console.log('addItemToPantry pantry info:\n',
-				lState._Lists[lState.currentList].inventory[itemID]);
-
-			const insert = {
-				qty: '1',
-				purchaseBy: 0,
-				inCart: false,
-				...props
-			};
-			if(!insert) return lState;
-
-			console.log('addItemToPantry insert:', insert);
-
-			const updatedList = {
-				...lState._Lists[idx],
-				modifyDate: Date.now(),
-				inventory: {
-					...lState._Lists[idx].inventory,
-					[itemID]: insert
-				}
-			};
-
-			console.log('addItemToPantry updatedList:', updatedList);
 
 			return {
 				...lState,
-				_Lists: [
-					...lState._Lists.slice(0, lState.currentList),
-					updatedList,
-					...lState._Lists.slice(lState.currentList + 1)
-				]
+				_Lists: {
+					...lState._Lists,
+					[listID]: {
+						...lState._Lists[listID],
+						inventory: {
+							...lState._Lists[listID].inventory,
+							[itemID]: props
+						}
+					}
+				}
 			};
 		},
 		deleteItemFromList: (lState, action) => {
@@ -145,66 +139,52 @@ const listsSlice = createSlice({
 			// action payload is [ itemID, listID ]
 			if(!action.payload) return lState;
 
-			const [ itemID, listID ] = action.payload;
-			const idx = listID
-				? lState._Lists.indexOf(lState._Lists.find(list => list.id === listID))
-				: lState.currentList;
+			const [ itemID, listID = lState.currentList ] = action.payload;
 
-			console.log('deleteItemFromPantry', itemID, idx);
-
-			const ret = { ...lState._Lists[idx].inventory };
-			delete ret[itemID];
+			const newInv = lState._Lists[listID].inventory;
+			delete newInv[itemID];
 
 			return {
 				...lState,
-				_Lists: [
-					...lState._Lists.slice(0, idx),
-					{
-						...lState._Lists[idx],
-						modifyDate: Date.now(),
-						inventory: {
-							...ret
-						}
-					},
-					...lState._Lists.slice(idx + 1)
-				]
+				_Lists: {
+					...lState._Lists,
+					[listID]: {
+						...lState._Lists[listID],
+						inventory: newInv
+					}
+				}
 			};
 		},
 		updateItemInList: (lState, action) => {
 			// Update an item in inventory
 			// action.payload is [ itemID, { props }, listID ]
-			console.log('updateItemInPantry', lState, action);
+			Utils.debugMsg('updateItemInPantry: '+JSON.stringify(action), Utils.VERBOSE);
 			if(!action.payload) return lState;
+			Utils.debugMsg('payload present');
 
-			const [ itemID, props, listID ] = action.payload;
+			const [ itemID, props, listID = lState.currentList ] = action.payload;
 			if(!itemID || !props) return lState;
-			const idx = listID
-				? lState._Lists.indexOf(lState._Lists.find(list => list.id === listID))
-				: lState.currentList;
+			Utils.debugMsg('itemID: '+itemID+'\nprops: '+props+'\nlistID: '+listID);
 
-			console.log('updateItemInPantry deconstruct:', itemID, props, listID);
-			console.log('updateItemInPantry pantry info:\n',
-				lState._Lists[idx].inventory[itemID]);
 
-			const insert = { ...lState._Lists[idx].inventory[itemID], ...props };
-			if(!insert) return lState;
-
-			console.log('updateItemInPantry insert:', insert);
+			if(!Object.keys(lState._Lists[listID].inventory).includes(itemID)) return lState;
+			Utils.debugMsg('updateItemInPantry passed short-circuits');
 
 			return {
 				...lState,
-				_Lists: [
-					...lState._Lists.slice(0, idx),
-					{
-						...lState._Lists[idx],
-						modifyDate: Date.now(),
+				_Lists: {
+					...lState._Lists,
+					[listID]: {
+						...lState._Lists[listID],
 						inventory: {
-							...lState._Lists[idx].inventory,
-							[itemID]: insert
+							...lState._Lists[listID].inventory,
+							[itemID]: {
+								...lState._Lists[listID].inventory[itemID],
+								...props
+							}
 						}
-					},
-					...lState._Lists.slice(idx + 1)
-				]
+					}
+				}
 			};
 		}
 	}
@@ -220,12 +200,4 @@ export const {
 	addItemToList,
 	deleteItemFromList,
 	updateItemInList
-/*
-	addItem,
-	deleteItem,
-	updateItem,
-	sortList,
-	resetState,
-	overwriteState
-*/
 } = listsSlice.actions;
