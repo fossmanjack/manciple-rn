@@ -52,3 +52,16 @@ I've just inserted a "sync" prop into the lists.  Thus we want to sync only base
 on lists that actually want to sync -- items only get synced if they're listed
 in a pantry that has sync enabled.  I don't want local-only stuff (birthday gifts,
 etc) being a part of the background data.
+
+### Thoughts
+
+It kind of seems like the best thing to do is to send all dispatches to seneschal
+and update the remote store in parallel.  Seneschal ... no, this would only work if
+there wasn't a local store.  Ugh.  Like.  If I could figure out push notifications then
+maybe but there would be collisions almost immediately, and I think I'd have to rewrite
+Redux to include dispatch timestamps?  No, this would never work.  It would, and could,
+only work if the back-end was the primary data source, and I want to avoid that.
+
+So we're back to the manifest/update changes approach I guess.  Bleh.
+
+Let's think about this.  Think about this.  With push notifications maybe?  Idk
