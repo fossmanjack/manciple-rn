@@ -42,7 +42,7 @@ export default function NavDrawer({ drawer, _Xstate }) {
 					}}
 					renderItem={data => {
 						const list = _Lists[data.item];
-						Utils.debugMsg('NavComponent renderItem:\n\tdata: '+data+
+						Utils.debugMsg('NavComponent renderItem:\n\tdata: '+JSON.stringify(data)+
 							'\n\tlist.name: '+list.name);
 						<Pressable
 							onPress={_ => handleListChange(key)}
