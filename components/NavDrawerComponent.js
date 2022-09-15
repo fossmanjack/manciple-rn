@@ -18,13 +18,17 @@ import {
 // component imports
 import UserComponent from '../components/UserComponent';
 
+// utils
+import * as Utils from '../utils/utils';
+
 export default function NavDrawer({ drawer, _Xstate }) {
 	const {
 		showListDetail,
 		showListCreate,
-		funs: { handleListChange, setXstate, navigate }
+		funs: { handleListChange, setXstate, navigate, drawerCtl }
 	} = _Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
+	Utils.debugMsg('NavDrawer rendering with keys: '+JSON.stringify(Object.keys(_Lists)), Utils.VERBOSE);
 
 	return (
 		<>
@@ -33,12 +37,13 @@ export default function NavDrawer({ drawer, _Xstate }) {
 				<FlatList
 					data={Object.keys(_Lists)}
 					keyExtractor={data => {
-						console.log('keyExtractor:', data);
+						Utils.debugMsg('NavComponent keyExtractor data: '+JSON.stringify(data));
 						return data;
 					}}
 					renderItem={data => {
 						const list = _Lists[data.item];
-						console.log('NavComponent renderItem:', data, list, list.name);
+						Utils.debugMsg('NavComponent renderItem:\n\tdata: '+data+
+							'\n\tlist.name: '+list.name);
 						<Pressable
 							onPress={_ => handleListChange(key)}
 							onLongPress={_ => {
@@ -46,7 +51,7 @@ export default function NavDrawer({ drawer, _Xstate }) {
 									'showListDetail': true,
 									'listToEdit': key
 								});
-								drawer.closeDrawer();
+								drawerCtl(false);
 							}}
 							style={{
 								borderBottomWidth: 1,

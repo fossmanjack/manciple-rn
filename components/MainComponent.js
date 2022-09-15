@@ -40,19 +40,12 @@ export default function Main() {
 	// and I may revisit when I have more time.
 	//const setXstate = payload => Object.keys(payload).forEach(key => _Xstate[key] = payload[key]);
 	const setXstate = payload => {
-		console.log('setXstate payload:', payload);
+		Utils.debugMsg('setXstate payload: '+JSON.stringify(payload));
 		Object.keys(payload).forEach(key => {
-			console.log(`${key}: ${payload[key]}`);
+			Utils.debugMsg('setXstate key: '+key+'\nvalue: '+JSON.stringify(payload[key]), Utils.VERBOSE);
 			_Xstate[key] = payload[key];
 		});
-		console.log('Updated Xstate:', _Xstate);
 	}
-/*
-		console.log('setXstate', props);
-		_Xstate = { ..._Xstate, ...props };
-		console.log('new Xstate:', _Xstate);
-	}
-*/
 
 	const navigate = destScreen => {
 		if(destScreen) {
@@ -75,14 +68,14 @@ export default function Main() {
 	const drawerCtl = newState => {
 		// if newState is undefined, toggle the drawer
 		// Otherwise, if "true" open the drawer, if "false" close the drawer
-		console.log('drawerCtl: drawerIsOpen?', _Xstate.drawerOpen, newState);
+		Utils.debugMsg('drawerCtl: '+_Xstate.drawerOpen+', '+newState, Utils.VERBOSE);
 
-		if(typeof newState === 'undefined') _Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+		if(Utils.nullp(newState)) _Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
 	}
 
 	const handleListChange = listID => {
-		console.log('handleListChange', listID);
+		Utils.debugMsg('handleListChange: '+listID, Utils.VERBOSE);
 		dispatch(Lists.setList(listID));
 		setXstate({
 			'headerTitle': `${_Lists[listID].name}: List view`,
@@ -127,6 +120,7 @@ export default function Main() {
 			nullp: Utils.nullp,
 			parseName: name => Utils.camelize(Utils.sanitize(name.trim())),
 			timestamp: Utils.timestamp,
+			checkCollision: Utils.checkCollision
 		}
 	}
 /*

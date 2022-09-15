@@ -48,8 +48,8 @@ export default function CurrentListScreen({ _Xstate }) {
 				return {
 					id: itemID,
 					..._ItemStore[itemID],
-					..._Images[itemID],
-					..._History[itemID],
+					images: [ ..._Images[itemID] || []],
+					history: [ ..._History[itemID] || []],
 					...refList.inventory[itemID]
 				}
 			}), sortOpts);
@@ -91,15 +91,19 @@ export default function CurrentListScreen({ _Xstate }) {
 		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Lists.updateList({
-				..._Lists[currentList],
-				staples: staples.filter(i => i !== itemID)
-			}));
+			dispatch(Lists.updateList([
+				currentList,
+				{
+					staples: staples.filter(i => i !== itemID)
+				}
+			]));
 		else // add itemID to array
-			dispatch(Lists.updateList({
-				..._Lists[currentList],
-				staples: [ ...staples, itemID ]
-			}));
+			dispatch(Lists.updateList([
+				currentList,
+				{
+					staples: [ ...staples, itemID ]
+				}
+			]));
 	};
 
 	const editItem = item => {
@@ -173,7 +177,7 @@ export default function CurrentListScreen({ _Xstate }) {
 		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
 		setListData(newData);
 		setXstate({ "listData": newData });
-	}, [ _Lists[currentList].inventory ]);
+	}, [ _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
 
 	useEffect(_ => console.log(timestamp(), 'itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 

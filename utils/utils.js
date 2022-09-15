@@ -33,8 +33,18 @@ export const timestamp = _ => {
 export const truncateString = (str, num) => str.length >= num ? str.slice(0, num)+' ...' : str;
 export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-\[\]\{\}\\\|\`]/g, '') : false;
 export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
-export const parseName = val => camelize(sanitize(val.trim()));
-export const collisonCheck = (a, b) => parseName(a) === parseName(b);
+//export const parseName = val => val && camelize(sanitize(val.trim())) || '';
+export const parseName = val => {
+	debugMsg('parseName: '+val, VERBOSE);
+	return val ? camelize(sanitize(val.trim())) : '';
+}
+//export const collisionCheck = (a, b) => parseName(a) === parseName(b);
+export const collisionCheck = (a, b) => {
+	debugMsg('collisionCheck:'+
+		'\n\ta: '+parseName(a)+
+		'\n\tb: '+parseName(b), VERBOSE);
+	return parseName(a) === parseName(b);
+}
 
 // Check for null or undefined objects or props
 export const nullp = val => (typeof val === 'undefined' || val === null);
@@ -59,7 +69,7 @@ export const debugMsg = (fun, params=[], dlvl=9) => {
 	// default to 9
 
 
-export const getuuid = len => {
+export const genuuid = len => {
 	if(len) return Math.random().toString(16).slice(2, len > 13 ? 15 : 2 + len);
 	else return uuid.v4();
 }
@@ -101,8 +111,6 @@ export const createListItem = props => {
 	const {
 		name = 'New item',
 		tags = [],
-		history = [],
-		images = [],
 		parents = [],
 		price = '',
 		loc = '',
@@ -120,9 +128,7 @@ export const createListItem = props => {
 		type: 'item',
 		version: 1,
 		tags,
-		history,
 		parents,
-		images,
 		price,
 		loc,
 		url,

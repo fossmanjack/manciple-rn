@@ -19,44 +19,55 @@ const itemStoreSlice = createSlice({
 	reducers: {
 		// all reducers should take itemID or [ itemID, { props }] as payload
 		addItem: (iState, action) => {
-			// For adding a new item to inventory, but can handle item updates as well
+			// For adding a new item to inventory and initializing history and images
+			// Can't update items
 			// Expects an array [ itemID, { item }] as payload
+			Utils.debugMsg('addItem: '+JSON.stringify(action.payload), Utils.VERBOSE);
 			if(!action.payload) return iState;
 			let [ itemID, props ] = action.payload;
 			if(!itemID || !props || props.type !== 'item') return iState;
 
-			// does the item already exist?  If so, treat as an update
-			if(Object.keys(iState._ItemStore).includes(itemID)) {
-				props = {
-					...iState._ItemStore[itemID],
-					...props
-				};
-			}
+			// does the item already exist?  If so, do nothing
+			if(Object.keys(iState._ItemStore).includes(itemID)) return iState;
 
 			// does the item share a camelized name with an existing item?  If so,
-			// use those values instead
-			if(Object.values(iState._ItemStore).find(ob => Utils.camelize(ob.name) === Utils.camelize(props.name))) {
+			// do nothing
+			if(Object.keys(iState._ItemStore).find(key => Utils.collisionCheck(iState._ItemStore[key].name, props.name))) return iState;
+/*
+			if(Object.values(iState._ItemStore).find(ob => Utils.collisionCheck(ob.name, props.name))) {
 				itemID = Object.keys(iState._ItemStore).find(key =>
-					Utils.camelize(iState._ItemStore[key].name) === Utils.camelize(props.name));
+					Utils.collisionCheck(iState._ItemStore[key].name, props.name));
 				props = {
 					...iState._ItemStore[itemID],
 					...props
 				};
 			}
+*/
 
-			// replace or insert the object associated with the itemID
+			Utils.debugMsg('addItem: '+itemID+': '+JSON.stringify(props), Utils.VERBOSE);
+
+			// replace or insert the object associated with the itemID and
+			// initialize history and image arrays
 			return {
 				...iState,
 				_ItemStore: {
 					...iState._ItemStore,
 					[itemID]: props
+				},
+				_History: {
+					...iState._History,
+					[itemID]: []
+				},
+				_Images: {
+					...iState._Images,
+					[itemID]: []
 				}
-			}
+			};
 		},
 		updateItem: (iState, action) => {
 			// For updating an existing item
 			// expects [ itemID, { updatedProps }] as payload
-			console.log('Inv: updateItem,', action);
+			Utils.debugMsg('Istore: updateItem: '+JSON.stringify(action.payload), Utils.VERBOSE);
 			if(!action.payload) return iState;
 			const [ itemID, props ] = action.payload;
 			if(!itemID || !props) return iState;
@@ -105,13 +116,13 @@ const itemStoreSlice = createSlice({
 			const [ itemID, newDate ] = action.payload;
 			if(!itemID || !newDate) return iState;
 
-			const newHist = [ newDate, ...iState._History[itemID] || [] ];
+			//const newHist = [ newDate, ...iState._History[itemID] || [] ];
 
 			return {
 				...iState,
 				_History: {
 					...iState._History,
-					[itemID]: newHist
+					[itemID]: [ newDate, ...iState._History[itemID] || [] ]
 				}
 			};
 		},

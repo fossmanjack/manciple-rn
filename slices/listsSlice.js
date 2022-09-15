@@ -46,7 +46,7 @@ const listsSlice = createSlice({
 			// Adds listID: pantry to _Lists
 			// Will not allow listID or pantry.name overwrite
 			// use this ONLY when creating a new pantry from scratch
-			// imports should use updatePantry
+			// imports should use importPantry
 			Utils.debugMsg('addList: '+action.payload, Utils.VERBOSE);
 			if(!action.payload) return lState;
 			const [
@@ -82,40 +82,68 @@ const listsSlice = createSlice({
 			};
 		},
 		updateList: (lState, action) => {
-			// update an existing list
+			// update an existing list, mostly like staples and such
 			// action.payload is [ listID, { ...props } ]
-			// use this when importing a list
+			// use this when importing a list ...  no, we'll write an importList function
 
 			if(!action.payload) return lState;
 
 			const [ listID, props ] = action.payload;
 			if(!listID || !props) return lState;
 
+			// Can't do anything unless the list exists
+			if(!Object.keys(lState._Lists).includes(listID)) return lState;
+
 			// Name collisions are still not ok
+			if(props.name && Object.keys(lState._Lists).filter(key => key !== listID)
+					.find(key => Utils.collisionCheck(lState._Lists.name, props.name)))
+					props.name = props.name+' '+Utils.genuuid(6);
+/*
+			// Name collisions are still not ok
+			// if no prop.name we can safely
 			const incomingName = Object.keys(lState._Lists).includes(listID)
 				? lState._Lists[listID].name
 				: props.name || 'New list '+Utils.genuuid(6);
 			if(Object.keys(lState._Lists).find(key => Utils.collisonCheck(lState._Lists[key].name, incomingName)))
 				props.name = ''+props.name+' '+Utils.genuuid(6);
+*/
 
 			return {
 				...lState,
 				_Lists: {
 					...lState._Lists,
 					[listID]: {
-						...(lState._Lists[listID] || {}),
+						...lState._Lists[listID],
 						...props,
 						modifyDate: Date.now()
 					}
 				}
 			};
 		},
+		importList: (lState, action) => {
+			// Import an existing list
+			// Will overwrite list if it exists
+			// action.payload is [ listID, { list object } ]
+			const [ listID = Utils.genuuid(), newList = Utils.createShoppingList() ] = action.payload;
+
+			return {
+				...lState,
+				_Lists: {
+					...lState._Lists,
+					[listID]: {
+						...newList,
+						modifyDate: Date.now()
+					}
+				}
+			}
+		},
+
 		// pantry inventory management
 		addItemToList: (lState, action) => {
 			// Update an item in inventory
 			// action.payload is [ itemID, { props }, listID ]
 			// Note that if item is in inventory already it'll be overwritten
-			Utils.debugMsg('addItemToList '+lState+' '+action, Utils.VERBOSE);
+			Utils.debugMsg('addItemToList '+JSON.stringify(lState)+' '+JSON.stringify(action), Utils.VERBOSE);
 			if(!action.payload) return lState;
 			const [ itemID, props, listID = lState.currentList ] = action.payload;
 			if(!itemID || !props) return lState;
@@ -141,7 +169,7 @@ const listsSlice = createSlice({
 
 			const [ itemID, listID = lState.currentList ] = action.payload;
 
-			const newInv = lState._Lists[listID].inventory;
+			const newInv = { ...lState._Lists[listID].inventory };
 			delete newInv[itemID];
 
 			return {
@@ -197,6 +225,7 @@ export const {
 	addList,
 	deleteList,
 	updateList,
+	importList,
 	addItemToList,
 	deleteItemFromList,
 	updateItemInList

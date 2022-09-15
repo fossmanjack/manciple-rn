@@ -146,7 +146,7 @@ export default function Carousel(props) {
 								onPress={handleDecrement}
 							/>
 							{
-								mode === 'list' && (
+								_Xstate.currentScreen === 'currentList' && (
 									<Button
 										icon={
 											<Icon

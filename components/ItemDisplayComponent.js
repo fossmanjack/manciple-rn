@@ -39,13 +39,14 @@ export default function ItemDisplay({ item, _Xstate }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
+	const { setXstate, dispatch } = _Xstate.funs;
 /*
 	const {
 		handleCheckBox,
 		handleDateChange
 	} = exports;
 */
-	const global = _Xstate.currentScreen === 'itemStore' ? true : false;
+	const global = _Xstate.currentScreen === 'itemStore';
 
 	const handleCheckBox = itemID => {
 		console.log('handleCheckBox called with item', itemID);
@@ -253,20 +254,26 @@ Solutions:
 									: '-'
 								}
 							/>
-							{ showCalendar && !global (
+							{ showCalendar && !global && (
 								<DateTimePicker
 									value={pickDate}
 									mode='date'
 									display='calendar'
 									onChange={(e, newDate) => {
-										setXstate({ 'showCalendar': false });
-										if(e.type !== 'neutralButtonPressed')
+										Utils.debugMsg('dateTimePicker:\n\te: '+
+											JSON.stringify(e)+'\n\tnewDate: '+
+											JSON.stringify(newDate)+
+											'\n\te.type: '+e.type);
+										//setXstate({ 'showCalendar': false });
+										setShowCalendar(false);
+										if(e.type === 'set')
 										{
+											Utils.debugMsg('setting date...');
 											setPickDate(newDate);
 											dispatch(Lists.updateItemInList([
 												item.id,
 												{
-													purchaseBy: newDate.getTime()
+													purchaseBy: e.nativeEvent.timestamp
 												}
 											]));
 										}
