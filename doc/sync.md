@@ -65,3 +65,53 @@ only work if the back-end was the primary data source, and I want to avoid that.
 So we're back to the manifest/update changes approach I guess.  Bleh.
 
 Let's think about this.  Think about this.  With push notifications maybe?  Idk
+
+### Tentative Update Flow
+
+- User dispatches state change
+
+{ action: 'slice/method', payload: [ ID, { data }] }
+
+- Middleware catches and packages like so:
+
+{
+	timestamp: Date.now(),
+	clientID,
+	dispatch: action,
+}
+
+- Middleware hands this off to seneschal and waits for response
+- Seneschal has been keeping track of connections from each client on back end,
+and each time a connection comes in, it sends as a response all dispatches received since
+last connection in array form [ [ timestamp, dispatch ], [ timestamp, dispatch ] ]
+- Potentially the array also includes as its first entry the current md5sum of the data in the database?
+- Middleware gets these items and dispatches them, then allows most recent dispatch to go forward
+- If the local checksum doesn't match the remote checksum after processing the queue then a re-sync can be requested
+- Extremely asynchronous
+- Worth noting that it's only itemStore and lists that are tracked in this way
+
+The problem with this approach is that it's inherently synchronous, and this needs to be an add-on -- if there's no
+internet connection, the app still has to work.  There's also the question of who gets which updates -- if they don't
+pertain to a list that's shared with the user then there's no point in sending them.
+
+Let's get the app working and then worry about how to handle the back end.  I don't think we're going to make Honors
+graduation at this rate.
+
+
+
+
+- updates previous checksum, then dispatches as normal
+- Seneschal receives the action and slots it into _Journal?
+- Meanwhile seneschal is listening to _Journal
+
+
+
+- Middleware sends seneschal lastUpdate, sees if there are any actions in queue
+- If yes, seneschal returns actions array [ [ timestamp, action ], [ timestamp, action ] ]
+- Response gets parsed and added to local dispatch queue
+- Local dispatch queue processed
+- Middleware sends
+- Middleware catches action and forwards to seneschal
+- Seneschal adds action to _Queue with timestamp
+- Seneschal processes action, DB is updated
+- Seneschal

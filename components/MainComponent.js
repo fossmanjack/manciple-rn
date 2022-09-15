@@ -20,12 +20,15 @@ import * as Global from '../slices/globalSlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function Main() {
+export default function Main({ _Xstate }) {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
 	//const [ _Xstate, updateXstate ] = useState({ });
-	const drawer = useRef(null);
+	//const drawer = useRef(null);
+	const { drawer, funs: { setXstate, drawerCtl, dispatch } } = _Xstate;
+
+	console.log('*********> MainComponent rendered!');
 
 // Transient Application State (_Xstate) -- functions first
 /* useState version
@@ -34,17 +37,21 @@ export default function Main() {
 		updateXstate({ ..._Xstate, ...payload });
 	}
 */
-
+/*
 	// I guess for the references (listData, etc) to work correctly we need to
 	// mutate the state object instead of replacing it immutably.  This is disappointing
 	// and I may revisit when I have more time.
 	//const setXstate = payload => Object.keys(payload).forEach(key => _Xstate[key] = payload[key]);
 	const setXstate = payload => {
 		Utils.debugMsg('setXstate payload: '+JSON.stringify(payload));
-		Object.keys(payload).forEach(key => {
-			Utils.debugMsg('setXstate key: '+key+'\nvalue: '+JSON.stringify(payload[key]), Utils.VERBOSE);
-			_Xstate[key] = payload[key];
-		});
+
+		//Object.keys(payload).forEach(key => {
+		//	Utils.debugMsg('setXstate key: '+key+'\nvalue: '+JSON.stringify(payload[key]), Utils.VERBOSE);
+		//	_Xstate[key] = payload[key];
+		//});
+
+		_Xstate = { ..._Xstate, ...payload };
+		Utils.debugMsg('setXstate done: '+JSON.stringify(_Xstate));
 	}
 
 	const navigate = destScreen => {
@@ -86,13 +93,11 @@ export default function Main() {
 
 	};
 
+	const dispatch = useDispatch();
+
 
 	// init Xstate
 
-/*
-	useEffect(_ => {
-		setXstate({
-*/
 	var _Xstate = {
 		currentScreen: 'currentList',
 		screenHist: [],
@@ -108,24 +113,21 @@ export default function Main() {
 		showSortOrder: false,
 		deleteItems: false,
 		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
-		headerControls: false,
+		headerControls: true,
 		funs: {
 			drawerCtl,
 			handleListChange,
 			setXstate,
 			navigate,
-			dispatch: useDispatch(),
+			dispatch,
 			sanitize: Utils.sanitize,
 			camelize: Utils.camelize,
 			nullp: Utils.nullp,
-			parseName: name => Utils.camelize(Utils.sanitize(name.trim())),
+			parseName: Utils.parseName,
 			timestamp: Utils.timestamp,
 			checkCollision: Utils.checkCollision
 		}
 	}
-/*
-		});
-	}, []);
 */
 
 
@@ -133,16 +135,6 @@ export default function Main() {
 		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
 
 	}
-
-/*
-	const setXstate = props => {
-		if(typeof props !== 'object') return _Xstate;
-		return {
-			..._Xstate,
-			...props
-		}
-	}
-*/
 
 // drawer functions
 	const setDrawerOpen = _ => {
@@ -178,9 +170,11 @@ export default function Main() {
 			/>
 			<Screen
 				_Xstate={_Xstate}
+				key={_Xstate.currentScreen}
 			/>
 			<ModalDialogComponent
 				_Xstate={_Xstate}
+				key={_Xstate}
 			/>
 		</DrawerLayoutAndroid>
 	);

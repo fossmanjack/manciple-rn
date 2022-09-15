@@ -44,45 +44,47 @@ export default function NavDrawer({ drawer, _Xstate }) {
 						const list = _Lists[data.item];
 						Utils.debugMsg('NavComponent renderItem:\n\tdata: '+JSON.stringify(data)+
 							'\n\tlist.name: '+list.name);
-						<Pressable
-							onPress={_ => handleListChange(key)}
-							onLongPress={_ => {
-								setXstate({
-									'showListDetail': true,
-									'listToEdit': key
-								});
-								drawerCtl(false);
-							}}
-							style={{
-								borderBottomWidth: 1,
-								borderBottomColor: 'lightgray',
-								paddingVertical: 10,
-							}}
-						>
-							<View
+						return (
+							<Pressable
+								onPress={_ => handleListChange(data.item)}
+								onLongPress={_ => {
+									setXstate({
+										'showListDetail': true,
+										'listToEdit': data.item
+									});
+									drawerCtl(false);
+								}}
 								style={{
-									flexDirection: 'row',
-									alignItems: 'center'
+									borderBottomWidth: 1,
+									borderBottomColor: 'lightgray',
+									paddingVertical: 10,
 								}}
 							>
-								<Icon
-									name='list'
-									type='entypo'
-									size={22}
+								<View
 									style={{
-										marginRight: 3,
-										marginLeft: 10
-									}}
-								/>
-								<Text
-									style={{
-										fontSize: 18
+										flexDirection: 'row',
+										alignItems: 'center'
 									}}
 								>
-									{list.name}
-								</Text>
-							</View>
-						</Pressable>
+									<Icon
+										name='list'
+										type='entypo'
+										size={22}
+										style={{
+											marginRight: 3,
+											marginLeft: 10
+										}}
+									/>
+									<Text
+										style={{
+											fontSize: 18
+										}}
+									>
+										{list.name}
+									</Text>
+								</View>
+							</Pressable>
+						);
 					}}
 				/>
 			}
@@ -134,11 +136,51 @@ export default function NavDrawer({ drawer, _Xstate }) {
 					paddingVertical: 10,
 				}}
 				onPress={_ => {
+					console.log('Displaying current Xstate -->');
+					const disp = { ..._Xstate };
+					delete disp.drawer;
+					console.log(disp);
+					//console.log(util.inspect(JSON.stringify(_Xstate), { maxStringLength: null }));
+					//process.stdout.write(JSON.stringify(_Xstate, null, 2));
+					//console.log(_Xstate);
+				}}
+			>
+				<View
+					style={{
+						flexDirection: 'row',
+						alignItems: 'center'
+					}}
+				>
+					<Icon
+						name='state-machine'
+						type='material-community'
+						size={22}
+						style={{
+							marginRight: 3,
+							marginLeft: 10
+						}}
+					/>
+					<Text
+						style={{
+							fontSize: 18
+						}}
+					>
+						Dump Xstate
+					</Text>
+				</View>
+			</Pressable>
+			<Pressable
+				style={{
+					borderBottomWidth: 1,
+					borderBottomColor: 'lightgray',
+					paddingVertical: 10,
+				}}
+				onPress={_ => {
 					setXstate({
 						'headerTitle': 'Manciple Options',
 						'headerControls': false
 					});
-					drawer.closeDrawer();
+					drawerCtl(false);
 					navigate('options');
 				}}
 			>
