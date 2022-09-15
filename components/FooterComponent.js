@@ -181,9 +181,14 @@ export const getAllTags = _ => {
 	}
 
 	const dumpState = _ => {
-		const state = _Store.getState();
+		//const state = _Store.getState();
+		//console.log(state);
+		Utils.debugMsg('Dumping _Xstate ------->', Utils.VERBOSE);
+		const dump = { ..._Xstate };
+		delete dump.drawer;
 
-		console.log(state);
+		console.log(dump);
+
 	}
 
 	const dumpListData = _ => {
@@ -218,7 +223,7 @@ export const getAllTags = _ => {
 			/>
 			<Pressable
 				onPress={dumpListData}
-				onLongPress={dumpState}
+				onLongPress={_Xstate.funs.dumpXstate}
 			>
 					<Icon
 						style={_Styles.footerIcon}

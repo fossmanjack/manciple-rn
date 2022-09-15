@@ -5,8 +5,7 @@ import ListEditDialog from '../dialogs/ListEditDialog';
 import ItemEditModal from '../dialogs/ItemEditModal';
 import SortOrderDialog from '../dialogs/SortOrderDialog';
 
-export default function ModalDialogComponent(props) {
-	const { _Xstate, setXstate } = props;
+export default function ModalDialogComponent({ _Xstate }) {
 
 	return (
 		<>

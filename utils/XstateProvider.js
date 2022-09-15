@@ -16,6 +16,13 @@ export default function XstateProvider() {
 		//Utils.debugMsg('setXstate done: '+JSON.stringify(_Xstate));
 	}
 
+	const dumpXstate = _ => {
+		Utils.debugMsg('Dumping current Xstate ---->');
+		const dump = { ..._Xstate };
+		delete dump.drawer;
+		console.log(dump);
+	}
+
 	const navigate = destScreen => {
 		if(destScreen) {
 			setXstate({
@@ -83,6 +90,7 @@ export default function XstateProvider() {
 			setXstate,
 			navigate,
 			dispatch,
+			dumpXstate,
 			sanitize: Utils.sanitize,
 			camelize: Utils.camelize,
 			nullp: Utils.nullp,
