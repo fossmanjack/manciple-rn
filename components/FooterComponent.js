@@ -22,12 +22,18 @@ import * as Istore from '../slices/itemStoreSlice';
 
 // Utils
 import { _Store } from '../res/_Store';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 import * as Utils from '../utils/utils';
 import { _Styles } from '../res/_Styles';
 
 export default function Footer() {
-	const { dispatch, parseName, checkCollision } = Xstate;
+	const {
+		dispatch,
+		dumpXstate,
+		parseName,
+		checkCollision,
+		listData
+	} = useXstate();
 	//const { funs: { dispatch, parseName, checkCollision } } = _Xstate;
 	const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
@@ -159,8 +165,8 @@ export const getAllTags = _ => {
 					dispatch(Lists.addItemToList([ itemID,
 						{
 							inCart: false,
-							qty: invItem.defaultQty || '1',
-							purchaseBy: invItem.interval && _History[itemID][0]
+							qty: _ItemStore[itemID].defaultQty || '1',
+							purchaseBy: _ItemStore[itemID].interval && _History[itemID][0]
 								? _History[itemID][0] + (invItem.interval * 86400000)
 								: 0,
 						}
@@ -176,12 +182,12 @@ export const getAllTags = _ => {
 
 	const handleSweepAll = _ => {
 
-		_Xstate.listData.filter(item => item.inCart).forEach(item => {
+		listData.filter(item => item.inCart).forEach(item => {
 			dispatch(Istore.updateHistory([ item.id, Date.now() ]));
 			dispatch(Lists.deleteItemFromList([ item.id ]));
 		});
 	}
-
+/*
 	const dumpState = _ => {
 		//const state = _Store.getState();
 		//console.log(state);
@@ -192,10 +198,11 @@ export const getAllTags = _ => {
 		console.log(dump);
 
 	}
+*/
 
 	const dumpListData = _ => {
 		console.log('Current list data:\n');
-		console.log(_Xstate.listData);
+		console.log(listData);
 	}
 
 	return (
@@ -225,7 +232,7 @@ export const getAllTags = _ => {
 			/>
 			<Pressable
 				onPress={dumpListData}
-				onLongPress={_Xstate.funs.dumpXstate}
+				onLongPress={dumpXstate}
 			>
 					<Icon
 						style={_Styles.footerIcon}

@@ -23,7 +23,7 @@ import * as Lists from '../slices/listsSlice';
 import * as Global from '../slices/globalSlice';
 
 // utility imports
-import { Xstate, XstateProvider } from '../res/Xstate';
+import { useXstate, XstateProvider } from '../res/Xstate';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
@@ -31,13 +31,15 @@ export default function Main() {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
-	const {
-		setXstate,
+	const Xstate = useXstate();
+	const { setXstate } = Xstate;
+
 	//const [ _Xstate, updateXstate ] = useState({ });
-	//const drawer = useRef(null);
+	const drawer = useRef(null);
 	//const { drawer, funs: { setXstate, drawerCtl, dispatch } } = _Xstate;
 
-	console.log('*********> MainComponent rendered!');
+	Utils.debugMsg('MainComponent rendered!\n**************************************\n'+
+		'\tXstate: '+JSON.stringify(Xstate));
 
 // Transient Application State (_Xstate) -- functions first
 /* useState version
@@ -121,7 +123,7 @@ export default function Main() {
 	const drawerCtl = newState => {
 		// if newState is undefined, toggle the drawer
 		// Otherwise, if "true" open the drawer, if "false" close the drawer
-		Utils.debugMsg('drawerCtl: '+drawerOpen+', '+newState, Utils.VERBOSE);
+		Utils.debugMsg('drawerCtl: '+Xstate.drawerOpen+', '+newState, Utils.VERBOSE);
 
 		if(Utils.nullp(newState)) Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
@@ -139,10 +141,16 @@ export default function Main() {
 
 	};
 
-	useState(_ => {
+	const dumpXstate = _ => {
+		Utils.debugMsg('Dumping current Xstate...', Utils.VERBOSE);
+		console.log(Xstate);
+	};
+
+	useEffect(_ => {
 		setXstate({
 			navigate,
 			drawerCtl,
+			dumpXstate,
 			handleListChange
 		});
 	}, []);
@@ -227,7 +235,7 @@ export default function Main() {
 					drawer={drawer.current}
 				/>
 			}
-			key={currentScreen}
+			key={Xstate.currentScreen}
 			onDrawerOpen={_ => setXstate({ drawerOpen: true })}
 			onDrawerClose={_ => setXstate({ drawerOpen: false })}
 		>

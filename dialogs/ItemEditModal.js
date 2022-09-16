@@ -21,7 +21,8 @@ import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 
 // Xstate
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
+import * as Utils from '../utils/utils';
 
 export default function ItemEditModal() {
 	const {
@@ -31,7 +32,7 @@ export default function ItemEditModal() {
 		setXstate,
 		parseName,
 		nullp
-	} = Xstate;
+	} = useXstate();
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	// updatedItem holds the props that have been changed
@@ -49,7 +50,8 @@ export default function ItemEditModal() {
 	// tracking this separately because it's handled separately
 	// staple and purchaseBy are handled elsewhere
 
-	console.log('EditItemModal', itemID, updatedItem);
+	Utils.debugMsg('Rendering ItemEditModal with itemID: '+itemID+
+		'\n\trefItem: '+refItem, Utils.VERBOSE);
 
 	const handleCommit = _ => {
 		if(Object.keys(updatedItem).length) { // only do stuff if there are changes

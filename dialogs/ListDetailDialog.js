@@ -11,10 +11,10 @@ import { Button, Icon } from 'react-native-elements';
 import Dialog from 'react-native-dialog';
 
 // Xstate
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function ListDetailDialog() {
-	const { listToEdit: listID, setXstate } = Xstate;
+	const { listToEdit: listID, setXstate, showListDetail } = useXstate();
 	const { _Lists } = useSelector(S => S.lists);
 	const refList = _Lists[listID];
 
@@ -23,7 +23,7 @@ export default function ListDetailDialog() {
 	}
 
 	return (
-		<Dialog.Container visible={_Xstate.showListDetail}>
+		<Dialog.Container visible={showListDetail}>
 			<Dialog.Title>
 				List Info: {refList.name}
 			</Dialog.Title>

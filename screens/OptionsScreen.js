@@ -20,10 +20,10 @@ import * as Global from '../slices/globalSlice';
 //import * as Dav from '../utils/davModule';
 import * as Saver from '../utils/saver';
 import { _Persist } from '../res/_Store';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function OptionsScreen() {
-	const { dispatch, drawerCtl, navigate } = Xstate;
+	const { dispatch, drawerCtl, navigate } = useXstate();
 	const _Opts = useSelector(S => S.options);
 //	const [ username, setUsername ] = useState('');
 //	const [ password, setPassword ] = useState('');

@@ -13,15 +13,16 @@ import Dialog from 'react-native-dialog';
 import * as Lists from '../slices/listsSlice';
 
 // Xstate
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function ListEditDialog() {
 	const {
 		listToEdit: listID,
 		dispatch,
 		setXstate,
-		parseName
-	} = Xstate;
+		parseName,
+		showListEdit
+	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const [ refList, setRefList ] = useState({ ..._Lists[listID] });
@@ -51,7 +52,7 @@ export default function ListEditDialog() {
 	useEffect(_ => setRefList({ ...refList, ...updatedList }), [ updatedList ]);
 
 	return (
-		<Dialog.Container visible={_Xstate.showListEdit}>
+		<Dialog.Container visible={showListEdit}>
 			<Dialog.Title>
 				Edit List
 			</Dialog.Title>

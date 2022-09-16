@@ -20,7 +20,7 @@ import UserComponent from '../components/UserComponent';
 
 // utils
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function NavDrawer() {
 	const {
@@ -31,7 +31,7 @@ export default function NavDrawer() {
 		dumpXstate,
 		navigate,
 		drawerCtl
-	} = Xstate;
+	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	Utils.debugMsg('NavDrawer rendering with keys: '+JSON.stringify(Object.keys(_Lists)), Utils.VERBOSE);
 

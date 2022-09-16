@@ -7,12 +7,12 @@ import HelpScreen from '../screens/HelpScreen';
 import ItemStoreScreen from '../screens/ItemStoreScreen';
 import OptionsScreen from '../screens/OptionsScreen';
 import UserScreen from '../screens/UserScreen';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function Screen() {
 	// I utterly cannot figure out how to do this with switch, so if/else it is
 
-	const { nav: currentScreen } = Xstate;
+	const { currentScreen: nav } = useXstate();
 
 	if(nav === 'currentList')
 		return <CurrentListScreen />;

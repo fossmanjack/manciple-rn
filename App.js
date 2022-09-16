@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { _Store } from './res/_Store';
 import { _Styles } from './res/_Styles';
-import MainScreen from './screens/MainScreen';
+//import MainScreen from './screens/MainScreen';
 //import XstateProvider from './utils/XstateProvider';
 import { XstateProvider } from './res/Xstate';
 import Main from './components/MainComponent';

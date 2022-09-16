@@ -23,9 +23,9 @@ import * as Istore from '../slices/itemStoreSlice';
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
-export default function ItemStoreScreen({ _Xstate }) {
+export default function ItemStoreScreen() {
 	const {
 		listData,
 		itemToEdit,
@@ -33,7 +33,7 @@ export default function ItemStoreScreen({ _Xstate }) {
 		drawerCtl,
 		dispatch,
 		setXstate
-	} = Xstate;
+	} = useXstate();
 
 
 	const { _Lists, currentList } = useSelector(S => S.lists);

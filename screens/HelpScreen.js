@@ -3,10 +3,10 @@ import {
 	View
 } from 'react-native';
 import Header from '../components/HeaderComponent';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function HelpScreen() {
-	const { navigate } = Xstate;
+	const { navigate } = useXstate();
 
 	return (
 		<View>

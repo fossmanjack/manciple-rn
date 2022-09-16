@@ -13,14 +13,16 @@ import * as Lists from '../slices/listsSlice';
 
 // utils
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function ListDeleteDialog() {
 	const {
 		listToEdit: listID,
 		setXstate,
-		dispatch
-	} = Xstate;
+		dispatch,
+		deleteItems,
+		showListDelete
+	} = useXstate();
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
@@ -69,7 +71,7 @@ export default function ListDeleteDialog() {
 			// remove the deleted pantry from parents
 			rents = _ItemStore[itemID].parents.filter(ptID => ptID === listID);
 			// if clear flag is set and no parents remain, delete the item from inventory
-			if(_Xstate.deleteItems && !rents.length)
+			if(deleteItems && !rents.length)
 				dispatch(Istore.deleteItem(itemID));
 			// otherwise update the item with the new, potentially empty, parents array
 			else
@@ -78,7 +80,7 @@ export default function ListDeleteDialog() {
 	}
 
 	return (
-		<Dialog.Container visible={_Xstate.showListDelete}>
+		<Dialog.Container visible={showListDelete}>
 			<Dialog.Title>
 				Delete List?
 			</Dialog.Title>
@@ -88,7 +90,7 @@ export default function ListDeleteDialog() {
 			</Dialog.Description>
 			<Dialog.Switch
 				label='Delete associated items from store'
-				value={_Xstate.deleteItems}
+				value={deleteItems}
 				onValueChange={val => setXstate({ 'deleteItems': val })}
 			/>
 			<Dialog.Button label='Cancel' onPress={handleCancel} />

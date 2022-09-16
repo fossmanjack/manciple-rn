@@ -25,7 +25,7 @@ import * as Istore from '../slices/itemStoreSlice';
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function CurrentListScreen() {
 	const {
@@ -35,14 +35,15 @@ export default function CurrentListScreen() {
 		dispatch,
 		setXstate,
 		timestamp,
-		listData
-	} = Xstate;
+		listData,
+		debugMsg
+	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
-	const [ listData, setListData ] = useState(listData || []);
+	//const [ listData, setListData ] = useState(listData || []);
 
-	console.log(timestamp(), 'CurrentListScreen', Xstate);
+	debugMsg('CurrentListScreen rendered with Xstate: '+useXstate(), Utils.VERBOSE);
 
 	const generateListData = _ => {
 		const refList = _Lists[currentList] || Utils.blankList;
@@ -183,7 +184,7 @@ export default function CurrentListScreen() {
 		Utils.debugMsg('Subbing to listData: '+currentList, Utils.VERBOSE);
 		const newData = generateListData();
 		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
-		setListData(newData);
+		//setListData(newData);
 		setXstate({ "listData": newData });
 	}, [ _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
 

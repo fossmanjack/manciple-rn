@@ -10,10 +10,10 @@ import {
 	Avatar
 } from 'react-native-elements';
 
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function UserComponent() {
-	const { navigate, drawerCtl } = Xstate;
+	const { navigate, drawerCtl } = useXstate();
 
 	const handlePress = _ => {
 		navigate('user');

@@ -2,7 +2,7 @@
 // Dialog for what it says
 
 // React, RN, RNE, redux
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 // Community
@@ -12,10 +12,10 @@ import Dialog from 'react-native-dialog';
 import * as Lists from '../slices/listsSlice';
 
 // Xstate
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function ListCreateDialog() {
-	const { dispatch, setXstate, sanitize } = Xstate;
+	const { dispatch, setXstate, sanitize, showListCreate } = useXstate();
 
 	const [ input, setInput ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
@@ -31,7 +31,7 @@ export default function ListCreateDialog() {
 	}
 
 	return (
-		<Dialog.Container visible={_Xstate.showListCreate}>
+		<Dialog.Container visible={showListCreate}>
 			<Dialog.Title>
 				Create New List
 			</Dialog.Title>

@@ -32,7 +32,7 @@ import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function ItemDisplay({ item }) {
 	const { _Lists, currentList } = useSelector(S => S.lists);
@@ -40,7 +40,7 @@ export default function ItemDisplay({ item }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
-	const { currentScreen, setXstate, dispatch } = Xstate;
+	const { currentScreen, setXstate, dispatch } = useXstate();
 /*
 	const {
 		handleCheckBox,
@@ -57,16 +57,16 @@ export default function ItemDisplay({ item }) {
 			const refItem = _ItemStore[itemID];
 			if(Object.keys(inventory).includes(itemID)) {
 				if(inventory[itemID].inCart) {
-					_Xstate.funs.dispatch(Istore.updateHistory([
+					dispatch(Istore.updateHistory([
 						itemID, Date.now()
 					]));
 				}
-				_Xstate.funs.dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
+				dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
 
 			} else {
-				_Xstate.funs.dispatch(Lists.addItemToList([ itemID, currentList ]));
+				dispatch(Lists.addItemToList([ itemID, currentList ]));
 				if(!refItem.parents.includes(currentList))
-					_Xstate.funs.dispatch(Istore.updateItem([
+					dispatch(Istore.updateItem([
 						itemID,
 						{
 							...refItem,
@@ -79,7 +79,7 @@ export default function ItemDisplay({ item }) {
 			const newItem = { ..._Lists[currentList].inventory[itemID] };
 			newItem.inCart = !newItem.inCart;
 
-			_Xstate.funs.dispatch(Lists.updateItemInList([ itemID, newItem, currentList ]));
+			dispatch(Lists.updateItemInList([ itemID, newItem, currentList ]));
 		}
 	}
 
@@ -209,7 +209,6 @@ Solutions:
 				padding: 20
 			}}>
 				<Carousel
-					_Xstate={_Xstate}
 					item={item}
 					width={200}
 					height={200}

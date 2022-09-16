@@ -24,11 +24,11 @@ import Dialog from 'react-native-dialog';
 import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 import * as Utils from '../utils/utils';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 export default function Carousel(props) {
 	const { item, height, width } = props;
-	const { dispatch } = Xstate;
+	const { dispatch } = useXstate();
 	const { id: itemID, images: pics } = item;
 
 	const [ currentImgIndex, setCurrentImgIndex ] = useState(0);

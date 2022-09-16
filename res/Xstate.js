@@ -1,9 +1,14 @@
-import { useState, createContext } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState, useContext, createContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import * as Utils from '../utils/utils';
 
-export const XstateProvider(props) {
-	const XstateContext = createContext({});
+const XstateContext = createContext({});
+
+export function XstateProvider(props) {
+	const { _Lists, currentList } = useSelector(S => S.lists);
+	const { _ItemStore } = useSelector(S => S.itemStore);
+
 	const setXstate = payload => {
 		Utils.debugMsg('setXstate payload: '+JSON.stringify(payload), Utils.VERBOSE);
 		delete payload.setXstate; // don't ever overwrite this
@@ -14,6 +19,7 @@ export const XstateProvider(props) {
 			lastUpdate: Date.now()
 		}));
 	}
+
 	const [ transientState, setTransientState ] = useState({
 		currentScreen: 'currentList',
 		screenHist: [],
@@ -36,12 +42,12 @@ export const XstateProvider(props) {
 		nullp: Utils.nullp,
 		parseName: Utils.parseName,
 		checkCollision: Utils.checkCollision,
-		setXstate,
-		dumpXstate: function() {
-			Utils.debugMsg('Dumping current Xstate...');
-			console.log(this);
-		}
+		timestamp: Utils.timestamp,
+		debugMsg: Utils.debugMsg,
+		setXstate
 	});
+	Utils.debugMsg('XstateContext:\n\ttransientState: '+JSON.stringify(transientState)+
+		'\n\tXstate Context: '+JSON.stringify(useContext(XstateContext)));
 
 	return (
 		<XstateContext.Provider value={transientState}>
@@ -50,5 +56,5 @@ export const XstateProvider(props) {
 	);
 }
 
-export const Xstate = useContext(XstateContext);
+export const useXstate = _ => useContext(XstateContext);
 

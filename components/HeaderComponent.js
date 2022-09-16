@@ -13,7 +13,7 @@ import SortOrderDialog from '../dialogs/SortOrderDialog';
 // import slices
 import * as Global from '../slices/globalSlice';
 import * as Lists from '../slices/listsSlice';
-import { Xstate } from '../res/Xstate';
+import { useXstate } from '../res/Xstate';
 
 // function def
 export default function Header() {
@@ -25,7 +25,7 @@ export default function Header() {
 		drawerCtl,
 		setXstate,
 		navigate
-	} = Xstate;
+	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleToggleMode = _ => {
