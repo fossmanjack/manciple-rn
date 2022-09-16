@@ -3,7 +3,7 @@
 // Couldn't find one I liked so made this from scratch
 
 // React, RN, RNE, Redux
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import {
 	Image,
 	Pressable,
@@ -24,10 +24,11 @@ import Dialog from 'react-native-dialog';
 import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
 export default function Carousel(props) {
-	const { item, height, width, _Xstate } = props;
-	const { dispatch } = _Xstate.funs;
+	const { item, height, width } = props;
+	const { dispatch } = Xstate;
 	const { id: itemID, images: pics } = item;
 
 	const [ currentImgIndex, setCurrentImgIndex ] = useState(0);

@@ -2,8 +2,14 @@
 // Handles modals, dialogs, navdrawer, header, loading from back-end
 
 // Import React, RN, Redux native and community components
-import { useState, useEffect, useRef } from 'react';
-import { DrawerLayoutAndroid } from 'react-native';
+import {
+	createContext,
+	useState,
+	useEffect,
+	useRef,
+	useContext
+} from 'react';
+import { DrawerLayoutAndroid, useWindowDimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Import local components
@@ -17,16 +23,19 @@ import * as Lists from '../slices/listsSlice';
 import * as Global from '../slices/globalSlice';
 
 // utility imports
+import { Xstate, XstateProvider } from '../res/Xstate';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
 
-export default function Main({ _Xstate }) {
+export default function Main() {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { debug, sortOpts } = useSelector(S => S.options);
+	const {
+		setXstate,
 	//const [ _Xstate, updateXstate ] = useState({ });
 	//const drawer = useRef(null);
-	const { drawer, funs: { setXstate, drawerCtl, dispatch } } = _Xstate;
+	//const { drawer, funs: { setXstate, drawerCtl, dispatch } } = _Xstate;
 
 	console.log('*********> MainComponent rendered!');
 
@@ -55,37 +64,72 @@ export default function Main({ _Xstate }) {
 		Utils.debugMsg('setXstate done: '+JSON.stringify(_Xstate));
 	}
 */
+/*
+	useEffect(_ => {
+		setXstate({
+			navigate: destScreen => {
+				if(destScreen) {
+					setXstate({
+						'screenHist': [ currentScreen, ...screenHist ],
+						'currentScreen': destScreen
+					});
+				} else {
+					newHist = [ ...screenHist ];
+
+					setXstate({
+						'currentScreen': newHist.unshift(),
+						'screenHist': newHist
+					});
+				}
+			},
+			drawerCtl: newState => {
+				if(nullp(newState)) drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+				else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
+			},
+			handleListChange: listID => {
+				dispatch(Lists.setList(listID));
+				setXstate({
+					'headerTitle': `${_Lists[listID].name}: List view`,
+					'headerControls': true
+				});
+				navigate('currentList');
+				drawerCtl(false);
+			}
+		});
+	}, []);
+*/
+// some extra functions
+// we'll try this so we don't have to export Xstate from main
 
 	const navigate = destScreen => {
 		if(destScreen) {
 			setXstate({
-				'screenHist': [ _Xstate.currentScreen, ..._Xstate.screenHist ],
+				'screenHist': [ Xstate.currentScreen, Xstate.screenHist ],
 				'currentScreen': destScreen
 			});
 		} else {
-			newHist = [ ..._Xstate.screenHist ];
-			destScreen = newHist.unshift();
+			newHist = [ ...Xstate.screenHist ];
+			//destScreen = newHist.unshift();
 
 			setXstate({
-				'screenHist': newHist,
-				'currentScreen': destScreen
+				'currentScreen': newHist.unshift(),
+				'screenHist': newHist
 			});
 		}
 	}
 
-
 	const drawerCtl = newState => {
 		// if newState is undefined, toggle the drawer
 		// Otherwise, if "true" open the drawer, if "false" close the drawer
-		Utils.debugMsg('drawerCtl: '+_Xstate.drawerOpen+', '+newState, Utils.VERBOSE);
+		Utils.debugMsg('drawerCtl: '+drawerOpen+', '+newState, Utils.VERBOSE);
 
-		if(Utils.nullp(newState)) _Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+		if(Utils.nullp(newState)) Xstate.drawerOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
 		else newState ? drawer.current.openDrawer() : drawer.current.closeDrawer();
 	}
 
 	const handleListChange = listID => {
 		Utils.debugMsg('handleListChange: '+listID, Utils.VERBOSE);
-		dispatch(Lists.setList(listID));
+		Xstate.dispatch(Lists.setList(listID));
 		setXstate({
 			'headerTitle': `${_Lists[listID].name}: List view`,
 			'headerControls': true
@@ -95,8 +139,16 @@ export default function Main({ _Xstate }) {
 
 	};
 
-	const dispatch = useDispatch();
+	useState(_ => {
+		setXstate({
+			navigate,
+			drawerCtl,
+			handleListChange
+		});
+	}, []);
 
+
+/*
 
 	// init Xstate
 	//var _Xstate = {
@@ -125,11 +177,17 @@ export default function Main({ _Xstate }) {
 		nullp: Utils.nullp,
 		parseName: Utils.parseName,
 		checkCollision: Utils.checkCollision,
-		setXstate: props => {
-			Utils.debugMsg('setXstate: '+JSON.stringify(this)+'\n'+JSON.stringify(props));
-			this = { ...this, ...props };
+		setXstate: function(payload) {
+			Utils.debugMsg('setXstate: '+JSON.stringify(this)+'\n'+JSON.stringify(payload));
+			delete payload.setXstate; // don't allow setXstate to be overwritten
+			this = { ...this, ...payload };
+		},
+		dumpXstate: function() {
+			Utils.debugMsg('Dumping current Xstate...');
+			console.log(this);
 		}
 	});
+*/
 
 /*
 	const handleDateChange = (item, date) => {
@@ -138,7 +196,10 @@ export default function Main({ _Xstate }) {
 	}
 */
 
+/*
 // drawer functions
+// I'm not sure we need these?
+
 	const setDrawerOpen = _ => {
 		drawer.current.openDrawer();
 	};
@@ -146,40 +207,33 @@ export default function Main({ _Xstate }) {
 	const setDrawerClosed = _ => {
 		drawer.current.closeDrawer();
 	};
+*/
 
 	//const drawerCtl = _ => drawerIsOpen ? drawer.current.closeDrawer() : drawer.current.openDrawer();
+// Xstate vars
+
+//	const { setXstate, currentScreen } = useContext(Xstate);
 
 
 // render component
 
 	return (
-		<Xstate.Provider>
-			<DrawerLayoutAndroid
-				ref={drawer}
-				drawerWidth={300}
-				drawerPosition='left'
-				renderNavigationView={_ =>
-					<NavDrawer
-						drawer={drawer.current}
-						_Xstate={_Xstate}
-					/>
-				}
-				key={_Xstate.currentScreen}
-				onDrawerOpen={_ => setXstate({ drawerOpen: true })}
-				onDrawerClose={_ => setXstate({ drawerOpen: false })}
-			>
-				<Header
-					_Xstate={_Xstate}
+		<DrawerLayoutAndroid
+			ref={drawer}
+			drawerWidth={useWindowDimensions().width * (2/3)}
+			drawerPosition='left'
+			renderNavigationView={_ =>
+				<NavDrawer
+					drawer={drawer.current}
 				/>
-				<Screen
-					_Xstate={_Xstate}
-					key={_Xstate.currentScreen}
-				/>
-				<ModalDialogComponent
-					_Xstate={_Xstate}
-					key={_Xstate}
-				/>
-			</DrawerLayoutAndroid>
-		</Xstate.Provider>
+			}
+			key={currentScreen}
+			onDrawerOpen={_ => setXstate({ drawerOpen: true })}
+			onDrawerClose={_ => setXstate({ drawerOpen: false })}
+		>
+			<Header />
+			<Screen />
+			<ModalDialogComponent />
+		</DrawerLayoutAndroid>
 	);
 }

@@ -2,7 +2,7 @@
 // Dialog for what it says
 
 // React, RN, RNE, redux
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 // Community
@@ -11,8 +11,11 @@ import Dialog from 'react-native-dialog';
 // Slices
 import * as Lists from '../slices/listsSlice';
 
-export default function ListCreateDialog({ _Xstate }) {
-	const { dispatch, setXstate, sanitize } = _Xstate.funs;
+// Xstate
+import { Xstate } from '../res/Xstate';
+
+export default function ListCreateDialog() {
+	const { dispatch, setXstate, sanitize } = Xstate;
 
 	const [ input, setInput ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);

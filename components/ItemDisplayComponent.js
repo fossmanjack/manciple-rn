@@ -32,21 +32,22 @@ import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
-export default function ItemDisplay({ item, _Xstate }) {
+export default function ItemDisplay({ item }) {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History } = useSelector(S => S.itemStore);
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
-	const { setXstate, dispatch } = _Xstate.funs;
+	const { currentScreen, setXstate, dispatch } = Xstate;
 /*
 	const {
 		handleCheckBox,
 		handleDateChange
 	} = exports;
 */
-	const global = _Xstate.currentScreen === 'itemStore';
+	const global = currentScreen === 'itemStore';
 
 	const handleCheckBox = itemID => {
 		console.log('handleCheckBox called with item', itemID);

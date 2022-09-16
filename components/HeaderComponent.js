@@ -13,16 +13,19 @@ import SortOrderDialog from '../dialogs/SortOrderDialog';
 // import slices
 import * as Global from '../slices/globalSlice';
 import * as Lists from '../slices/listsSlice';
+import { Xstate } from '../res/Xstate';
 
 // function def
-export default function Header({ _Xstate }) {
+export default function Header() {
 	const {
 		currentScreen,
 		headerTitle,
 		headerControls,
 		showSortDialog,
-		funs: { drawerCtl, setXstate, navigate }
-	} = _Xstate;
+		drawerCtl,
+		setXstate,
+		navigate
+	} = Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleToggleMode = _ => {

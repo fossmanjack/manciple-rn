@@ -3,7 +3,7 @@
 // associated items
 
 // community imports
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import Dialog from 'react-native-dialog';
 
@@ -13,9 +13,14 @@ import * as Lists from '../slices/listsSlice';
 
 // utils
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
-export default function ListDeleteDialog({ _Xstate }) {
-	const { listToEdit: listID, funs: { setXstate, dispatch } } = _Xstate;
+export default function ListDeleteDialog() {
+	const {
+		listToEdit: listID,
+		setXstate,
+		dispatch
+	} = Xstate;
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { _Lists, currentList } = useSelector(S => S.lists);
 

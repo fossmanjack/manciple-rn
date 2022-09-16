@@ -20,13 +20,18 @@ import { useSelector } from 'react-redux';
 import * as Lists from '../slices/listsSlice';
 import * as Istore from '../slices/itemStoreSlice';
 
-export default function ItemEditModal({ _Xstate }) {
-	const { itemToEdit: itemID, showItemEdit, funs: {
+// Xstate
+import { Xstate } from '../res/Xstate';
+
+export default function ItemEditModal() {
+	const {
+		itemToEdit: itemID,
+		showItemEdit,
 		dispatch,
 		setXstate,
 		parseName,
 		nullp
-	}} = _Xstate;
+	} = Xstate;
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	// updatedItem holds the props that have been changed

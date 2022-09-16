@@ -2,7 +2,7 @@
 // Provides the ability to edit the list name
 
 // React, RN, RNE, Redux
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -12,8 +12,16 @@ import Dialog from 'react-native-dialog';
 // Slices
 import * as Lists from '../slices/listsSlice';
 
-export default function ListEditDialog({ _Xstate }) {
-	const { listToEdit: listID, funs: { dispatch, setXstate, parseName } } = _Xstate;
+// Xstate
+import { Xstate } from '../res/Xstate';
+
+export default function ListEditDialog() {
+	const {
+		listToEdit: listID,
+		dispatch,
+		setXstate,
+		parseName
+	} = Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const [ refList, setRefList ] = useState({ ..._Lists[listID] });

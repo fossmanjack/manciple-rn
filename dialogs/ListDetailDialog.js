@@ -2,6 +2,7 @@
 // Displays list meta-information and exposes list functions
 
 // React, RN, RNE, Redux
+import { useContext } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
@@ -9,8 +10,11 @@ import { Button, Icon } from 'react-native-elements';
 // Community
 import Dialog from 'react-native-dialog';
 
-export default function ListDetailDialog({ _Xstate }) {
-	const { listToEdit: listID, funs: { setXstate } } = _Xstate;
+// Xstate
+import { Xstate } from '../res/Xstate';
+
+export default function ListDetailDialog() {
+	const { listToEdit: listID, setXstate } = Xstate;
 	const { _Lists } = useSelector(S => S.lists);
 	const refList = _Lists[listID];
 

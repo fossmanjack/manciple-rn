@@ -20,19 +20,24 @@ import UserComponent from '../components/UserComponent';
 
 // utils
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
-export default function NavDrawer({ drawer, _Xstate }) {
+export default function NavDrawer() {
 	const {
 		showListDetail,
 		showListCreate,
-		funs: { handleListChange, setXstate, navigate, drawerCtl }
-	} = _Xstate;
+		handleListChange,
+		setXstate,
+		dumpXstate,
+		navigate,
+		drawerCtl
+	} = Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	Utils.debugMsg('NavDrawer rendering with keys: '+JSON.stringify(Object.keys(_Lists)), Utils.VERBOSE);
 
 	return (
 		<>
-			<UserComponent drawer={drawer} _Xstate={_Xstate} />
+			<UserComponent />
 			{ Object.keys(_Lists).length &&
 				<FlatList
 					data={Object.keys(_Lists)}
@@ -91,7 +96,7 @@ export default function NavDrawer({ drawer, _Xstate }) {
 			<Pressable
 				onPress={_ => {
 					console.log('New list pressed');
-					drawer.closeDrawer();
+					drawerCtl(false);
 					setXstate({
 						'headerTitle': `${_Lists[currentList].name}: List view`,
 						'headerControls': true,
@@ -135,15 +140,7 @@ export default function NavDrawer({ drawer, _Xstate }) {
 					borderBottomColor: 'lightgray',
 					paddingVertical: 10,
 				}}
-				onPress={_ => {
-					console.log('Displaying current Xstate -->');
-					const disp = { ..._Xstate };
-					delete disp.drawer;
-					console.log(disp);
-					//console.log(util.inspect(JSON.stringify(_Xstate), { maxStringLength: null }));
-					//process.stdout.write(JSON.stringify(_Xstate, null, 2));
-					//console.log(_Xstate);
-				}}
+				onPress={dumpXstate}
 			>
 				<View
 					style={{
@@ -219,7 +216,7 @@ export default function NavDrawer({ drawer, _Xstate }) {
 						'headerTitle': 'Manciple Help',
 						'headerControls': false
 					});
-					drawer.closeDrawer();
+					drawerCtl(false);
 					navigate('help');
 				}}
 			>

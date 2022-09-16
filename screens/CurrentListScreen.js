@@ -25,15 +25,24 @@ import * as Istore from '../slices/itemStoreSlice';
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
-export default function CurrentListScreen({ _Xstate }) {
-	const { itemToEdit, showItemEdit, funs: { drawerCtl, dispatch, setXstate, timestamp } } = _Xstate;
+export default function CurrentListScreen() {
+	const {
+		itemToEdit,
+		showItemEdit,
+		drawerCtl,
+		dispatch,
+		setXstate,
+		timestamp,
+		listData
+	} = Xstate;
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
-	const [ listData, setListData ] = useState(_Xstate.listData || []);
+	const [ listData, setListData ] = useState(listData || []);
 
-	console.log(timestamp(), 'CurrentListScreen', _Xstate);
+	console.log(timestamp(), 'CurrentListScreen', Xstate);
 
 	const generateListData = _ => {
 		const refList = _Lists[currentList] || Utils.blankList;
@@ -119,7 +128,6 @@ export default function CurrentListScreen({ _Xstate }) {
 		return (
 			<ItemDisplay
 				item={item}
-				_Xstate={_Xstate}
 			/>
 		)
 	}
@@ -202,9 +210,7 @@ export default function CurrentListScreen({ _Xstate }) {
 				closeOnRowOpen
 				closeOnScroll
 			/>
-			<Footer
-				_Xstate={_Xstate}
-			/>
+			<Footer />
 		</>
 	);
 }

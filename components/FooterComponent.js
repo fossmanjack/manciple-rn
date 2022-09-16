@@ -22,11 +22,13 @@ import * as Istore from '../slices/itemStoreSlice';
 
 // Utils
 import { _Store } from '../res/_Store';
+import { Xstate } from '../res/Xstate';
 import * as Utils from '../utils/utils';
 import { _Styles } from '../res/_Styles';
 
-export default function Footer({ _Xstate }) {
-	const { funs: { dispatch, parseName, checkCollision } } = _Xstate;
+export default function Footer() {
+	const { dispatch, parseName, checkCollision } = Xstate;
+	//const { funs: { dispatch, parseName, checkCollision } } = _Xstate;
 	const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);

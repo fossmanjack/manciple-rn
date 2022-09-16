@@ -23,14 +23,17 @@ import * as Istore from '../slices/itemStoreSlice';
 // utility imports
 import { _Styles } from '../res/_Styles';
 import * as Utils from '../utils/utils';
+import { Xstate } from '../res/Xstate';
 
 export default function ItemStoreScreen({ _Xstate }) {
 	const {
 		listData,
 		itemToEdit,
 		showItemEdit,
-		funs: { drawerCtl, dispatch, setXstate }
-	} = _Xstate;
+		drawerCtl,
+		dispatch,
+		setXstate
+	} = Xstate;
 
 
 	const { _Lists, currentList } = useSelector(S => S.lists);
@@ -47,7 +50,7 @@ export default function ItemStoreScreen({ _Xstate }) {
 
 	const toggleItemEditModal = _ => {
 		console.log('toggleItemEditModal called');
-		setXstate({ 'showItemEdit': !_Xstate.showItemEdit });
+		setXstate({ 'showItemEdit': !Xstate.showItemEdit });
 	}
 
 	const generateListData = _ => {
@@ -181,12 +184,7 @@ export default function ItemStoreScreen({ _Xstate }) {
 		const { item } = data;
 		return (
 			<ItemDisplay
-				_Xstate={_Xstate}
 				item={item}
-				exports={{
-					handleCheckBox,
-					handleDateChange
-				}}
 			/>
 		)
 	}
@@ -258,9 +256,7 @@ export default function ItemStoreScreen({ _Xstate }) {
 				closeOnRowOpen
 				closeOnScroll
 			/>
-			<Footer
-				_Xstate={_Xstate}
-			/>
+			<Footer />
 		</>
 	);
 }

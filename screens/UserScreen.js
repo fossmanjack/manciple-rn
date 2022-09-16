@@ -17,8 +17,10 @@ import * as Options from '../slices/optionsSlice';
 import * as Saver from '../utils/saver';
 import Header from '../components/HeaderComponent';
 import { _Store } from '../res/_Store';
+import { Xstate } from '../res/Xstate';
 
-export default function UserScreen({ drawerCtl, setNav }) {
+export default function UserScreen() {
+	const { dispatch, drawerCtl, navigate } = Xstate;
 	const userState = useSelector(S => S.user);
 	const optionsState = useSelector(S => S.options);
 	const [ url, setUrl ] = useState(optionsState.syncOpts.url || 'https://');
@@ -28,7 +30,6 @@ export default function UserScreen({ drawerCtl, setNav }) {
 	const [ userAvi, setUserAvi ] = useState(userState.userAvi || null);
 	const [ userdataSaved, setUserdataSaved ] = useState(true);
 	const [ userLoggedIn, setUserLoggedIn ] = useState(username ? true : false);
-	const dispatch = useDispatch();
 
 
 	const handleLogin = _ => {

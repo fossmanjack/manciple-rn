@@ -1,27 +1,29 @@
 // ScreenComponent.js
 // Loads the various screens on state change in Main
+import { useContext } from 'react';
 import { Text, View } from 'react-native';
 import CurrentListScreen from '../screens/CurrentListScreen';
 import HelpScreen from '../screens/HelpScreen';
 import ItemStoreScreen from '../screens/ItemStoreScreen';
 import OptionsScreen from '../screens/OptionsScreen';
 import UserScreen from '../screens/UserScreen';
+import { Xstate } from '../res/Xstate';
 
-export default function Screen({ _Xstate }) {
+export default function Screen() {
 	// I utterly cannot figure out how to do this with switch, so if/else it is
 
-	const nav = _Xstate.currentScreen;
+	const { nav: currentScreen } = Xstate;
 
 	if(nav === 'currentList')
-		return <CurrentListScreen _Xstate={_Xstate} />;
+		return <CurrentListScreen />;
 	else if(nav === 'itemStore')
-		return <ItemStoreScreen _Xstate={_Xstate} />;
+		return <ItemStoreScreen />;
 	else if(nav === 'user')
-		return <UserScreen _Xstate={_Xstate} />;
+		return <UserScreen />;
 	else if(nav === 'help')
-		return <HelpScreen _Xstate={_Xstate} />;
+		return <HelpScreen />;
 	else if(nav === 'options')
-		return <OptionsScreen _Xstate={_Xstate} />;
+		return <OptionsScreen />;
 	else
 		return (<View><Text>Oops!</Text></View>);
 }
@@ -30,7 +32,7 @@ export default function Screen({ _Xstate }) {
 	return (
 		{switch(_Xstate.currentScreen) {
 			case 'currentList':
-				<CurrentListScreen _Xstate={_Xstate} />;
+				<CurrentListScreen />;
 				break;
 			default:
 				<View><Text>Oops!</Text></View>;
@@ -43,19 +45,19 @@ export default function Screen({ _Xstate }) {
 		{_ => {
 			switch(_Xstate.currentScreen) {
 				case 'currentList':
-					return (<CurrentListScreen _Xstate={_Xstate} />);
+					return (<CurrentListScreen />);
 					break;
 				case 'help':
-					return (<HelpScreen _Xstate={_Xstate} />);
+					return (<HelpScreen />);
 					break;
 				case 'itemStore':
-					return (<ItemStoreScreen _Xstate={_Xstate} />);
+					return (<ItemStoreScreen />);
 					break;
 				case 'options':
-					return (<OptionsScreen _Xstate={_Xstate} />);
+					return (<OptionsScreen />);
 					break;
 				case 'user':
-					return (<UserScreen _Xstate={_Xstate} />);
+					return (<UserScreen />);
 					break;
 				default:
 					return (<View><Text>Oops!</Text></View>);
