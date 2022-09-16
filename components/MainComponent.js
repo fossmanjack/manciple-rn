@@ -37,11 +37,12 @@ export default function Main({ _Xstate }) {
 		updateXstate({ ..._Xstate, ...payload });
 	}
 */
-/*
+
 	// I guess for the references (listData, etc) to work correctly we need to
 	// mutate the state object instead of replacing it immutably.  This is disappointing
 	// and I may revisit when I have more time.
 	//const setXstate = payload => Object.keys(payload).forEach(key => _Xstate[key] = payload[key]);
+/*
 	const setXstate = payload => {
 		Utils.debugMsg('setXstate payload: '+JSON.stringify(payload));
 
@@ -53,6 +54,7 @@ export default function Main({ _Xstate }) {
 		_Xstate = { ..._Xstate, ...payload };
 		Utils.debugMsg('setXstate done: '+JSON.stringify(_Xstate));
 	}
+*/
 
 	const navigate = destScreen => {
 		if(destScreen) {
@@ -97,8 +99,8 @@ export default function Main({ _Xstate }) {
 
 
 	// init Xstate
-
-	var _Xstate = {
+	//var _Xstate = {
+	const Xstate = createContext({
 		currentScreen: 'currentList',
 		screenHist: [],
 		drawerOpen: false,
@@ -114,27 +116,27 @@ export default function Main({ _Xstate }) {
 		deleteItems: false,
 		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
 		headerControls: true,
-		funs: {
-			drawerCtl,
-			handleListChange,
-			setXstate,
-			navigate,
-			dispatch,
-			sanitize: Utils.sanitize,
-			camelize: Utils.camelize,
-			nullp: Utils.nullp,
-			parseName: Utils.parseName,
-			timestamp: Utils.timestamp,
-			checkCollision: Utils.checkCollision
+		drawerCtl,
+		handleListChange,
+		navigate,
+		dispatch,
+		sanitize: Utils.sanitize,
+		camelize: Utils.camelize,
+		nullp: Utils.nullp,
+		parseName: Utils.parseName,
+		checkCollision: Utils.checkCollision,
+		setXstate: props => {
+			Utils.debugMsg('setXstate: '+JSON.stringify(this)+'\n'+JSON.stringify(props));
+			this = { ...this, ...props };
 		}
-	}
-*/
+	});
 
-
+/*
 	const handleDateChange = (item, date) => {
 		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
 
 	}
+*/
 
 // drawer functions
 	const setDrawerOpen = _ => {
@@ -151,31 +153,33 @@ export default function Main({ _Xstate }) {
 // render component
 
 	return (
-		<DrawerLayoutAndroid
-			ref={drawer}
-			drawerWidth={300}
-			drawerPosition='left'
-			renderNavigationView={_ =>
-				<NavDrawer
-					drawer={drawer.current}
+		<Xstate.Provider>
+			<DrawerLayoutAndroid
+				ref={drawer}
+				drawerWidth={300}
+				drawerPosition='left'
+				renderNavigationView={_ =>
+					<NavDrawer
+						drawer={drawer.current}
+						_Xstate={_Xstate}
+					/>
+				}
+				key={_Xstate.currentScreen}
+				onDrawerOpen={_ => setXstate({ drawerOpen: true })}
+				onDrawerClose={_ => setXstate({ drawerOpen: false })}
+			>
+				<Header
 					_Xstate={_Xstate}
 				/>
-			}
-			key={_Xstate.currentScreen}
-			onDrawerOpen={_ => setXstate({ drawerOpen: true })}
-			onDrawerClose={_ => setXstate({ drawerOpen: false })}
-		>
-			<Header
-				_Xstate={_Xstate}
-			/>
-			<Screen
-				_Xstate={_Xstate}
-				key={_Xstate.currentScreen}
-			/>
-			<ModalDialogComponent
-				_Xstate={_Xstate}
-				key={_Xstate}
-			/>
-		</DrawerLayoutAndroid>
+				<Screen
+					_Xstate={_Xstate}
+					key={_Xstate.currentScreen}
+				/>
+				<ModalDialogComponent
+					_Xstate={_Xstate}
+					key={_Xstate}
+				/>
+			</DrawerLayoutAndroid>
+		</Xstate.Provider>
 	);
 }
