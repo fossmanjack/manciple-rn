@@ -116,9 +116,12 @@ export default function CurrentListScreen() {
 			]));
 	};
 
-	const editItem = item => {
+	const editItem = (itemID, rowMap) => {
+		debugMsg('editItem:\n\titemID: '+JSON.stringify(itemID)+'\n\trowMap: '+rowMap);
+		rowMap[itemID].closeRow();
+
 		setXstate({
-			'itemToEdit': item.id,
+			'itemToEdit': itemID,
 			'showItemEdit': true
 		});
 	}
@@ -144,7 +147,7 @@ export default function CurrentListScreen() {
 			}}>
 				<Button
 					onPress={_ => {
-							editItem(item);
+							editItem(item.id, rowMap);
 						}
 					}
 					icon={

@@ -14,7 +14,7 @@ import Dialog from 'react-native-dialog';
 import { useXstate } from '../res/Xstate';
 
 export default function ListDetailDialog() {
-	const { listToEdit: listID, setXstate, showListDetail } = useXstate();
+	const { listToEdit: listID, setXstate, showListDetail, parseDate } = useXstate();
 	const { _Lists } = useSelector(S => S.lists);
 	const refList = _Lists[listID];
 
@@ -29,13 +29,16 @@ export default function ListDetailDialog() {
 			</Dialog.Title>
 			<View>
 				<Text>
-					Created on: {refList.creationDate}
+					List ID: {listID}
 				</Text>
 				<Text>
-					Last modified: {refList.modifyDate}
+					Created on: {parseDate(refList.creationDate)}
 				</Text>
 				<Text>
-					List size: {refList.inventory.length}
+					Last modified: {parseDate(refList.modifyDate)}
+				</Text>
+				<Text>
+					List size: {Object.keys(refList.inventory).length}
 				</Text>
 			</View>
 			<Dialog.Button

@@ -21,12 +21,16 @@ export default function ListEditDialog() {
 		dispatch,
 		setXstate,
 		parseName,
-		showListEdit
+		debugMsg,
+		showListEdit,
+		sanitize
 	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const [ refList, setRefList ] = useState({ ..._Lists[listID] });
 	const [ updatedList, setUpdatedList ] = useState({});
+
+	debugMsg('ListEditDialog refList: '+JSON.stringify(refList));
 
 	const handleSubmit = _ => {
 		setXstate({ 'showListEdit': false });
@@ -37,7 +41,7 @@ export default function ListEditDialog() {
 		setUpdatedList({});
 	}
 
-	const setProp = (field, val) => setUpdatedItem({ ...updatedItem, [field]: parseName(val) });
+	const setProp = (field, val) => setUpdatedList({ ...updatedList, [field]: sanitize(val) });
 
 	const handleDeleteList = _ => {
 		// Offloading pantry deletion to its own component to use the Dialog
@@ -59,7 +63,7 @@ export default function ListEditDialog() {
 			<Dialog.Input
 				placeholder='Edit list name...'
 				value={refList.name}
-				onChangeText={text => setProp(name, text)}
+				onChangeText={text => setProp('name', text)}
 			/>
 			<Dialog.Button label='Delete List' onPress={handleDeleteList} />
 			<Dialog.Button label='Cancel' onPress={_ => setXstate({ 'showListEdit': false })} />

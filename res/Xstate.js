@@ -41,6 +41,7 @@ export function XstateProvider(props) {
 		camelize: Utils.camelize,
 		nullp: Utils.nullp,
 		parseName: Utils.parseName,
+		parseDate: Utils.parseDate,
 		checkCollision: Utils.checkCollision,
 		timestamp: Utils.timestamp,
 		debugMsg: Utils.debugMsg,

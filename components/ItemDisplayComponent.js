@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {
 	CheckBox,
+	Chip,
 	Icon,
 	ListItem,
 	Button
@@ -129,6 +130,10 @@ export default function ItemDisplay({ item }) {
 		);
 	}
 
+	const editTags = item => {
+		console.log('editTags');
+	}
+
 /* Differences between ItemStore and List view:
 
 - Checkbox completely different, different functions
@@ -214,6 +219,23 @@ Solutions:
 					height={200}
 					key={item}
 				/>
+				<View style={{ flexDirection: 'row' }}>
+					{ item.tags.forEach(tag =>
+						<Chip
+							color='gold'
+							title={tag}
+						/>
+					)}
+					<Chip
+						icon={{
+							name: 'plus',
+							type: 'font-awesome',
+							color: 'white'
+						}}
+						color='gold'
+						onPress={_ => editTags(item)}
+					/>
+				</View>
 				<View style={{ flexDirection: 'row' }}>
 					<View style={{ flex: 3 }}>
 						<Text style={_Styles.textItemDetailLabel}>

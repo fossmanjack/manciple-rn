@@ -59,6 +59,8 @@ export default function ItemEditModal() {
 
 			const toList = {};
 
+			setXstate({ 'showItemEdit': false });
+
 			if(newItem.qty) {
 				toList.qty = newItem.qty;
 				delete newItem.qty;
