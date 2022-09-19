@@ -35,7 +35,7 @@ export const sanitize = str => str ? str.replace(/[~!@#$%^&*().,<>?_=+:;\'\"\/\-
 export const camelize = str => str ? str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, c) => c.toUpperCase()) : false;
 //export const parseName = val => val && camelize(sanitize(val.trim())) || '';
 export const parseName = val => {
-	debugMsg('parseName: '+val, VERBOSE);
+	debugMsg('parseName: '+JSON.stringify(val), VERBOSE);
 	return val ? camelize(sanitize(val.trim())) : '';
 }
 //export const collisionCheck = (a, b) => parseName(a) === parseName(b);
@@ -173,10 +173,10 @@ export const blankShoppingList = (createShoppingList({
 	name: 'Blank list'
 }));
 
-export const getAllTags = _ => {
+export const getAllTags = store => {
 	const tagsAcc = [];
 
-	_ItemStore.forEach(item => tagsAcc.concat(item.tags));
+	store.forEach(item => tagsAcc.concat(item.tags));
 
 	return [ ...new Set(tagsAcc) ].sort((a, b) =>
 		a > b ? 1 : a < b ? -1 : 0);

@@ -28,7 +28,7 @@ import { useXstate } from '../res/Xstate';
 
 export default function Carousel(props) {
 	const { item, height, width } = props;
-	const { dispatch } = useXstate();
+	const { dispatch, currentScreen } = useXstate();
 	const { id: itemID, images: pics } = item;
 
 	const [ currentImgIndex, setCurrentImgIndex ] = useState(0);
@@ -147,7 +147,7 @@ export default function Carousel(props) {
 								onPress={handleDecrement}
 							/>
 							{
-								_Xstate.currentScreen === 'currentList' && (
+								currentScreen === 'currentList' && (
 									<Button
 										icon={
 											<Icon

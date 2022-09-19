@@ -41,7 +41,7 @@ export default function ItemDisplay({ item }) {
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
-	const { currentScreen, setXstate, dispatch } = useXstate();
+	const { currentScreen, setXstate, dispatch, showTagEdit } = useXstate();
 /*
 	const {
 		handleCheckBox,
@@ -132,6 +132,19 @@ export default function ItemDisplay({ item }) {
 
 	const editTags = item => {
 		console.log('editTags');
+		setXstate({
+			'itemToEdit': item.id,
+			'showTagEdit': true
+		});
+	}
+
+	const removeTag = (item, tag) => {
+		dispatch(Istore.updateItem([
+			item.id,
+			{
+				tags: item.tags.filter(t => t !== tag)
+			}
+		]));
 	}
 
 /* Differences between ItemStore and List view:
@@ -219,12 +232,28 @@ Solutions:
 					height={200}
 					key={item}
 				/>
-				<View style={{ flexDirection: 'row' }}>
-					{ item.tags.forEach(tag =>
-						<Chip
-							color='gold'
-							title={tag}
-						/>
+				<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+					{ item.tags.map(tag => {
+						console.log('rendering tag:', tag);
+						return (
+							<Chip
+								buttonStyle={{
+									backgroundColor: 'goldenrod',
+									marginVertical: 5,
+									marginRight: 5
+								}}
+								title={`${tag} |`}
+								onPress={_ => removeTag(item, tag)}
+								key={`${item.id}-${tag}`}
+								iconRight
+								icon={{
+									name: 'x',
+									type: 'feather',
+									color: 'white'
+								}}
+							/>
+						)
+					}
 					)}
 					<Chip
 						icon={{
@@ -232,7 +261,10 @@ Solutions:
 							type: 'font-awesome',
 							color: 'white'
 						}}
-						color='gold'
+						buttonStyle={{
+							backgroundColor: 'goldenrod',
+							marginVertical: 5
+						}}
 						onPress={_ => editTags(item)}
 					/>
 				</View>
