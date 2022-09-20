@@ -9,8 +9,7 @@
 - [x] Sweep all
 - [x] Toggle staple
 - [x] Add all staples
-- [p] Item edit
-	- PARTIAL: Only item name is up for edit at this time
+- [x] Item edit
 - [x] Add new item
 - [x] Add existing item
 - [x] Add new item with quantity
@@ -27,6 +26,20 @@
 - [x] Tag add window works
 - [x] Adding new item with tags works
 - [x] Adding existing item with new tags works
+
+### ItemStore Functionality
+
+- [ ] View renders as expected
+- [ ] Items can be expanded
+- [ ] Items can be plussed and minused, updating correctly
+- [ ] Items can be swept to bring up delete prompt
+- [ ] Sweep all does something else?  Not sure yet
+- [ ] Add new item (posts to no list)
+- [ ] Attempting to add existing item fails
+- [ ] Add existing item with quantity updates default quantity
+- [ ] Carousel changes as expected (delete photo)
+- [ ] Sort order works
+- [ ] Tags display correctly
 
 ### Pantry functionality
 

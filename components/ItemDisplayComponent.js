@@ -84,15 +84,9 @@ export default function ItemDisplay({ item }) {
 		}
 	}
 
-	const IconDrawer = item => {
+	const IconDrawer = ({ item }) => {
 		return (
-			<View style={{
-				flex: 4,
-				flexDirection: 'row-reverse',
-				alignItems: 'flex-end',
-				alignSelf: 'flex-end',
-				justifyContent: 'center',
-			}}>
+			<>
 				{
 					item.staple && <Icon
 						name='refresh'
@@ -126,7 +120,7 @@ export default function ItemDisplay({ item }) {
 						}}
 					/>
 				}
-			</View>
+			</>
 		);
 	}
 
@@ -163,9 +157,10 @@ Solutions:
 			backgroundColor: 'white',
 			borderBottomColor: 'lightgray',
 			borderBottomWidth: 1,
+			flex: 1
 		}}>
-			<CollapseHeader>
-				<ListItem>
+			<CollapseHeader style={{ flex: 1 }}>
+				<ListItem style={{ flex: 1 }}>
 					{ global
 						? <Button
 							type='clear'
@@ -191,7 +186,11 @@ Solutions:
 							onPress={_ => handleCheckBox(item.id)}
 						/>
 					}
-					<ListItem.Content>
+					<ListItem.Content style={{
+						flex: 1,
+						borderWidth: 1,
+						borderColor: 'yellow'
+					}}>
 						<ListItem.Title
 							style={item.inCart
 								? _Styles.textItemNameChecked
@@ -203,12 +202,17 @@ Solutions:
 						{ !global &&
 							<ListItem.Subtitle style={{
 								flexDirection: 'row',
-								width: '100%',
+								flex: 1,
+								alignSelf: 'stretch',
+								borderWidth: 1,
+								borderColor: 'purple'
 							}}>
 								<View style={{
 									flex: 8,
 									flexDirection: 'row',
-									alignSelf: 'stretch'
+									borderWidth: 1,
+									borderColor: 'blue',
+									backgroundColor: 'white'
 								}}>
 									<Text style={_Styles.textItemQtyLabel}>
 										Qty:
@@ -217,7 +221,17 @@ Solutions:
 										{item.qty}
 									</Text>
 								</View>
-								<IconDrawer item={item} />
+								<View style={{
+									flex: 4,
+									flexDirection: 'row-reverse',
+									alignItems: 'flex-end',
+									justifyContent: 'center',
+									borderWidth: 1,
+									borderColor: 'red',
+									backgroundColor: 'white'
+								}}>
+									<IconDrawer item={item} />
+								</View>
 							</ListItem.Subtitle>
 						}
 					</ListItem.Content>

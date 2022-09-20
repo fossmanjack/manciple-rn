@@ -60,7 +60,8 @@ export default function CurrentListScreen() {
 					..._ItemStore[itemID],
 					images: [ ..._Images[itemID] || []],
 					history: [ ..._History[itemID] || []],
-					...refList.inventory[itemID]
+					...refList.inventory[itemID],
+					staple: refList.staples.includes(itemID)
 				}
 			}), sortOpts);
 	}
@@ -128,7 +129,7 @@ export default function CurrentListScreen() {
 
 	const renderItem = (data, rowMap) => {
 		const { item } = data;
-		Utils.debugMsg('renderItem: '+item.name, Utils.VERBOSE);
+		Utils.debugMsg('renderItem: '+JSON.stringify(item, null, 2), Utils.VERBOSE);
 		return (
 			<ItemDisplay
 				item={item}

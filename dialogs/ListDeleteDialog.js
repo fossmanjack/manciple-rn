@@ -97,7 +97,7 @@ export default function ListDeleteDialog() {
 				Delete List?
 			</Dialog.Title>
 			<Dialog.Description>
-				Are you sure you want to delete the list '{_Lists[listID].name}'?  You
+				Are you sure you want to delete the list '{_Lists[listID].name || 'unknown'}'?  You
 				cannot undo this action.
 			</Dialog.Description>
 			<Dialog.Switch

@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import {
 	Modal,
+	ScrollView,
 	Text,
 	TextInput,
 	View
@@ -161,12 +162,66 @@ export default function ItemEditModal() {
 			transparent={false}
 			visible={showItemEdit}
 			onRequestClose={handleClose}
+			style={{ flex: 1 }}
 		>
+			<ScrollView style={{ flex: 1 }}>
 			<Input
 				placeholder='Item name'
 				value={refItem.name}
 				onChangeText={t => setProp('name', t)}
 				label='Item name'
+			/>
+			<View style={{ flexDirection: 'row', flex: 1 }}>
+				<Input
+					placeholder='Default quantity'
+					value={refItem.defaultQty}
+					onChangeText={t => setProp('defaultQty', t)}
+					label='Default quantity'
+					containerStyle={{ flex: 2 }}
+				/>
+				<Input
+					placeholder='Price'
+					value={refItem.price}
+					onChangeText={t => setProp('price', t)}
+					label='Price'
+					containerStyle={{ flex: 2 }}
+				/>
+			</View>
+			<View style={{ flexDirection: 'row', flex: 1 }}>
+				<Input
+					placeholder='Location'
+					value={refItem.loc}
+					onChangeText={t => setProp('loc', t)}
+					label='Location'
+					containerStyle={{ flex: 2 }}
+				/>
+				<Input
+					placeholder='Interval in days'
+					value={refItem.interval}
+					onChangeText={t => setProp('interval', t)}
+					label='Interval'
+					containerStyle={{ flex: 2 }}
+				/>
+			</View>
+			<Input
+				placeholder='url'
+				value={refItem.url}
+				onChangeText={t => setProp('url', t)}
+				label='URL'
+			/>
+			<Input
+				placeholder='UPC'
+				value={refItem.upc}
+				onChangeText={t => setProp('upc', t)}
+				label='UPC'
+			/>
+			<Input
+				placeholder='Notes'
+				value={refItem.notes}
+				onChangeText={t => setProp('notes', t)}
+				label='Notes'
+				multiline
+				numberOfLines={3}
 			/>
 			<View style={{
 				flexDirection: 'row'
@@ -180,6 +235,7 @@ export default function ItemEditModal() {
 					onPress={handleClose}
 				/>
 			</View>
+			</ScrollView>
 		</Modal>
 	);
 }

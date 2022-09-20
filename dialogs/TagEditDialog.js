@@ -3,7 +3,7 @@
 
 // React, RN, RNE, Redux
 import { useState, useEffect, useContext } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Chip } from 'react-native-elements';
 import { useSelector } from 'react-redux';
 
@@ -116,28 +116,30 @@ export default function TagEditDialog() {
 			<Dialog.Title>
 				Edit Tags
 			</Dialog.Title>
-			<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-				{
-					_ItemStore[itemID].tags.map(tag => {
-						console.log('TED render tag:', tag);
-						return (
-							<CurrentTagChip
+			<ScrollView style={{ flex: 1 }}>
+				<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+					{
+						_ItemStore[itemID].tags.map(tag => {
+							console.log('TED render tag:', tag);
+							return (
+								<CurrentTagChip
+									tag={tag}
+									key={`${itemID}-${tag}`}
+								/>
+							);
+						})
+					}
+					{
+						tagsStore.map(tag => {
+							console.log('TED render other tag:', tag);
+							return (<OtherTagChip
 								tag={tag}
 								key={`${itemID}-${tag}`}
-							/>
-						);
-					})
-				}
-				{
-					tagsStore.map(tag => {
-						console.log('TED render other tag:', tag);
-						return (<OtherTagChip
-							tag={tag}
-							key={`${itemID}-${tag}`}
-						/>);
-					})
-				}
-			</View>
+							/>);
+						})
+					}
+				</View>
+			</ScrollView>
 			<Dialog.Input
 				placeholder='Add new tag...'
 				value={newTagName}
