@@ -58,7 +58,7 @@ const listsSlice = createSlice({
 			if(Object.keys(lState._Lists).includes(listID)) return lState;
 
 			// Don't allow name collisions
-			if(Object.keys(lState._Lists).find(key => collisionCheck(lState._Lists[key].name, newList.name)))
+			if(Object.keys(lState._Lists).find(key => Utils.collisionCheck(lState._Lists[key].name, newList.name)))
 				return lState;
 
 			return {

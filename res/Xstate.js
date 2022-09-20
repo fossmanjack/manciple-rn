@@ -38,17 +38,16 @@ export function XstateProvider(props) {
 		showSortOrder: false,
 		showTagEdit: false,
 		deleteItems: false,
-		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
-		headerControls: true,
 		dispatch: useDispatch(),
 		sanitize: Utils.sanitize,
 		camelize: Utils.camelize,
 		nullp: Utils.nullp,
 		parseName: Utils.parseName,
 		parseDate: Utils.parseDate,
-		checkCollision: Utils.checkCollision,
+		collisionCheck: Utils.collisionCheck,
 		timestamp: Utils.timestamp,
 		debugMsg: Utils.debugMsg,
+		genuuid: Utils.genuuid,
 		setXstate
 	});
 	Utils.debugMsg('XstateContext:\n\ttransientState: '+JSON.stringify(transientState)+

@@ -4,6 +4,7 @@
 
 // community imports
 import { useState, useContext } from 'react';
+import { Alert } from 'react-native';
 import { useSelector } from 'react-redux';
 import Dialog from 'react-native-dialog';
 
@@ -31,12 +32,14 @@ export default function ListDeleteDialog() {
 	}
 
 	const handleConfirm = _ => {
+		const listToDelete = ''+listID; // make sure this doesn't change
 		const keys = Object.keys(_Lists);
+		// First make sure we're not deleting our only list, because that will
+		// break things up real good
 		if(keys.length < 2) {
-			setXstate({ 'showListDelete': false });
 			Alert.alert(
 				'Cannot delete list!',
-				'You must have at least one list.  If you would like to clear and',
+				'You must have at least one list.  If you would like to clear and '+
 				'initialize your current list, press \"Clear.\"',
 				[
 					{
@@ -45,31 +48,40 @@ export default function ListDeleteDialog() {
 					},
 					{
 						text: 'Clear',
-						onPress: _ => dispatch(Lists.updateList([ keys[0], Utils.createList() ]))
+						onPress: _ => dispatch(Lists.updateList([ keys[0], Utils.createShoppingList({}) ]))
 					}
 				],
 				{ cancelable: true }
 			);
 			return;
 		}
-		if(currentList === listID) {
+
+		// listToEdit will be invalid once the list is deleted so we have to
+		// account for that
+		const idx = keys.indexOf(listToDelete);
+
+		// If trying to delete list 0, shift to list 1, otherwise shift down
+		// one list.  We know we have at least two lists since we're past that
+		// check already
+		const newID = idx === 0 ? keys[1] : keys[idx - 1];
+
+		// Need to switch to a new list before deleting the currentList
+		if(currentList === listToDelete) {
 			console.log('trying to delete current list!');
-			const keys = Object.keys(_Lists);
-			const idx = keys.indexOf(listID);
-			const newID = keys[0] === listID ? keys[1] || '' : keys[0];
 			dispatch(Lists.setList(newID));
 		}
 
+		setXstate({ 'listToEdit': newID, 'showListDelete': false });
+		dispatch(Lists.deleteList(listToDelete));
 		console.log('currentList', currentList);
-		dispatch(Lists.deleteList(listID));
 		console.log(_Lists);
 
 		// Now remove all references to the deleted listID from item store
-		const itemsArr = Object.keys(_ItemStore).filter(itemID => _ItemStore[itemID].parents.includes(listID));
+		const itemsArr = Object.keys(_ItemStore).filter(itemID => _ItemStore[itemID].parents.includes(listToDelete));
 
 		itemsArr.forEach(itemID => {
 			// remove the deleted pantry from parents
-			rents = _ItemStore[itemID].parents.filter(ptID => ptID === listID);
+			rents = _ItemStore[itemID].parents.filter(ptID => ptID === listToDelete);
 			// if clear flag is set and no parents remain, delete the item from inventory
 			if(deleteItems && !rents.length)
 				dispatch(Istore.deleteItem(itemID));

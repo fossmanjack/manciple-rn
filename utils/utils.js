@@ -169,9 +169,9 @@ export const createShoppingList = props => {
 	});
 }
 
-export const blankShoppingList = (createShoppingList({
+export const blankShoppingList = createShoppingList({
 	name: 'Blank list'
-}));
+});
 
 export const getAllTags = store => {
 	const tagsAcc = [];

@@ -46,8 +46,8 @@ export default function CurrentListScreen() {
 	debugMsg('CurrentListScreen rendered with Xstate: '+useXstate(), Utils.VERBOSE);
 
 	const generateListData = _ => {
-		const refList = _Lists[currentList] || Utils.blankList;
-		Utils.debugMsg('refreshListData: '+refList.name, Utils.VERBOSE);
+		const refList = _Lists[currentList] || Utils.blankShoppingList;
+		Utils.debugMsg('refreshListData: '+JSON.stringify(refList), Utils.VERBOSE);
 
 		// Data for each listed item is stored in two places: Inventory has the
 		// largely-immutable stuff and Lists has the daily changes.  The props
@@ -189,7 +189,7 @@ export default function CurrentListScreen() {
 		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
 		//setListData(newData);
 		setXstate({ "listData": newData });
-	}, [ _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
+	}, [ currentList, _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
 
 	useEffect(_ => console.log(timestamp(), 'itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 

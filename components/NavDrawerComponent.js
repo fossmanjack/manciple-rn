@@ -173,10 +173,6 @@ export default function NavDrawer() {
 					paddingVertical: 10,
 				}}
 				onPress={_ => {
-					setXstate({
-						'headerTitle': 'Manciple Options',
-						'headerControls': false
-					});
 					drawerCtl(false);
 					navigate('options');
 				}}
@@ -212,10 +208,6 @@ export default function NavDrawer() {
 					paddingVertical: 10,
 				}}
 				onPress={_ => {
-					setXstate({
-						'headerTitle': 'Manciple Help',
-						'headerControls': false
-					});
 					drawerCtl(false);
 					navigate('help');
 				}}

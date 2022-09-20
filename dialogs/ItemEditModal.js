@@ -41,7 +41,6 @@ export default function ItemEditModal() {
 	const [ refItem, setRefItem ] = useState(
 		{
 			..._ItemStore[itemID],
-			..._Lists[currentList].inventory[itemID],
 			history: _History[itemID] ? [ ..._History[itemID] ] : [],
 			images: _Images[itemID] ? [ ..._Images[itemID] ] : []
 		}
@@ -91,9 +90,14 @@ export default function ItemEditModal() {
 
 			// Since CurrentListView is subscribed to the List inventory,
 			// update that last
-
+			// EDIT: removing this last part entirely since changing lists messes
+			// everything up, and the only list-specific setting exposed here would
+			// be quantity -- staple and purchaseBy are handled with dedicated buttons
+			// so let's just do that with quantity as well.
+/*
 			if(Object.keys(toList).length)
 				dispatch(Lists.updateItemInList([ itemID, toList, currentList ]));
+*/
 		}
 /*
 		dispatch(Pantry.updateItem({
@@ -142,6 +146,7 @@ export default function ItemEditModal() {
 		console.log('setProp', field, val);
 		field === 'qty' && setUpdatedQty(val);
 		field === 'name' && setUpdatedItem({
+			..._Lists[currentList].inventory[itemID],
 			...updatedItem, id: Utils.sanitize(Utils.camelize(val.trim()))
 		});
 		setUpdatedItem({ ...updatedItem, [field]: val.trim() });
@@ -157,13 +162,11 @@ export default function ItemEditModal() {
 			visible={showItemEdit}
 			onRequestClose={handleClose}
 		>
-			<Text>
-				Name
-			</Text>
 			<Input
 				placeholder='Item name'
 				value={refItem.name}
 				onChangeText={t => setProp('name', t)}
+				label='Item name'
 			/>
 			<View style={{
 				flexDirection: 'row'

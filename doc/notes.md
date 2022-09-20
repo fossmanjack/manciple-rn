@@ -48,3 +48,5 @@ historySlice -> purchase history, also save all dispatches?  I'm sure that can
 be done, maybe with middleware?
 
 A shared item DB ... is it feasible?  Is it needful?
+
+### Replace the staples button with a checkbox maybe?  Or a RNE switch?

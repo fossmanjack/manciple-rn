@@ -85,10 +85,6 @@ export default function UserScreen() {
 
 	return (
 		<>
-			<Header
-				drawerCtl={drawerCtl}
-				title='User Login'
-			/>
 			<UserAvi />
 			<View style={{ flexDirection: 'row' }}>
 				<Input

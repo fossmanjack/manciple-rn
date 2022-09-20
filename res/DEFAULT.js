@@ -76,7 +76,7 @@ export const ITEMSTORE = {
 	},
 	'f5218e83-fea6-4ba4-9254-2889e579cba7': {
 		name: 'Soda',
-		tags: [ 'drink', 'soft drink', 'grocery' ],
+		tags: [ 'drink', 'softDrink', 'grocery' ],
 		type: 'item',
 		version: 1,
 		price: '',

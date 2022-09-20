@@ -30,11 +30,10 @@
 
 ### Pantry functionality
 
-- [ ] Change pantry
-- [ ] Create new pantry
-- [ ] Update pantry
-- [ ] Delete pantry
-- [ ] Export pantry
+- [x] Change pantry
+- [x] Create new pantry
+- [x] Update pantry
+- [x] Delete pantry
 
 ### DAV functionality
 

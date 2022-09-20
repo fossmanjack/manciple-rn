@@ -14,20 +14,28 @@ import * as Lists from '../slices/listsSlice';
 // Xstate
 import { useXstate } from '../res/Xstate';
 
+// Utils
+import * as Utils from '../utils/utils';
+
 export default function ListCreateDialog() {
-	const { dispatch, setXstate, sanitize, showListCreate } = useXstate();
+	const { dispatch, setXstate, sanitize, showListCreate, genuuid } = useXstate();
 
 	const [ input, setInput ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 
 	const handleCreateList = _ => {
-		const listID = uuid.v4();
+		const listID = genuuid();
 
-		dispatch(Lists.addList([ listID, { name: sanitize(input.trim()) }]));
+		dispatch(Lists.addList([
+			listID,
+			Utils.createShoppingList({
+				name: sanitize(input.trim())
+			})
+		]));
 		dispatch(Lists.setList(listID));
 
 		setInput('');
-		setXstate({ 'showListCreate': false });
+		setXstate({ 'showListCreate': false, 'listData': [] });
 	}
 
 	return (
