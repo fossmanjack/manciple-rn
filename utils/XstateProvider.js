@@ -81,6 +81,7 @@ export default function XstateProvider() {
 		showListEdit: false,
 		showItemEdit: false,
 		showSortOrder: false,
+		showTagEdit: false,
 		deleteItems: false,
 		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
 		headerControls: true,

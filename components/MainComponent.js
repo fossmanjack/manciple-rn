@@ -9,7 +9,7 @@ import {
 	useRef,
 	useContext
 } from 'react';
-import { DrawerLayoutAndroid, useWindowDimensions } from 'react-native';
+import { DrawerLayoutAndroid, useWindowDimensions, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Import local components
@@ -226,6 +226,7 @@ export default function Main() {
 // render component
 
 	return (
+		<View style={{ flex: 1 }}>
 		<DrawerLayoutAndroid
 			ref={drawer}
 			drawerWidth={useWindowDimensions().width * (2/3)}
@@ -243,5 +244,6 @@ export default function Main() {
 			<Screen />
 			<ModalDialogComponent />
 		</DrawerLayoutAndroid>
+		</View>
 	);
 }

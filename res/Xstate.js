@@ -1,4 +1,5 @@
 import { useState, useContext, createContext } from 'react';
+import { useWindowDimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as Utils from '../utils/utils';
@@ -21,6 +22,8 @@ export function XstateProvider(props) {
 	}
 
 	const [ transientState, setTransientState ] = useState({
+		windowX: useWindowDimensions().width,
+		windowY: useWindowDimensions().height,
 		currentScreen: 'currentList',
 		screenHist: [],
 		drawerOpen: false,
@@ -33,6 +36,7 @@ export function XstateProvider(props) {
 		showListEdit: false,
 		showItemEdit: false,
 		showSortOrder: false,
+		showTagEdit: false,
 		deleteItems: false,
 		headerTitle: `${_Lists[currentList] ? _Lists[currentList].name : ''}: List view`,
 		headerControls: true,
