@@ -74,3 +74,5 @@ cancel and ok buttons), so next I should probably implement pantry mode.
 "Collections" of items and quantities that you can add to the current list with a
 single click.  Credit to my wife, and also implementing this feature would greatly
 facilitate recipe book integration.
+
+### Add a "share" slider to the list of lists
