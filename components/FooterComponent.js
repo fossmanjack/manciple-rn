@@ -13,8 +13,6 @@ import {
 import { useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
 
-// Community
-import uuid from 'react-native-uuid';
 
 // Slices
 import * as Lists from '../slices/listsSlice';
@@ -38,6 +36,7 @@ export default function Footer() {
 	const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
+	const { uuid } = useSelector(S => S.user);
 
 	const handleSubmit = _ => {
 		Utils.debugMsg('handleSubmit: new item '+inputText+' to list '+currentList, Utils.VERBOSE);
@@ -88,14 +87,19 @@ export default function Footer() {
 
 			Utils.debugMsg('handleSubmit itemID: '+itemID+'\nnewItem: '+JSON.stringify(newItem));
 
+			let purchaseBy = 0;
+			if(newItem.interval) {
+				let lastBuy = _History[itemID] && _History[itemID][0] ? _History[itemID][0] : Date.now();
+				purchaseBy = lastBuy + (refItem.interval * 86400000);
+			}
+
 			dispatch(Lists.addItemToList([
 				itemID,
 				{
 					inCart: false,
 					qty: qty || newItem.defaultQty || '1',
-					purchaseBy: newItem.interval && _History[itemID][0]
-						? _History[itemID][0] + (newItem.interval * 86400000)
-						: 0,
+					addedBy: uuid,
+					purchaseBy
 				},
 				currentList
 			]));

@@ -1,6 +1,7 @@
-// ItemStoreScreen.js
-// For managing the item store directly.  Displays items stored in
-// _ItemStore with SwipeListView.
+// CurrentListScreen.js
+// Handles the bulk of the application logic, displays items stored in
+// _Lists[currentList].inventory in a third-party SwipeListView, handles
+// selection buttons, etc
 
 // react, RN, community imports
 import { useState, useEffect } from 'react';
@@ -12,6 +13,7 @@ import { Button, Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // custom component imports
+import ItemEditModal from '../dialogs/ItemEditModal';
 import Header from '../components/HeaderComponent';
 import Footer from '../components/FooterComponent';
 import ItemDisplay from '../components/ItemDisplayComponent';
@@ -27,82 +29,63 @@ import { useXstate } from '../res/Xstate';
 
 export default function ItemStoreScreen() {
 	const {
-		listData,
 		itemToEdit,
 		showItemEdit,
 		drawerCtl,
 		dispatch,
-		setXstate
+		setXstate,
+		timestamp,
+		listData,
+		debugMsg
 	} = useXstate();
-
-
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
 	const { sortOpts } = useSelector(S => S.options);
 
-/*
-	const [ showEditItemModal, setShowEditItemModal ] = useState(false);
-	const [ itemToEdit, setItemToEdit ] = useState(Object.keys(_ItemStore)[0]);
-	const [ showDeleteDialog, setShowDeleteDialog ] = useState(false);
-	const [ itemToDelete, setItemToDelete ] = useState('');
-	const [ listData, setListData ] = useState([]);
-*/
-
-	const toggleItemEditModal = _ => {
-		console.log('toggleItemEditModal called');
-		setXstate({ 'showItemEdit': !Xstate.showItemEdit });
-	}
+	debugMsg('CurrentListScreen rendered with Xstate: '+useXstate(), Utils.VERBOSE);
 
 	const generateListData = _ => {
-		console.log('Istore: generateListData');
-		return Utils.sortList(Object.keys(_ItemStore).map(itemID => {
-			return {
-				id: itemID,
-				..._ItemStore[itemID],
-				history: [ ..._History[itemID] ],
-				images: [ ..._Images[itemID] ]
-			}
-		}), sortOpts);
-	}
 
-	const handleCheckBox = itemID => {
-		// Add or remove item from current list
-		if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
-			// if it's in the list, remove it
-			dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
-		} else {
-			// if it's not in the list, add it
-			const itemRef = _ItemStore[itemID];
-			dispatch(Lists.addItemToList([ itemID,
-				{
-					inCart: false,
-					purchaseBy: itemRef.interval && _History[itemID] && _History[itemID].length
-						? _History[itemID][0] + (itemRef.interval * 86400000)
-						: 0,
-					qty: itemRef.defaultQty || '1'
-				},
-				currentList
-			]));
-			if(!itemRef.parents.includes(currentList))
-				dispatch(Istore.updateItem([ itemID,
-					{
-						parents: [
-							...itemRef.parents,
-							currentList
-						]
+		// Data for each listed item is stored in two places: Inventory has the
+		// largely-immutable stuff and Lists has the daily changes.  The props
+		// don't share names so we can just merge them to build our item data set.
+		return Utils.sortList(
+			Object.keys(_ItemStore).map(itemID => {
+				Utils.debugMsg('Mapping refList.inventory: '+itemID, Utils.VERBOSE);
+
+				let retOb = {
+					id: itemID,
+					..._ItemStore[itemID],
+					images: [ ..._Images[itemID] || []],
+					history: [ ..._History[itemID] || []],
+					staple: _Lists[currentList].staples.includes(itemID)
+				};
+
+				// append list metadata if the item is in the current list
+				// Is this really necessary?
+				if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
+					retOb = {
+						...retOb,
+						..._Lists[currentList].inventory[itemID],
 					}
-				]));
-		}
+				};
+
+				return retOb;
+			}
+		), sortOpts);
+
 	}
 
 	const handleSweep = (itemID, rowMap) => {
-		const { props: { item }} = rowMap[itemID];
+		// in this view, sweep deletes the item from the itemstore
+		// Pop up an alert to confirm, and on confirmation trigger delete function
+		rowMap[itemID].closeRow();
 
-		// swipe item to bring up delete item alert
 		Alert.alert(
-			'Delete item?',
-			`Are you sure you want to delete ${item.name} from ` +
-			`the item store?  This will erase all detail and purchase history!`,
+			'Delete item',
+			`Are you sure you wish to delete ${_ItemStore[itemID].name} from your `+
+			`item store?  The item will be removed from all lists and all `+
+			`item history will be lost!`,
 			[
 				{
 					text: 'Cancel',
@@ -110,78 +93,56 @@ export default function ItemStoreScreen() {
 				},
 				{
 					text: 'Confirm',
-					onPress: _ => deleteItem(itemID)
+					onPress: _ => handleDeleteItem(itemID)
 				}
-			]
+			],
+			{ cancelable: true }
 		);
 	}
 
-	const deleteItem = itemID => {
-		dispatch(Istore.deleteItem(itemID));
-
+	const handleDeleteItem = itemID => {
 		Object.keys(_Lists).forEach(listID => {
 			if(Object.keys(_Lists[listID].inventory).includes(itemID))
 				dispatch(Lists.deleteItemFromList([ itemID, listID ]));
 		});
-	}
 
-	const handleSweepAll = _ => {
-		// this does the same thing as CurrentListScreen
-		listData.filter(item => item.inCart).forEach(item => {
-			dispatch(Istore.updateItem(
-				item.id,
-				{
-					history: [ Date.now(), ...item.history ],
-				}
-			));
-			dispatch(Lists.deleteItemFromList(item.id));
-		});
+		dispatch(Istore.deleteItem(itemID));
 	}
 
 	const handleToggleStaple = itemID => {
-		console.log('handleToggleStaple called with item', itemID);
+		Utils.debugMsg('handleToggleStaple: '+itemID, Utils.VERBOSE);
 
 		const staples = [ ..._Lists[currentList].staples ];
 
 		if(staples.includes(itemID)) // remove itemID from array
-			dispatch(Lists.updateList([ currentList,
+			dispatch(Lists.updateList([
+				currentList,
 				{
 					staples: staples.filter(i => i !== itemID)
 				}
 			]));
 		else // add itemID to array
-			dispatch(Lists.updateList([ currentList,
+			dispatch(Lists.updateList([
+				currentList,
 				{
 					staples: [ ...staples, itemID ]
 				}
 			]));
 	};
 
-	const editItem = itemID => {
-		setItemToEdit({ itemID });
+	const editItem = (itemID, rowMap) => {
+		debugMsg('editItem:\n\titemID: '+JSON.stringify(itemID)+'\n\trowMap: '+rowMap);
+		rowMap[itemID].closeRow();
 
-		setShowEditItemModal(!showEditItemModal);
-	}
-
-	const handleDateChange = (item, date) => {
-		console.log('handleDateChange called with\n\titem:', item, '\n\tdate:', date);
-
-		dispatch(Lists.updateItemInList(
-			[
-				item.id,
-				{
-					..._Lists[currentList].inventory[item.id],
-					purchaseBy: date.getTime()
-				},
-				currentList
-			]
-		));
+		setXstate({
+			'itemToEdit': itemID,
+			'showItemEdit': true
+		});
 	}
 
 	const renderItem = (data, rowMap) => {
-		// this needs to be redone since it isn't going to have the list
-		// data with it
 		const { item } = data;
+		Utils.debugMsg('renderItem: '+JSON.stringify(item, null, 2), Utils.VERBOSE);
 		return (
 			<ItemDisplay
 				item={item}
@@ -200,7 +161,7 @@ export default function ItemStoreScreen() {
 			}}>
 				<Button
 					onPress={_ => {
-							editItem(item.id);
+							editItem(item.id, rowMap);
 						}
 					}
 					icon={
@@ -236,16 +197,27 @@ export default function ItemStoreScreen() {
 	// since state changes asynchronously we need to check against the state
 	// value rather than calling the update method after dispatching a state change
 
-	//useEffect(_ => setListData(generateListData()), [ _ItemStore ]);
-	useEffect(_ => setXstate({ 'listData': generateListData() }), [ _ItemStore ]);
+	useEffect(_ => {
+		Utils.debugMsg('Subbing to listData: '+currentList, Utils.VERBOSE);
+		const newData = generateListData();
+		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
+		//setListData(newData);
+		setXstate({ "listData": newData });
+	}, [ currentList, _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
+
+	useEffect(_ => console.log(timestamp(), 'itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
 	return (
 		<>
 			<SwipeListView
 				data={listData}
+				key={listData}
 				renderItem={renderItem}
 				renderHiddenItem={renderHiddenItem}
-				keyExtractor={item => item.id}
+				keyExtractor={item => {
+					Utils.debugMsg('SwipeListView key extracted: '+item.id, Utils.VERBOSE);
+					return item.id;
+				}}
 				rightOpenValue={-100}
 				leftActivationValue={75}
 				leftActionValue={500}

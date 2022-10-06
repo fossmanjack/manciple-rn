@@ -48,7 +48,9 @@ export function XstateProvider(props) {
 		timestamp: Utils.timestamp,
 		debugMsg: Utils.debugMsg,
 		genuuid: Utils.genuuid,
-		setXstate
+		setXstate,
+		token: '',
+		password: ''
 	});
 	Utils.debugMsg('XstateContext:\n\ttransientState: '+JSON.stringify(transientState)+
 		'\n\tXstate Context: '+JSON.stringify(useContext(XstateContext)));

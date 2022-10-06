@@ -1,3 +1,31 @@
+### Sync (as of 2022-10-04)
+
+Seneschal (server -> DB) receives and stores dispatches and also maintains a local
+copy of the Redux state.  When a client reconnects, the dispatches it missed are
+sent in chronological order (by timestamp), allowing the client state to reconcile.
+
+If the client hasn't connected in more than $TIMEOUT, the full Redux state object
+is sent instead.
+
+Implement a "LOCK" state for each datum so that when it's open in one app it can't
+be altered in another.  Alternatively, the "lock" is manual.
+
+This is based on websockets.  I don't think I care about DAV anymore.
+
+### WAIT!
+
+You can store dispatches server-side for each known client!  Or each known user!
+What if we were to treat each datum as a "room" that all users with access are
+subscribed to, and then ... and then.
+
+Well, either way, we can store dispatches on a per-user basis, so when you reconnect
+you get played back all the dispatches you missed no matter how long you've been
+logged out for.  And it can be a per-app thing too.  (Of course, the best case is
+if we can set the app to long-poll every half hour or so in the background, and then
+pop a notification if there have been important changes.)
+
+
+---
 ### Sync flow
 
 1. retrieve remote manifest and load

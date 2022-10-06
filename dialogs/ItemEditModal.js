@@ -55,7 +55,14 @@ export default function ItemEditModal() {
 
 	const handleCommit = _ => {
 		if(Object.keys(updatedItem).length) { // only do stuff if there are changes
-			const newItem = { ...updatedItem };
+			const newItem = {};
+
+			// sanitize the inputs as needed
+			Object.keys(updatedItem).forEach(key => {
+				if(typeof updatedItem[key] === 'string')
+					newItem[key] = updatedItem[key].trim();
+				else newItem[key] = updatedItem[key];
+			});
 
 			const toList = {};
 
@@ -141,7 +148,7 @@ export default function ItemEditModal() {
 
 	const handleClose = _ => setXstate({ showItemEdit: false });
 
-	const setProp = (field, val) => setUpdatedItem({ ...updatedItem, [field]: val.trim() });
+	const setProp = (field, val) => setUpdatedItem({ ...updatedItem, [field]: val });
 /*
 		setUpdatedItem({ ...updatedIte
 		console.log('setProp', field, val);

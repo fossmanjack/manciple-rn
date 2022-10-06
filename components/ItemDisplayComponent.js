@@ -38,6 +38,7 @@ import { useXstate } from '../res/Xstate';
 export default function ItemDisplay({ item }) {
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History } = useSelector(S => S.itemStore);
+	const { uuid } = useSelector(S => S.user);
 	const [ showCalendar, setShowCalendar ] = useState(false);
 	const [ currentImageIndex, setCurrentImageIndex ] = useState(0);
 	const [ pickDate, setPickDate ] = useState(new Date(Date.now()));
@@ -65,7 +66,21 @@ export default function ItemDisplay({ item }) {
 				dispatch(Lists.deleteItemFromList([ itemID, currentList ]));
 
 			} else {
-				dispatch(Lists.addItemToList([ itemID, currentList ]));
+				let purchaseBy = 0;
+				if(refItem.interval) {
+					let lastBuy = _History[itemID] && _History[itemID][0] ? _History[itemID][0] : Date.now();
+					purchaseBy = lastBuy + (refItem.interval * 86400000);
+				}
+				dispatch(Lists.addItemToList([
+					itemID,
+					{
+						inCart: false,
+						qty: refItem.defaultQty || '1',
+						addedBy: uuid,
+						purchaseBy
+					},
+					currentList
+				]));
 				if(!refItem.parents.includes(currentList))
 					dispatch(Istore.updateItem([
 						itemID,
@@ -166,8 +181,8 @@ Solutions:
 							type='clear'
 							icon={_ => (
 								<Icon
-									name={listed ? 'minus' : 'plus'}
-									color={listed ? 'red' : 'green'}
+									name={Object.keys(_Lists[currentList].inventory).includes(item.id) ? 'minus' : 'plus'}
+									color={Object.keys(_Lists[currentList].inventory).includes(item.id) ? 'red' : 'green'}
 									type='font-awesome'
 									size={32}
 								/>
@@ -281,6 +296,14 @@ Solutions:
 						}}
 						onPress={_ => editTags(item)}
 					/>
+				</View>
+				<View>
+					<Text style={_Styles.textItemDetailLabel}>
+						Added by:
+					</Text>
+					<Text style={_Styles.textItemDetailText}>
+						{item.addedBy || '-'}
+					</Text>
 				</View>
 				<View style={{ flexDirection: 'row' }}>
 					<View style={{ flex: 3 }}>

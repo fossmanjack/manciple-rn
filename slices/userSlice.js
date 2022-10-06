@@ -1,11 +1,12 @@
-// Hopefully excluded from persistence, this slice handles the logged in
-// user's userinfo
+// Handles the non-private users info -- password and token are kept in secure
+// storage and loaded into Xstate
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
 	username: null,
-	password: null,
+	uuid: null,
 	userAvi: null,
+	knownUsers: {}
 }
 
 const userSlice = createSlice({
@@ -14,7 +15,17 @@ const userSlice = createSlice({
 	reducers: {
 		setUserAvi: (userState, action) => { return { ...userState, userAvi: action.payload }},
 		setUsername: (userState, action) => { return { ...userState, username: action.payload }},
-		setPassword: (userState, action) => { return { ...userState, password: action.payload }}
+		setUUID: (uState, action) => { return { ...uState, uuid: action.payload }},
+		setKnownUsers: (uState, action) => { return { ...uState, knownUsers: action.payload }},
+		addKnownUser: (uState, action) => {
+			return {
+				...uState,
+				knownUsers: {
+					...uState.knownUsers,
+					...action.payload
+				}
+			}
+		}
 	},
 });
 
@@ -22,6 +33,8 @@ export const userReducer = userSlice.reducer;
 
 export const {
 	setUsername,
-	setPassword,
 	setUserAvi,
+	setUUID,
+	setKnownUsers,
+	addKnownUser
 } = userSlice.actions;
