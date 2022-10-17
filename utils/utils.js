@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import uuid from 'react-native-uuid';
+import RNuuid from 'react-native-uuid';
 //import { _Store } from '../res/_Store';
 
 // global constants
@@ -71,7 +71,7 @@ export const debugMsg = (fun, params=[], dlvl=9) => {
 
 export const genuuid = len => {
 	if(len) return Math.random().toString(16).slice(2, len > 13 ? 15 : 2 + len);
-	else return uuid.v4();
+	else return RNuuid.v4();
 }
 
 export const calculateInterval = item => {
@@ -120,7 +120,8 @@ export const createListItem = props => {
 		notes = '',
 		defaultQty = '',
 		creationDate = Date.now(),
-		modifyDate = Date.now()
+		modifyDate = Date.now(),
+		uuid = null
 	} = props;
 
 	return ({
@@ -137,7 +138,10 @@ export const createListItem = props => {
 		notes,
 		defaultQty,
 		creationDate,
-		modifyDate
+		modifyDate,
+		createdBy: uuid,
+		access: [ uuid ],
+		modifiedBy: uuid
 	});
 }
 
@@ -154,7 +158,8 @@ export const createShoppingList = props => {
 		staples = [ ],
 		sync = false,
 		type = 'shoppingList',
-		version = '1'
+		version = '1',
+		uuid = null
 	} = props;
 
 	return ({
@@ -165,7 +170,10 @@ export const createShoppingList = props => {
 		staples,
 		sync,
 		type,
-		version
+		version,
+		createdBy: uuid,
+		modifiedBy: uuid,
+		access: [ uuid ]
 	});
 }
 

@@ -19,7 +19,10 @@ export const LISTS = {
 			'3b706aa4-5f33-4aff-95ee-158c0523adea',
 			'f5218e83-fea6-4ba4-9254-2889e579cba7',
 		],
-		sync: false
+		sync: false,
+		access: [],
+		createdBy: '',
+		modifiedBy: ''
 	},
 	[uuid.v4()]: {
 		name: 'Hardware store',
@@ -37,12 +40,18 @@ export const LISTS = {
 		staples: [
 
 		],
-		sync: false
+		sync: false,
+		access: [],
+		createdBy: '',
+		modifiedBy: ''
 	}
 }
 
 export const ITEMSTORE = {
 	'd3bebaa4-d834-49cd-852e-a64f6638a2b4': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Milk',
 		tags: [ 'drink', 'grocery', 'dairy' ],
 		type: 'item',
@@ -55,11 +64,15 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'3b706aa4-5f33-4aff-95ee-158c0523adea': {
 		name: 'Bread',
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		tags: [ 'food', 'grocery', 'starch' ],
 		type: 'item',
 		version: 1,
@@ -71,10 +84,14 @@ export const ITEMSTORE = {
 		notes: 'Something multi-grain',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'f5218e83-fea6-4ba4-9254-2889e579cba7': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Soda',
 		tags: [ 'drink', 'softDrink', 'grocery' ],
 		type: 'item',
@@ -87,10 +104,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'910f2d0e-be22-4957-9e16-a716649837bd': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Coffee',
 		tags: [ 'drink', 'breakfast', 'grocery' ],
 		type: 'item',
@@ -103,10 +124,14 @@ export const ITEMSTORE = {
 		notes: 'Fresh-ground arabica, medium roast',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'dc17c8aa-8cc4-4806-9cc3-032b718a9b9b': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Lettuce',
 		tags: [ 'food', 'grocery', 'produce' ],
 		type: 'item',
@@ -119,10 +144,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'05e4e5a9-1d69-49dc-9166-e3b13e7b9dcb': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Trash bags',
 		tags: [ 'household', 'maintenance' ],
 		type: 'item',
@@ -135,10 +164,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'b5cebc8a-1fd4-4a95-9eba-0a7dbdc97298': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'AAA batteries',
 		tags: [ 'hardware', 'battery', 'household' ],
 		type: 'item',
@@ -151,10 +184,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'd345f31d-72e3-4e00-a233-cb1796060232': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Borax',
 		tags: [ 'household', 'laundry', 'cleaning' ],
 		type: 'item',
@@ -167,10 +204,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'ec2851ac-af2c-4971-9c75-c2bb2b236eb0': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Mop',
 		tags: [ 'tool', 'household', 'cleaning' ],
 		type: 'item',
@@ -183,10 +224,14 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	},
 	'09ec4d24-5f47-48c0-9d44-5c6f297fd640': {
+		access: [],
+		createdBy: '',
+		modifiedBy: '',
 		name: 'Parchment paper',
 		tags: [ 'kitchen', 'baking' ],
 		type: 'item',
@@ -199,6 +244,7 @@ export const ITEMSTORE = {
 		notes: '',
 		parents: [ ],
 		defaultQty: '',
+		defaultPriority: 1,
 		creationDate: Date.now(),
 		modifyDate: Date.now()
 	}
