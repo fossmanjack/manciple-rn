@@ -31,12 +31,14 @@ export default function ItemStoreScreen() {
 	const {
 		itemToEdit,
 		showItemEdit,
+		inputText,
 		drawerCtl,
 		dispatch,
 		setXstate,
 		timestamp,
 		listData,
-		debugMsg
+		debugMsg,
+		parseName
 	} = useXstate();
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore, _History, _Images } = useSelector(S => S.itemStore);
@@ -45,35 +47,67 @@ export default function ItemStoreScreen() {
 	debugMsg('CurrentListScreen rendered with Xstate: '+useXstate(), Utils.VERBOSE);
 
 	const generateListData = _ => {
-
 		// Data for each listed item is stored in two places: Inventory has the
 		// largely-immutable stuff and Lists has the daily changes.  The props
 		// don't share names so we can just merge them to build our item data set.
-		return Utils.sortList(
-			Object.keys(_ItemStore).map(itemID => {
-				Utils.debugMsg('Mapping refList.inventory: '+itemID, Utils.VERBOSE);
+		let keys, retOb;
 
-				let retOb = {
-					id: itemID,
-					..._ItemStore[itemID],
-					images: [ ..._Images[itemID] || []],
-					history: [ ..._History[itemID] || []],
-					staple: _Lists[currentList].staples.includes(itemID)
-				};
+		if(inputText) {
+			const rx = new RegExp(parseName(inputText));
+			const srx = new RegExp('^'+parseName(inputText));
 
-				// append list metadata if the item is in the current list
-				// Is this really necessary?
-				if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
+			return Object.keys(_ItemStore)
+				.filter(itemID => rx.test(parseName(_ItemStore[itemID].name)))
+				.map(itemID => {
 					retOb = {
-						...retOb,
-						..._Lists[currentList].inventory[itemID],
-					}
-				};
+						id: itemID,
+						..._ItemStore[itemID],
+						images: [ ..._Images[itemID] || []],
+						history: [ ..._History[itemID] || []],
+						staple: _Lists[currentList].staples.includes(itemID)
+					};
 
-				return retOb;
-			}
-		), sortOpts);
+					if(Object.keys(_Lists[currentList].inventory).includes(itemID))
+						retOb = { ...retOb, ..._Lists[currentList].inventory[itemID] };
 
+					return retOb;
+				})
+				.sort((a, b) => {
+					let x = parseName(a.name);
+					let y = parseName(b.name);
+
+					if(srx.test(x)) return -1;
+					if(srx.test(y)) return 1;
+
+					return x > y ? 1 : x < y ? -1 : 0;
+				});
+		} else {
+			return Utils.sortList(
+				Object.keys(_ItemStore)
+					.map(itemID => {
+					Utils.debugMsg('Mapping refList.inventory: '+itemID, Utils.VERBOSE);
+
+					let retOb = {
+						id: itemID,
+						..._ItemStore[itemID],
+						images: [ ..._Images[itemID] || []],
+						history: [ ..._History[itemID] || []],
+						staple: _Lists[currentList].staples.includes(itemID)
+					};
+
+					// append list metadata if the item is in the current list
+					// Is this really necessary?
+					if(Object.keys(_Lists[currentList].inventory).includes(itemID)) {
+						retOb = {
+							...retOb,
+							..._Lists[currentList].inventory[itemID],
+						}
+					};
+
+					return retOb;
+				}
+			), sortOpts);
+		}
 	}
 
 	const handleSweep = (itemID, rowMap) => {
@@ -203,7 +237,7 @@ export default function ItemStoreScreen() {
 		Utils.debugMsg('newData generated with '+newData.length+' items', Utils.VERBOSE);
 		//setListData(newData);
 		setXstate({ "listData": newData });
-	}, [ currentList, _Lists[currentList].inventory, _ItemStore, _History, _Images ]);
+	}, [ currentList, _Lists[currentList].inventory, _ItemStore, _History, _Images, inputText ]);
 
 	useEffect(_ => console.log(timestamp(), 'itemToEdit changed!', itemToEdit), [ itemToEdit ]);
 
