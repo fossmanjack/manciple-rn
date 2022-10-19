@@ -38,6 +38,7 @@ export function XstateProvider(props) {
 		showSortOrder: false,
 		showTagEdit: false,
 		deleteItems: false,
+		inputText: '',
 		dispatch: useDispatch(),
 		sanitize: Utils.sanitize,
 		camelize: Utils.camelize,

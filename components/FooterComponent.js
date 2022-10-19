@@ -30,10 +30,12 @@ export default function Footer() {
 		dumpXstate,
 		parseName,
 		checkCollision,
-		listData
+		listData,
+		inputText,
+		setXstate
 	} = useXstate();
 	//const { funs: { dispatch, parseName, checkCollision } } = _Xstate;
-	const [ inputText, setInputText ] = useState('');
+	//const [ inputText, setInputText ] = useState('');
 	const { _Lists, currentList } = useSelector(S => S.lists);
 	const { _ItemStore } = useSelector(S => S.itemStore);
 	const { uuid } = useSelector(S => S.user);
@@ -183,6 +185,8 @@ export const getAllTags = _ => {
 		setInputText('');
 
 	}
+
+	const setInputText = text => setXstate({ inputText: text });
 
 	const handleSweepAll = _ => {
 
