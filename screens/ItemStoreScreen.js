@@ -57,7 +57,10 @@ export default function ItemStoreScreen() {
 			const srx = new RegExp('^'+parseName(inputText));
 
 			return Object.keys(_ItemStore)
-				.filter(itemID => rx.test(parseName(_ItemStore[itemID].name)))
+				.filter(itemID =>
+					rx.test(parseName(_ItemStore[itemID].name)) ||
+					_ItemStore[itemID].tags.find(tag => rx.test(parseName(tag)))
+				)
 				.map(itemID => {
 					retOb = {
 						id: itemID,
